@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.core.common.mapper.UserInfoMapper">
+    <resultMap id="BaseResultMap" type="com.example.core.common.entity.UserInfo">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="user_id" property="userId" jdbcType="VARCHAR"/>
+        <result column="avatar" property="avatar" jdbcType="VARCHAR"/>
+        <result column="account" property="account" jdbcType="VARCHAR"/>
+        <result column="login_pwd" property="loginPwd" jdbcType="VARCHAR"/>
+        <result column="nick_name" property="nickName" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="email" property="email" jdbcType="VARCHAR"/>
+        <result column="market" property="market" jdbcType="VARCHAR"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="discount" property="discount" jdbcType="DECIMAL"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="login_limit" property="loginLimit" jdbcType="INTEGER"/>
+        <result column="login_time" property="loginTime" jdbcType="TIMESTAMP"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="login_ip" property="loginIp" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id
+        ,avatar, user_id, account, login_pwd, nick_name, phone, email, market, type, discount,
+    status, login_limit, login_time, remark, create_time, update_time, login_ip
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from w_user_info
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectByPhone" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from w_user_info
+        where phone = #{phone,jdbcType=VARCHAR} or email = #{phone,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from w_user_info
+        where user_id = #{userId,jdbcType=VARCHAR}
+    </select>
+
+
+    <select id="selectAllNum" resultType="java.lang.Integer">
+        select count(1) as num
+        from w_user_info
+        where type = 0
+    </select>
+
+
+    <select id="selectActiveNum" resultType="java.lang.Integer">
+        select count(1) as num
+        from (
+                 select u.user_id
+                 from t_product_info as p
+                          left join
+                      t_order_info as o on o.order_no = p.order_no
+                          left join
+                      w_user_info as u on u.user_id = o.user_id
+                 where date_format(p.end_time, '%Y-%m-%d') >= date_format(now(), '%Y-%m-%d')
+                   and date_format(now(), '%Y-%m-%d') >= date_format(p.create_time, '%Y-%m-%d')
+                   and u.type = 0
+                 group by u.user_id) as t
+    </select>
+
+
+<!--    <select id="selectCreateNum" resultType="com.example.core.common.vo.user.CreateNum">-->
+<!--        select count(1)                                                as num,-->
+<!--               date_format(create_time, #{dateStyle,jdbcType=VARCHAR}) as dateStr-->
+<!--        from w_user_info-->
+<!--        where date_format(create_time, #{dateStyle,jdbcType=VARCHAR}) >= #{startTime,jdbcType=VARCHAR}-->
+<!--          and #{endTime,jdbcType=VARCHAR} >= date_format(create_time, #{dateStyle,jdbcType=VARCHAR})-->
+<!--        group by date_format(create_time, #{dateStyle,jdbcType=VARCHAR})-->
+<!--    </select>-->
+
+    <select id="queryActiveNum" resultType="java.lang.Integer" parameterType="java.util.Map">
+        select COALESCE(count(1), 0) as num
+        from (
+                 select u.user_id
+                 from t_product_info as p
+                          left join
+                      t_order_info as o on o.order_no = p.order_no
+                          left join
+                      w_user_info as u on u.user_id = o.user_id
+                 where u.type = 0
+                   and date_format(p.end_time, #{dateStyle,jdbcType=VARCHAR}) >= #{dateStr,jdbcType=VARCHAR}
+                   and #{dateStr,jdbcType=VARCHAR} >= date_format(p.create_time, #{dateStyle,jdbcType=VARCHAR})
+                 group by u.user_id
+             ) as t
+
+    </select>
+
+
+    <select id="selectByType" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from w_user_info
+        where type = #{type,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectByMarket" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from w_user_info
+        where market = #{market,jdbcType=VARCHAR}
+    </select>
+
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from w_user_info
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.example.core.common.entity.UserInfo">
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into w_user_info (user_id,avatar, account, login_pwd,
+        nick_name, phone, email,
+        market, type, discount,
+        status, login_limit, login_time,
+        remark, create_time, update_time,
+        login_ip)
+        values (#{userId,jdbcType=VARCHAR},#{avatar,jdbcType=VARCHAR}, #{account,jdbcType=VARCHAR},
+        #{loginPwd,jdbcType=VARCHAR},
+        #{nickName,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},
+        #{market,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{discount,jdbcType=DECIMAL},
+        #{status,jdbcType=INTEGER}, #{loginLimit,jdbcType=INTEGER}, #{loginTime,jdbcType=TIMESTAMP},
+        #{remark,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
+        #{loginIp,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.example.core.common.entity.UserInfo">
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into w_user_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="avatar != null">
+                avatar,
+            </if>
+            <if test="account != null">
+                account,
+            </if>
+            <if test="loginPwd != null">
+                login_pwd,
+            </if>
+            <if test="nickName != null">
+                nick_name,
+            </if>
+            <if test="phone != null">
+                phone,
+            </if>
+            <if test="email != null">
+                email,
+            </if>
+            <if test="market != null">
+                market,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="discount != null">
+                discount,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="loginLimit != null">
+                login_limit,
+            </if>
+            <if test="loginTime != null">
+                login_time,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="loginIp != null">
+                login_ip,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                #{userId,jdbcType=VARCHAR},
+            </if>
+            <if test="avatar != null">
+                #{avatar,jdbcType=VARCHAR},
+            </if>
+            <if test="account != null">
+                #{account,jdbcType=VARCHAR},
+            </if>
+            <if test="loginPwd != null">
+                #{loginPwd,jdbcType=VARCHAR},
+            </if>
+            <if test="nickName != null">
+                #{nickName,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="market != null">
+                #{market,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=INTEGER},
+            </if>
+            <if test="discount != null">
+                #{discount,jdbcType=DECIMAL},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="loginLimit != null">
+                #{loginLimit,jdbcType=INTEGER},
+            </if>
+            <if test="loginTime != null">
+                #{loginTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="loginIp != null">
+                #{loginIp,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.example.core.common.entity.UserInfo">
+        update w_user_info
+        <set>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=VARCHAR},
+            </if>
+            <if test="avatar != null">
+                avatar = #{avatar,jdbcType=VARCHAR},
+            </if>
+            <if test="account != null">
+                account = #{account,jdbcType=VARCHAR},
+            </if>
+            <if test="loginPwd != null">
+                login_pwd = #{loginPwd,jdbcType=VARCHAR},
+            </if>
+            <if test="nickName != null">
+                nick_name = #{nickName,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null">
+                phone = #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                email = #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="market != null">
+                market = #{market,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=INTEGER},
+            </if>
+            <if test="discount != null">
+                discount = #{discount,jdbcType=DECIMAL},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="loginLimit != null">
+                login_limit = #{loginLimit,jdbcType=INTEGER},
+            </if>
+            <if test="loginTime != null">
+                login_time = #{loginTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="loginIp != null">
+                login_ip = #{loginIp,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.example.core.common.entity.UserInfo">
+        update w_user_info
+        set user_id     = #{userId,jdbcType=VARCHAR},
+            avatar      = #{avatar,jdbcType=VARCHAR},
+            account     = #{account,jdbcType=VARCHAR},
+            login_pwd   = #{loginPwd,jdbcType=VARCHAR},
+            nick_name   = #{nickName,jdbcType=VARCHAR},
+            phone       = #{phone,jdbcType=VARCHAR},
+            email       = #{email,jdbcType=VARCHAR},
+            market      = #{market,jdbcType=VARCHAR},
+            type        = #{type,jdbcType=INTEGER},
+            discount    = #{discount,jdbcType=DECIMAL},
+            status      = #{status,jdbcType=INTEGER},
+            login_limit = #{loginLimit,jdbcType=INTEGER},
+            login_time  = #{loginTime,jdbcType=TIMESTAMP},
+            remark      = #{remark,jdbcType=VARCHAR},
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            update_time = #{updateTime,jdbcType=TIMESTAMP},
+            login_ip    = #{loginIp,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <select id="selectList" resultType="com.example.core.common.vo.user.SelectListVO" parameterType="java.util.Map">
+        select
+        u.id, u.user_id as userId, u.account, u.nick_name as nickName, u.phone, u.email, u.market, u.type,
+        u.status, u.remark, u.create_time as createTime, u.update_time as updateTime, uf.valid_num as validNum,
+        IFNULL(count(ud.id),0)as discountNum
+        from
+        w_user_info as u
+        left join
+        w_user_finance as uf on uf.user_id = u.user_id
+        left join
+        w_user_discount as ud on ud.user_id = u.user_id
+        where 1 = 1
+        <if test="account != null">
+            and (u.account = #{account,jdbcType=VARCHAR} or u.phone = #{account,jdbcType=VARCHAR} or u.email =
+            #{account,jdbcType=VARCHAR})
+        </if>
+        <if test="status != null">
+            and u.status = #{status,jdbcType=INTEGER}
+        </if>
+        <if test="remark != null">
+            and u.remark like '%${remark}%'
+        </if>
+        <if test="nickName != null">
+            and u.nick_name like '%${nickName}%'
+        </if>
+        <if test="startTime != null">
+            and u.create_time >= #{startTime,jdbcType=VARCHAR}
+        </if>
+        <if test="endTime != null">
+            and #{endTime,jdbcType=VARCHAR} >= u.create_time
+        </if>
+        group by u.user_id
+        order by u.create_time desc
+    </select>
+
+
+    <select id="selectListNew" resultType="com.example.core.common.vo.user.SelectListVO" parameterType="java.util.Map">
+        select t.*
+        from(
+        select
+        u.id, u.user_id as userId, u.account, u.nick_name as nickName, u.phone, u.email, u.market, u.type,
+        u.status, u.remark, u.create_time as createTime, u.update_time as updateTime, uf.valid_num as validNum,
+        COUNT(CASE WHEN p.product_no is not null THEN 1 ELSE NULL END) as productNum
+        from
+        w_user_info as u
+        left join
+        w_user_finance as uf on uf.user_id = u.user_id
+        left join
+        t_order_info as o on o.user_id = u.user_id
+        left join
+        t_product_info as p on p.order_no = o.order_no and (p.status = 2 or p.status = 3)
+        where 1 = 1
+        <if test="account != null">
+            and (u.account = #{account,jdbcType=VARCHAR} or u.phone = #{account,jdbcType=VARCHAR} or u.email =
+            #{account,jdbcType=VARCHAR})
+        </if>
+        <if test="status != null">
+            and u.status = #{status,jdbcType=INTEGER}
+        </if>
+        <if test="remark != null">
+            and u.remark like '%${remark}%'
+        </if>
+        <if test="nickName != null">
+            and u.nick_name like '%${nickName}%'
+        </if>
+        <if test="startTime != null">
+            and u.create_time >= #{startTime,jdbcType=VARCHAR}
+        </if>
+        <if test="endTime != null">
+            and #{endTime,jdbcType=VARCHAR} >= u.create_time
+        </if>
+        group by u.user_id
+        )as t
+        <if test="sort == 0">
+            order by t.createTime desc
+        </if>
+        <if test="sort == 1">
+            order by t.createTime
+        </if>
+        <if test="sort == 2">
+            order by t.productNum desc
+        </if>
+        <if test="sort == 3">
+            order by t.productNum
+        </if>
+        <if test="sort == 4">
+            order by t.validNum desc
+        </if>
+        <if test="sort == 5">
+            order by t.validNum
+        </if>
+    </select>
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        select *
+        from w_user_info
+        where user_id = #{userId}
+    </select>
+<!--    <select id="batchQueryActiveNum" resultType="com.example.core.common.vo.user.CreateNum">-->
+<!--         <![CDATA[-->
+<!--        SELECT DATE_FORMAT(p.create_time, #{dateStyle}) AS dateStr,-->
+<!--               COUNT(DISTINCT u.user_id)                AS num-->
+<!--        FROM t_product_info AS p-->
+<!--                 LEFT JOIN t_order_info AS o ON o.order_no = p.order_no-->
+<!--                 LEFT JOIN w_user_info AS u ON u.user_id = o.user_id-->
+<!--        WHERE u.type = 0-->
+<!--          &#45;&#45; 核心：按原逻辑筛选「日期Str在p的create和end时间之间」-->
+<!--          AND DATE_FORMAT(p.create_time, #{dateStyle}) BETWEEN #{startTime} AND #{endTime}-->
+<!--          AND DATE_FORMAT(p.end_time, #{dateStyle}) >= DATE_FORMAT(p.create_time, #{dateStyle})-->
+<!--        GROUP BY DATE_FORMAT(p.create_time, #{dateStyle})-->
+<!--        ]]>-->
+<!--    </select>-->
+    <select id="selectAllActiveDateRanges" resultType="map">
+        <![CDATA[
+        SELECT DATE_FORMAT(p.create_time, #{dateStyle}) AS createFmt,
+               DATE_FORMAT(p.end_time, #{dateStyle})    AS endFmt
+        FROM t_product_info p
+                 LEFT JOIN t_order_info o ON o.order_no = p.order_no
+                 LEFT JOIN w_user_info u ON u.user_id = o.user_id
+        WHERE u.type = 0
+          AND DATE_FORMAT(p.create_time, #{dateStyle}) <= #{endTime}
+          AND DATE_FORMAT(p.end_time, #{dateStyle}) >= #{startTime}
+        ]]>
+    </select>
+    <select id="selectAllActiveUsersWithRange" resultType="map">
+        SELECT DISTINCT u.user_id,
+                        DATE_FORMAT(p.create_time, #{dateStyle}) AS createFmt,
+                        DATE_FORMAT(p.end_time, #{dateStyle})    AS endFmt
+        FROM t_product_info p
+                 LEFT JOIN t_order_info o ON o.order_no = p.order_no
+                 LEFT JOIN w_user_info u ON u.user_id = o.user_id
+        WHERE u.type = 0
+          AND DATE_FORMAT(p.create_time, #{dateStyle}) &lt;= #{endTime}
+          AND DATE_FORMAT(p.end_time, #{dateStyle}) &gt;= #{startTime}
+    </select>
+    <select id="selectByEmail" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from w_user_info
+        where email = #{email,jdbcType=VARCHAR}}
+    </select>
+
+</mapper>

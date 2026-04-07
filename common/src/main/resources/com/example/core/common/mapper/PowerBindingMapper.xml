@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.core.common.mapper.PowerBindingMapper" >
+  <resultMap id="BaseResultMap" type="com.example.core.common.entity.PowerBinding" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="grouping_id" property="groupingId" jdbcType="INTEGER" />
+    <result column="binding_id" property="bindingId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, type, grouping_id, binding_id, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from w_power_binding
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectGroupingByAdmin" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from w_power_binding
+    where binding_id = #{adminId,jdbcType=INTEGER} and type = 0
+  </select>
+
+  <select id="selectPowerByGrouping" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from
+      w_power_binding
+    where
+      type = #{type,jdbcType=INTEGER}
+    and
+      grouping_id in
+    <foreach item="item" collection="list" separator="," open="(" close=")">
+      #{item,jdbcType=INTEGER}
+    </foreach>
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from w_power_binding
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.example.core.common.entity.PowerBinding" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into w_power_binding (type, grouping_id, binding_id,
+      create_time, update_time)
+    values (#{type,jdbcType=INTEGER}, #{groupingId,jdbcType=INTEGER}, #{bindingId,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.example.core.common.entity.PowerBinding" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into w_power_binding
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="groupingId != null" >
+        grouping_id,
+      </if>
+      <if test="bindingId != null" >
+        binding_id,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="type != null" >
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="groupingId != null" >
+        #{groupingId,jdbcType=INTEGER},
+      </if>
+      <if test="bindingId != null" >
+        #{bindingId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.example.core.common.entity.PowerBinding" >
+    update w_power_binding
+    <set >
+      <if test="type != null" >
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="groupingId != null" >
+        grouping_id = #{groupingId,jdbcType=INTEGER},
+      </if>
+      <if test="bindingId != null" >
+        binding_id = #{bindingId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.example.core.common.entity.PowerBinding" >
+    update w_power_binding
+    set type = #{type,jdbcType=INTEGER},
+      grouping_id = #{groupingId,jdbcType=INTEGER},
+      binding_id = #{bindingId,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
