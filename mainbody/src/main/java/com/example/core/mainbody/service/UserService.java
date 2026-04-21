@@ -18,11 +18,11 @@ public interface UserService {
     ResultMessage register(RegisterSO registerSO);
 
     /**
-     * 验证手机号是否存在
-     * @param phone
+     * 验证邮箱是否存在
+     * @param email
      * @return
      */
-    ResultMessage verifyPhone(String phone);
+    ResultMessage verifyEmail(String email);
 
     /**
      * 更新密码
@@ -100,4 +100,9 @@ public interface UserService {
      */
     ResultMessage updatePro(UpdateProSo updateProSo);
 
+
+    /**
+     * 获取用户资产概览（总资产、累计收益、VIP状态）
+     */
+    ResultMessage getUserAssetOverview(String userId);
 }

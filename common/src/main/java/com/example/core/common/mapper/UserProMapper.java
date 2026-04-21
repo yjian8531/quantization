@@ -1,9 +1,6 @@
 package com.example.core.common.mapper;
 
 import com.example.core.common.entity.UserPro;
-import com.example.core.common.vo.finance.QueryCommissionStatisticsVO;
-import com.example.core.common.vo.finance.QueryUserProListVO;
-import com.example.core.common.vo.finance.UserNumVO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -18,23 +15,20 @@ public interface UserProMapper {
 
     UserPro selectByPrimaryKey(Integer id);
 
-    UserPro selectByUserId(@Param("userId") String userId);
-
-    List<QueryCommissionStatisticsVO> selectListByStatistics(@Param("account") String account);
-
-    List<UserPro> selectByUserIds(@Param("list")List<String> list);
-
-    List<UserPro> selectByProUserId(@Param("proUserId") String proUserId);
-
-    List<UserNumVO> selectStatisticsByUserIds(@Param("list")List<String> list);
-
-    List<UserPro> selectByProUserIds(@Param("list")List<String> list);
-
-    List<QueryUserProListVO> selectList(Map<String ,Object> param);
-
     int updateByPrimaryKeySelective(UserPro record);
 
     int updateByPrimaryKey(UserPro record);
+    /** 根据推广人 ID 查询所有下级 */
+    List<UserPro> selectByProUserId(@Param("proUserId") String proUserId);
 
-    String selectProCreateMonth(@Param("userId")String userId);
+//    /** 统计当月新增下级人数 */
+//    int countMonthlyNewUsers(@Param("proUserId") String proUserId, @Param("startTime") String startTime);
+//
+//    /** 统计该推广人的总下级人数 */
+//    int countTotalSubUsers(@Param("proUserId") String proUserId);
+
+    /** 查询推广用户列表（关联用户信息） */
+    List<Map<String, Object>> selectPromotionUsers(@Param("proUserId") String proUserId);
+
+    UserPro selectByUserId(String userId);
 }

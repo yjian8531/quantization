@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.core.common.mapper.ProductInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.example.core.common.entity.ProductInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="product_name" property="productName" jdbcType="VARCHAR" />
+    <result column="level" property="level" jdbcType="INTEGER" />
+    <result column="annual_rate" property="annualRate" jdbcType="DECIMAL" />
+    <result column="monthly_fee" property="monthlyFee" jdbcType="DECIMAL" />
+    <result column="buy_count" property="buyCount" jdbcType="INTEGER" />
+    <result column="total_amount" property="totalAmount" jdbcType="DECIMAL" />
+    <result column="profit_ratio" property="profitRatio" jdbcType="DECIMAL" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+    <result column="cumulative_profit" property="cumulativeProfit" jdbcType="DECIMAL" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, product_name, level, annual_rate, monthly_fee, buy_count, total_amount, profit_ratio, 
+    description, cumulative_profit, status, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from w_product_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from w_product_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.example.core.common.entity.ProductInfo" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into w_product_info (product_name, level, annual_rate, 
+      monthly_fee, buy_count, total_amount, 
+      profit_ratio, description, cumulative_profit, 
+      status, create_time, update_time
+      )
+    values (#{productName,jdbcType=VARCHAR}, #{level,jdbcType=INTEGER}, #{annualRate,jdbcType=DECIMAL}, 
+      #{monthlyFee,jdbcType=DECIMAL}, #{buyCount,jdbcType=INTEGER}, #{totalAmount,jdbcType=DECIMAL}, 
+      #{profitRatio,jdbcType=DECIMAL}, #{description,jdbcType=VARCHAR}, #{cumulativeProfit,jdbcType=DECIMAL}, 
+      #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.example.core.common.entity.ProductInfo" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into w_product_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="productName != null" >
+        product_name,
+      </if>
+      <if test="level != null" >
+        level,
+      </if>
+      <if test="annualRate != null" >
+        annual_rate,
+      </if>
+      <if test="monthlyFee != null" >
+        monthly_fee,
+      </if>
+      <if test="buyCount != null" >
+        buy_count,
+      </if>
+      <if test="totalAmount != null" >
+        total_amount,
+      </if>
+      <if test="profitRatio != null" >
+        profit_ratio,
+      </if>
+      <if test="description != null" >
+        description,
+      </if>
+      <if test="cumulativeProfit != null" >
+        cumulative_profit,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="productName != null" >
+        #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="level != null" >
+        #{level,jdbcType=INTEGER},
+      </if>
+      <if test="annualRate != null" >
+        #{annualRate,jdbcType=DECIMAL},
+      </if>
+      <if test="monthlyFee != null" >
+        #{monthlyFee,jdbcType=DECIMAL},
+      </if>
+      <if test="buyCount != null" >
+        #{buyCount,jdbcType=INTEGER},
+      </if>
+      <if test="totalAmount != null" >
+        #{totalAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="profitRatio != null" >
+        #{profitRatio,jdbcType=DECIMAL},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="cumulativeProfit != null" >
+        #{cumulativeProfit,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.example.core.common.entity.ProductInfo" >
+    update w_product_info
+    <set >
+      <if test="productName != null" >
+        product_name = #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="level != null" >
+        level = #{level,jdbcType=INTEGER},
+      </if>
+      <if test="annualRate != null" >
+        annual_rate = #{annualRate,jdbcType=DECIMAL},
+      </if>
+      <if test="monthlyFee != null" >
+        monthly_fee = #{monthlyFee,jdbcType=DECIMAL},
+      </if>
+      <if test="buyCount != null" >
+        buy_count = #{buyCount,jdbcType=INTEGER},
+      </if>
+      <if test="totalAmount != null" >
+        total_amount = #{totalAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="profitRatio != null" >
+        profit_ratio = #{profitRatio,jdbcType=DECIMAL},
+      </if>
+      <if test="description != null" >
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="cumulativeProfit != null" >
+        cumulative_profit = #{cumulativeProfit,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.example.core.common.entity.ProductInfo" >
+    update w_product_info
+    set product_name = #{productName,jdbcType=VARCHAR},
+      level = #{level,jdbcType=INTEGER},
+      annual_rate = #{annualRate,jdbcType=DECIMAL},
+      monthly_fee = #{monthlyFee,jdbcType=DECIMAL},
+      buy_count = #{buyCount,jdbcType=INTEGER},
+      total_amount = #{totalAmount,jdbcType=DECIMAL},
+      profit_ratio = #{profitRatio,jdbcType=DECIMAL},
+      description = #{description,jdbcType=VARCHAR},
+      cumulative_profit = #{cumulativeProfit,jdbcType=DECIMAL},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <!-- 查询产品列表（支持等级筛选，只查上架产品） -->
+  <select id="selectProductList" resultType="com.example.core.common.vo.product.ProductListVO">
+    select id, product_name, level, annual_rate, monthly_fee, buy_count, total_amount, profit_ratio
+    from w_product_info
+    where status = 0
+    <if test="level != null">and level = #{level}</if>
+    order by level asc, id asc
+  </select>
+
+  <!-- 查询产品详情 -->
+  <select id="selectProductDetail" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" /> from w_product_info where id = #{id} and status = 0
+  </select>
+
+  <select id="selectAdminProductList" resultType="com.example.core.common.entity.ProductInfo">
+    select id, product_name, level, annual_rate, monthly_fee, buy_count,
+    total_amount, profit_ratio, description, cumulative_profit, status,
+    create_time, update_time
+    from w_product_info
+    <where>
+      <if test="level != null">
+        and level = #{level}
+      </if>
+      <if test="status != null">
+        and status = #{status}
+      </if>
+    </where>
+    order by id desc
+  </select>
+</mapper>

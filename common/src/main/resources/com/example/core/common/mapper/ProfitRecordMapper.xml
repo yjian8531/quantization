@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.core.common.mapper.ProfitRecordMapper" >
+  <resultMap id="BaseResultMap" type="com.example.core.common.entity.ProfitRecord" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="product_no" property="productNo" jdbcType="VARCHAR" />
+    <result column="product_name" property="productName" jdbcType="VARCHAR" />
+    <result column="product_type" property="productType" jdbcType="VARCHAR" />
+    <result column="profit_amount" property="profitAmount" jdbcType="DECIMAL" />
+    <result column="profit_rate" property="profitRate" jdbcType="DECIMAL" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, user_id, product_no, product_name, product_type, profit_amount, profit_rate, 
+    status, create_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from w_profit_record
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from w_profit_record
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.example.core.common.entity.ProfitRecord" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into w_profit_record (user_id, product_no, product_name, 
+      product_type, profit_amount, profit_rate, 
+      status, create_time)
+    values (#{userId,jdbcType=VARCHAR}, #{productNo,jdbcType=VARCHAR}, #{productName,jdbcType=VARCHAR}, 
+      #{productType,jdbcType=VARCHAR}, #{profitAmount,jdbcType=DECIMAL}, #{profitRate,jdbcType=DECIMAL}, 
+      #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.example.core.common.entity.ProfitRecord" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into w_profit_record
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="productNo != null" >
+        product_no,
+      </if>
+      <if test="productName != null" >
+        product_name,
+      </if>
+      <if test="productType != null" >
+        product_type,
+      </if>
+      <if test="profitAmount != null" >
+        profit_amount,
+      </if>
+      <if test="profitRate != null" >
+        profit_rate,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="productNo != null" >
+        #{productNo,jdbcType=VARCHAR},
+      </if>
+      <if test="productName != null" >
+        #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="productType != null" >
+        #{productType,jdbcType=VARCHAR},
+      </if>
+      <if test="profitAmount != null" >
+        #{profitAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="profitRate != null" >
+        #{profitRate,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.example.core.common.entity.ProfitRecord" >
+    update w_profit_record
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="productNo != null" >
+        product_no = #{productNo,jdbcType=VARCHAR},
+      </if>
+      <if test="productName != null" >
+        product_name = #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="productType != null" >
+        product_type = #{productType,jdbcType=VARCHAR},
+      </if>
+      <if test="profitAmount != null" >
+        profit_amount = #{profitAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="profitRate != null" >
+        profit_rate = #{profitRate,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.example.core.common.entity.ProfitRecord" >
+    update w_profit_record
+    set user_id = #{userId,jdbcType=VARCHAR},
+      product_no = #{productNo,jdbcType=VARCHAR},
+      product_name = #{productName,jdbcType=VARCHAR},
+      product_type = #{productType,jdbcType=VARCHAR},
+      profit_amount = #{profitAmount,jdbcType=DECIMAL},
+      profit_rate = #{profitRate,jdbcType=DECIMAL},
+      status = #{status,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <!-- 新增：查询用户收益记录列表（支持产品筛选和时间范围） -->
+  <select id="selectProfitRecordList" resultType="com.example.core.common.vo.profitrecord.ProfitRecordVO">
+    select
+    product_name as productName,
+    product_type as productType,
+    profit_amount as profitAmount,
+    profit_rate as profitRate,
+    status as status,
+    create_time as createTime
+    from w_profit_record
+    where user_id = #{userId,jdbcType=VARCHAR}
+    <if test="productName != null and productName != ''">
+      and product_name like concat('%', #{productName,jdbcType=VARCHAR}, '%')
+    </if>
+    <if test="startTime != null and startTime != ''">
+      <![CDATA[ and create_time >= #{startTime,jdbcType=VARCHAR} ]]>
+    </if>
+    <if test="endTime != null and endTime != ''">
+      <![CDATA[ and create_time <= #{endTime,jdbcType=VARCHAR} ]]>
+    </if>
+    order by create_time desc
+  </select>
+
+  <!-- 新增：查询收益趋势数据（年/月/天维度聚合） -->
+  <select id="selectProfitTrend" resultType="com.example.core.common.vo.profitrecord.ProfitTrendVO">
+    select
+    <choose>
+      <!-- 年维度：按 YEAR(create_time) 分组 -->
+      <when test="dimension == 'year'">
+        DATE_FORMAT(create_time, '%Y') as timeLabel,
+      </when>
+      <!-- 月维度：按 YEAR-MONTH 分组 -->
+      <when test="dimension == 'month'">
+        DATE_FORMAT(create_time, '%Y-%m') as timeLabel,
+      </when>
+      <!-- 天维度：按 YEAR-MONTH-DAY 分组 -->
+      <otherwise>
+        DATE_FORMAT(create_time, '%Y-%m-%d') as timeLabel,
+      </otherwise>
+    </choose>
+    IFNULL(SUM(profit_amount), 0.0000) as totalProfit
+    from w_profit_record
+    where user_id = #{userId,jdbcType=VARCHAR}
+    <if test="startTime != null and startTime != ''">
+      <![CDATA[ and create_time >= #{startTime,jdbcType=VARCHAR} ]]>
+    </if>
+    <if test="endTime != null and endTime != ''">
+      <![CDATA[ and create_time <= #{endTime,jdbcType=VARCHAR} ]]>
+    </if>
+    <choose>
+      <when test="dimension == 'year'">
+        group by YEAR(create_time)
+      </when>
+      <when test="dimension == 'month'">
+        group by YEAR(create_time), MONTH(create_time)
+      </when>
+      <otherwise>
+        group by YEAR(create_time), MONTH(create_time), DAY(create_time)
+      </otherwise>
+    </choose>
+    order by timeLabel asc
+  </select>
+</mapper>

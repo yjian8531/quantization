@@ -465,7 +465,6 @@
         select
         <include refid="Base_Column_List"/>
         from w_user_info
-        where email = #{email,jdbcType=VARCHAR}}
+        where email = #{email,jdbcType=VARCHAR}
     </select>
-
 </mapper>

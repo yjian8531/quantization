@@ -7,9 +7,6 @@ import lombok.Data;
  */
 @Data
 public class LoginSO {
-
-    /** 账号 **/
-    private String phone;
     /** 邮箱 **/
     private String email;
     /** 密码 **/

@@ -4,6 +4,7 @@ import com.example.core.common.entity.*;
 import com.example.core.common.mapper.*;
 import com.example.core.common.utils.*;
 import com.example.core.mainbody.service.UserService;
+import com.example.core.mainbody.so.finance.UserAssetOverviewVO;
 import com.example.core.mainbody.so.user.*;
 import com.example.core.mainbody.utils.InterceptorUtil;
 import com.github.pagehelper.Page;
@@ -17,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.core.common.entity.UserDiscount;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 用户业务实现类
@@ -61,6 +61,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PowerBindingMapper powerBindingMapper;
+
+    @Autowired
+    private FinanceDetailMapper userFinanceDetailMapper;
 
 
 //    @Autowired
@@ -170,48 +173,49 @@ public class UserServiceImpl implements UserService {
 //
 //    }
 
+    /**
+     *
+     * 用户注册
+     * @param registerSO
+     * @return
+     */
     @Transactional(rollbackFor = Exception.class)
     public ResultMessage register(RegisterSO registerSO) {
-        // 【新增】校验推广码是否必填
+        // 1. 校验推广码
         if (StringUtils.isEmpty(registerSO.getMarket())) {
             return new ResultMessage(ResultMessage.FAILED_CODE, "必须填写推广码才能注册");
         }
-
-        // 【新增】查询推广码是否存在
         UserInfo proUser = queryMarket(registerSO.getMarket());
         if (proUser == null) {
             return new ResultMessage(ResultMessage.FAILED_CODE, "无效推广码");
         }
 
-        // 检查邮箱是否已注册
-        UserInfo userInfo = userInfoMapper.selectByPhone(registerSO.getEmail());
-        if (userInfo != null) {
+        // 2. 检查邮箱是否已注册
+        if (userInfoMapper.selectByEmail(registerSO.getEmail()) != null) {
             return new ResultMessage(ResultMessage.FAILED_CODE, "当前邮箱已注册");
         }
 
-        userInfo = new UserInfo();
+        // 3. 组装用户信息
+        UserInfo userInfo = new UserInfo();
         userInfo.setUserId(CommonUtil.getRandomStr(32));
         userInfo.setAvatar(registerSO.getAvatar());
         userInfo.setAccount(registerSO.getEmail());
         userInfo.setNickName(registerSO.getName());
         userInfo.setEmail(registerSO.getEmail());
-
-        // 生成新的推广码
-        String marketNew = CommonUtil.getRandomStr(6).toUpperCase();
-        UserInfo marketUser = queryMarket(marketNew);
-        while (marketUser != null) {
-            marketNew = CommonUtil.getRandomStr(6).toUpperCase();
-            marketUser = queryMarket(marketNew);
-        }
-
-        userInfo.setMarket(marketNew);
         userInfo.setLoginPwd(MD5.MD5Encode(MD5.MD5Encode(MD5.MD5Encode(registerSO.getPwd()))));
+
+        // 生成唯一推广码
+        String marketNew = CommonUtil.getRandomStr(6).toUpperCase();
+        while (queryMarket(marketNew) != null) {
+            marketNew = CommonUtil.getRandomStr(6).toUpperCase();
+        }
+        userInfo.setMarket(marketNew);
         userInfo.setStatus(CommonUtil.STATUS_0);
-        userInfo.setType(CommonUtil.STATUS_0);
-        userInfo.setLoginIp(registerSO.getIp());
+        userInfo.setType(registerSO.getType() != null ? registerSO.getType() : CommonUtil.STATUS_0);
         userInfo.setUpdateTime(new Date());
         userInfo.setCreateTime(new Date());
 
+        // 4. 插入用户表
         int i = userInfoMapper.insertSelective(userInfo);
         if (i > 0) {
             // 添加推广关系
@@ -222,20 +226,13 @@ public class UserServiceImpl implements UserService {
             userPro.setCreateTime(new Date());
             userProMapper.insertSelective(userPro);
 
-            if (StringUtils.isNotEmpty(registerSO.getOpenId())) {
-                UserWx userWx = new UserWx();
-                userWx.setUserId(userInfo.getUserId());
-                userWx.setOpenId(registerSO.getOpenId());
-                userWx.setStatus(CommonUtil.STATUS_0);
-                userWx.setCreateTime(new Date());
-                userWxMapper.insertSelective(userWx);
-            }
-
+            // 创建财务账户
             UserFinance userFinance = new UserFinance();
             userFinance.setUserId(userInfo.getUserId());
             userFinance.setType(CommonUtil.STATUS_0);
             userFinanceMapper.insertSelective(userFinance);
 
+            // 缓存登录信息到 Redis
             Map<String, Object> map = new HashMap<>();
             String str = CommonUtil.getRandomStr(4);
             map.put("userInfo", userInfo);
@@ -244,9 +241,8 @@ public class UserServiceImpl implements UserService {
             userInfo.setToken(InterceptorUtil.getToken(userInfo.getUserId(), str));
 
             return new ResultMessage(ResultMessage.SUCCEED_CODE, "注册成功", userInfo);
-        } else {
-            return new ResultMessage(ResultMessage.FAILED_CODE, "注册失败");
         }
+        return new ResultMessage(ResultMessage.FAILED_CODE, "注册失败");
     }
 
     /**
@@ -261,17 +257,17 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * 验证手机号是否存在
+     * 验证邮箱是否存在
      *
-     * @param phone
+     * @param email
      * @return
      */
-    public ResultMessage verifyPhone(String phone) {
-        UserInfo userInfo = userInfoMapper.selectByPhone(phone);
+    public ResultMessage verifyEmail(String email) {
+        UserInfo userInfo = userInfoMapper.selectByEmail(email);
         if (userInfo == null) {
-            return new ResultMessage(ResultMessage.FAILED_CODE, "手机号不存在");
+            return new ResultMessage(ResultMessage.FAILED_CODE, "邮箱不存在");
         } else {
-            return new ResultMessage(ResultMessage.SUCCEED_CODE, "手机号存在");
+            return new ResultMessage(ResultMessage.SUCCEED_CODE, "邮箱存在");
         }
     }
 
@@ -283,9 +279,9 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     public ResultMessage updatePwd(UpdatePwdSO updatePwdSO, String openId) {
-        UserInfo userInfo = userInfoMapper.selectByPhone(updatePwdSO.getEmail());
+        UserInfo userInfo = userInfoMapper.selectByEmail(updatePwdSO.getEmail());
         if (userInfo == null) {
-            return new ResultMessage(ResultMessage.FAILED_CODE, "当前手机号不存在");
+            return new ResultMessage(ResultMessage.FAILED_CODE, "当前账号不存在");
         }
         if (openId != null) {
             UserWx userWx = userWxMapper.selectByUserId(userInfo.getUserId());
@@ -360,7 +356,7 @@ public class UserServiceImpl implements UserService {
 //    }
     public ResultMessage login(LoginSO loginSO) {
         // 根据邮箱查询用户（原来是查手机号）
-        UserInfo userInfo = userInfoMapper.selectByPhone(loginSO.getEmail());
+        UserInfo userInfo = userInfoMapper.selectByEmail(loginSO.getEmail());
         if (userInfo != null) {
             if (userInfo.getStatus() == 1) {
                 return new ResultMessage(ResultMessage.FAILED_CODE, "当前账号已被禁用");
@@ -551,9 +547,66 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * 获取用户资产总览
+     *
+     * @param userId
+     * @return
+     */
+    @Override
+    public ResultMessage getUserAssetOverview(String userId) {
+        // 查询用户信息
+        UserInfo userInfo = userInfoMapper.selectById(userId);
+        if (userInfo == null) {
+            return new ResultMessage(ResultMessage.FAILED_CODE, "用户不存在");
+        }
 
+        // 查询用户财务信息
+        UserFinance userFinance = userFinanceMapper.selectByUserId(userId);
+        if (userFinance == null) {
+            // 如果没有财务信息，创建一条默认记录
+            userFinance = new UserFinance();
+            userFinance.setUserId(userId);
+            userFinance.setTotalNum(BigDecimal.ZERO);
+            userFinance.setValidNum(BigDecimal.ZERO);
+            userFinance.setFrozenNum(BigDecimal.ZERO);
+            userFinance.setType(CommonUtil.STATUS_0);
+            userFinance.setCreateTime(new Date());
+            userFinance.setUpdateTime(new Date());
+            userFinanceMapper.insertSelective(userFinance);
+        }
 
+        // 【新增】从财务明细表查询累计收益（佣金+续费）
+        BigDecimal totalProfit = userFinanceDetailMapper.selectTotalProfit(userId);
+        if (totalProfit == null) {
+            totalProfit = BigDecimal.ZERO;
+        }
 
+        // 构造返回数据
+        UserAssetOverviewVO vo = new UserAssetOverviewVO();
+        vo.setTotalAsset(userFinance.getTotalNum() != null ? userFinance.getTotalNum() : BigDecimal.ZERO);
+        vo.setTotalProfit(totalProfit);  // 使用真实的累计收益
+        vo.setValidNum(userFinance.getValidNum() != null ? userFinance.getValidNum() : BigDecimal.ZERO);
+        vo.setFrozenNum(userFinance.getFrozenNum() != null ? userFinance.getFrozenNum() : BigDecimal.ZERO);
+
+        // VIP状态：根据type字段判断，type=1表示VIP
+        vo.setIsVip(userInfo.getType() != null && userInfo.getType() == 1 ? 1 : 0);
+
+        // 账号名称：优先使用昵称，没有则使用邮箱前缀
+        if (StringUtils.isNotEmpty(userInfo.getNickName())) {
+            vo.setAccountName(userInfo.getNickName());
+        } else if (StringUtils.isNotEmpty(userInfo.getEmail())) {
+            String email = userInfo.getEmail();
+            vo.setAccountName(email.substring(0, email.indexOf("@")));
+        } else {
+            vo.setAccountName("投资者");
+        }
+
+        // 账号ID：使用userId后6位
+        vo.setAccountId(userInfo.getUserId().substring(userInfo.getUserId().length() - 6));
+
+        return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, vo);
+    }
 
     /**
      * 计算折扣率

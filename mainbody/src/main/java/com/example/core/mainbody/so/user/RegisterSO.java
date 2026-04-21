@@ -10,10 +10,6 @@ public class RegisterSO {
 
     /** 注册验证码 **/
     private String code;
-    /** 验证码类型(0:公众号验证码，1:邮箱验证码) **/
-    private Integer codeType;
-    /** 手机号 **/
-    private String phone;
     /** 邮箱 **/
     private String email;
     /** 密码 **/
@@ -22,13 +18,8 @@ public class RegisterSO {
     private String name;
     /** 推广码 **/
     private String market;
-    /** 类型 **/
+    /** 类型 0:普通用户,1:公司内部账号 **/
     private Integer type;
-    /** IP地址 **/
-    private String ip;
-    /** 关注微信公众号openId **/
-    private String openId;
-
     /** 头像 **/
     private String avatar;
 

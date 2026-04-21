@@ -2,7 +2,7 @@ package com.example.core.mainbody.filter;
 
 import com.example.core.common.entity.SysOperation;
 import com.example.core.common.mapper.SysOperationMapper;
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
+import java.util.Base64;
 import com.example.core.common.entity.UserLog;
 import com.example.core.common.mapper.UserLogMapper;
 import com.example.core.common.utils.RedisUtil;
@@ -65,13 +65,13 @@ public class UserInterceptor implements HandlerInterceptor {
 
                         if(sysOperation != null && sysOperation.getType() == 1){//判断是否需要进行重复操作限制
                             String key = json.getJSONObject("userInfo").getString("account")+":"+url+":"+paramStr;
-                            if("Y".equals(RedisUtil.get(Base64.encode(key.getBytes())))){
+                            if("Y".equals(RedisUtil.get(Base64.getEncoder().encodeToString(key.getBytes())))){
                                 ServletOutputStream out = response.getOutputStream();
                                 ResultMessage result = new ResultMessage(ResultMessage.FAILED_CODE,"Do not repeat the operation");
                                 out.print(JSONObject.fromObject(result).toString());
                                 return false;
                             }else{
-                                RedisUtil.setEx(Base64.encode(key.getBytes()),"Y",2);
+                                RedisUtil.setEx(Base64.getEncoder().encodeToString(key.getBytes()), "Y",2);
 
                                 if(sysOperation != null){
                                     UserLog userLog = new UserLog();

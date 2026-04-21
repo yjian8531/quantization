@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.core.common.mapper.DepositAddressMapper" >
+  <resultMap id="BaseResultMap" type="com.example.core.common.entity.DepositAddress" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="network_type" property="networkType" jdbcType="VARCHAR" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="bind_time" property="bindTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, address, network_type, user_id, bind_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from w_deposit_address
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from w_deposit_address
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.example.core.common.entity.DepositAddress" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into w_deposit_address (address, network_type, user_id, 
+      bind_time)
+    values (#{address,jdbcType=VARCHAR}, #{networkType,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, 
+      #{bindTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.example.core.common.entity.DepositAddress" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into w_deposit_address
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="address != null" >
+        address,
+      </if>
+      <if test="networkType != null" >
+        network_type,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="bindTime != null" >
+        bind_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="address != null" >
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="networkType != null" >
+        #{networkType,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="bindTime != null" >
+        #{bindTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.example.core.common.entity.DepositAddress" >
+    update w_deposit_address
+    <set >
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="networkType != null" >
+        network_type = #{networkType,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="bindTime != null" >
+        bind_time = #{bindTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.example.core.common.entity.DepositAddress" >
+    update w_deposit_address
+    set address = #{address,jdbcType=VARCHAR},
+      network_type = #{networkType,jdbcType=VARCHAR},
+      user_id = #{userId,jdbcType=VARCHAR},
+      bind_time = #{bindTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectByUserAndNetwork" resultMap="BaseResultMap">
+    select * from w_deposit_address
+    where user_id = #{userId} and network_type = #{networkType}
+  </select>
+
+  <!-- 获取空闲地址（带行锁防并发） -->
+  <select id="selectUnusedAddress" resultMap="BaseResultMap">
+    select * from w_deposit_address
+    where network_type = #{networkType} and user_id IS NULL
+      limit 1 for update
+  </select>
+
+  <!-- 绑定地址给用户 -->
+  <update id="bindAddressToUser">
+    update w_deposit_address
+    set user_id = #{userId}, bind_time = NOW()
+    where address = #{address} and user_id IS NULL
+  </update>
+</mapper>

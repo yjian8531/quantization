@@ -14,7 +14,9 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
-
+/**
+ * 文件上传
+ */
 @Slf4j
 @RestController
 @RequestMapping("/upload")

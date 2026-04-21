@@ -5,7 +5,7 @@ import com.example.core.common.entity.SysOperation;
 import com.example.core.common.mapper.AdminLogMapper;
 import com.example.core.common.mapper.PowerBindingMapper;
 import com.example.core.common.mapper.SysOperationMapper;
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
+import java.util.Base64;
 import com.example.core.common.entity.AdminLog;
 import com.example.core.common.utils.RedisUtil;
 import com.example.core.common.utils.ResultMessage;
@@ -95,14 +95,14 @@ public class AdminInterceptor implements HandlerInterceptor {
                             /** 操作权限校验  end **/
 
                             String key = json.getJSONObject("admin").getString("adminId")+":"+url+":"+paramStr;
-                            if("Y".equals(RedisUtil.get(Base64.encode(key.getBytes())))  && url.indexOf("get") == -1 && url.indexOf("query") == -1){
+                            if("Y".equals(RedisUtil.get(Base64.getEncoder().encodeToString(key.getBytes())))  && url.indexOf("get") == -1 && url.indexOf("query") == -1){
                                 response.setContentType("text/html;charset=GBK");
                                 ServletOutputStream out = response.getOutputStream();
                                 ResultMessage result = new ResultMessage("3333","Do not repeat the operation");
                                 out.print(JSONObject.fromObject(result).toString());
                                 return false;
                             }else{
-                                RedisUtil.setEx(Base64.encode(key.getBytes()),"Y",2);
+                                RedisUtil.setEx(Base64.getEncoder().encodeToString(key.getBytes()), "Y",2);
 
                                 if(sysOperation != null){
                                     AdminLog adminLog = new AdminLog();

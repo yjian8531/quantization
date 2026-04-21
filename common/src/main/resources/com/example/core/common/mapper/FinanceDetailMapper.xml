@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.core.common.mapper.FinanceDetailMapper" >
+
+  <resultMap id="BaseResultMap" type="com.example.core.common.entity.FinanceDetail" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="finance_no" property="financeNo" jdbcType="VARCHAR" />
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+    <result column="tx_hash" property="txHash" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="coin_type" property="coinType" jdbcType="VARCHAR" />
+    <result column="chain_type" property="chainType" jdbcType="VARCHAR" />
+    <result column="money_num" property="moneyNum" jdbcType="DECIMAL" />
+    <result column="period" property="period" jdbcType="INTEGER" />
+    <result column="tag" property="tag" jdbcType="VARCHAR" />
+    <result column="direction" property="direction" jdbcType="INTEGER" />
+    <result column="way" property="way" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="remarks" property="remarks" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, user_id, finance_no, order_no,tx_hash,type, coin_type, chain_type,money_num, period, tag, direction, way,
+    status, remarks, create_time, update_time
+  </sql>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from w_finance_detail
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectByUserId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from w_finance_detail
+    where user_id = #{userId,jdbcType=VARCHAR}
+    order by create_time desc
+  </select>
+
+  <select id="selectPageByUserId" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from w_finance_detail
+    where user_id = #{userId,jdbcType=VARCHAR}
+    <if test="tag != null and tag != ''">
+      and tag = #{tag,jdbcType=VARCHAR}
+    </if>
+    <if test="type != null">
+      and type = #{type,jdbcType=INTEGER}
+    </if>
+    order by create_time desc
+  </select>
+
+  <!-- 查询用户累计收益（佣金+续费收入） -->
+  <select id="selectTotalProfit" resultType="java.math.BigDecimal">
+    select
+    IFNULL(SUM(money_num), 0.00)
+    from w_finance_detail
+    where user_id = #{userId,jdbcType=VARCHAR}
+    and direction = 0  <!-- 收入 -->
+    and status = 1     <!-- 已完成 -->
+    and tag in ('commission', 'renew')  <!-- 佣金和续费 -->
+  </select>
+
+  <!-- 查询用户累计总收入 -->
+  <select id="selectTotalIncome" resultType="java.math.BigDecimal">
+    select
+    IFNULL(SUM(money_num), 0.00)
+    from w_finance_detail
+    where user_id = #{userId,jdbcType=VARCHAR}
+    and direction = 0  <!-- 收入 -->
+    and status = 1     <!-- 已完成 -->
+  </select>
+
+  <!-- 查询用户累计总支出 -->
+  <select id="selectTotalExpense" resultType="java.math.BigDecimal">
+    select
+    IFNULL(SUM(money_num), 0.00)
+    from w_finance_detail
+    where user_id = #{userId,jdbcType=VARCHAR}
+    and direction = 1  <!-- 支出 -->
+    and status = 1     <!-- 已完成 -->
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from w_finance_detail
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="insert" parameterType="com.example.core.common.entity.FinanceDetail" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into w_finance_detail (user_id, finance_no, order_no, tx_hash, type, coin_type, chain_type,
+    money_num, period, tag, direction, way, status,
+    remarks, create_time, update_time)
+    values (#{userId,jdbcType=VARCHAR}, #{financeNo,jdbcType=VARCHAR}, #{orderNo,jdbcType=VARCHAR}, #{txHash,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{coinType,jdbcType=VARCHAR}, #{chainType,jdbcType=VARCHAR},
+    #{moneyNum,jdbcType=DECIMAL}, #{period,jdbcType=INTEGER}, #{tag,jdbcType=VARCHAR}, #{direction,jdbcType=INTEGER}, #{way,jdbcType=INTEGER}, #{status,jdbcType=INTEGER},
+    #{remarks,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+
+  </insert>
+
+  <insert id="insertSelective" parameterType="com.example.core.common.entity.FinanceDetail" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into w_finance_detail
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="financeNo != null" >
+        finance_no,
+      </if>
+      <if test="orderNo != null" >
+        order_no,
+      </if>
+      <if test="txHash != null" >
+        tx_hash,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="coinType != null" >
+        coin_type,
+      </if>
+        <if test="chainType != null" >
+        chain_type,
+      </if>
+      <if test="moneyNum != null" >
+        money_num,
+      </if>
+      <if test="period != null" >
+        period,
+      </if>
+      <if test="tag != null" >
+        tag,
+      </if>
+      <if test="direction != null" >
+        direction,
+      </if>
+      <if test="way != null" >
+        way,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="remarks != null" >
+        remarks,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="financeNo != null" >
+        #{financeNo,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNo != null" >
+        #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="txHash != null" >
+        #{txHash,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="coinType != null" >
+        #{coinType,jdbcType=VARCHAR},
+      </if>
+      <if test="chainType != null" >
+        #{chainType,jdbcType=VARCHAR},
+      </if>
+      <if test="moneyNum != null" >
+        #{moneyNum,jdbcType=DECIMAL},
+      </if>
+      <if test="period != null" >
+        #{period,jdbcType=INTEGER},
+      </if>
+      <if test="tag != null" >
+        #{tag,jdbcType=VARCHAR},
+      </if>
+      <if test="direction != null" >
+        #{direction,jdbcType=INTEGER},
+      </if>
+      <if test="way != null" >
+        #{way,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="remarks != null" >
+        #{remarks,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.example.core.common.entity.FinanceDetail" >
+    update w_finance_detail
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="financeNo != null" >
+        finance_no = #{financeNo,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNo != null" >
+        order_no = #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="txHash != null" >
+        tx_hash = #{txHash,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=INTEGER},
+      </if>
+      <if test="coinType != null" >
+        coin_type = #{coinType,jdbcType=VARCHAR},
+      </if>
+      <if test="chainType != null" >
+        chain_type = #{chainType,jdbcType=VARCHAR},
+      </if>
+      <if test="moneyNum != null" >
+        money_num = #{moneyNum,jdbcType=DECIMAL},
+      </if>
+      <if test="period != null" >
+        period = #{period,jdbcType=INTEGER},
+      </if>
+      <if test="tag != null" >
+        tag = #{tag,jdbcType=VARCHAR},
+      </if>
+      <if test="direction != null" >
+        direction = #{direction,jdbcType=INTEGER},
+      </if>
+      <if test="way != null" >
+        way = #{way,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="remarks != null" >
+        remarks = #{remarks,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+
+  <select id="selectBillListByUserId" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from w_finance_detail
+    where user_id = #{userId,jdbcType=VARCHAR}
+    <if test="direction != null">
+      and direction = #{direction,jdbcType=INTEGER}
+    </if>
+    <if test="tags != null and tags.size() > 0">
+      and tag in
+      <foreach collection="tags" item="item" open="(" separator="," close=")">
+        #{item,jdbcType=VARCHAR}
+      </foreach>
+    </if>
+    <if test="startTime != null and startTime != ''">
+      and create_time &gt;= #{startTime,jdbcType=VARCHAR}
+    </if>
+    <if test="endTime != null and endTime != ''">
+      and create_time &lt;= #{endTime,jdbcType=VARCHAR}
+    </if>
+    order by create_time desc
+  </select>
+  <select id="selectWeekIncome" resultType="java.math.BigDecimal">
+    select
+      IFNULL(SUM(money_num), 0.00)
+    from w_finance_detail
+    where user_id = #{userId,jdbcType=VARCHAR}
+      and direction = 0
+      and status = 1
+      and create_time &gt;= #{startTime,jdbcType=VARCHAR}
+      and create_time &lt;= #{endTime,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectWeekExpense" resultType="java.math.BigDecimal">
+    select
+      IFNULL(SUM(money_num), 0.00)
+    from w_finance_detail
+    where user_id = #{userId,jdbcType=VARCHAR}
+      and direction = 1
+      and status = 1
+      and create_time &gt;= #{startTime,jdbcType=VARCHAR}
+      and create_time &lt;= #{endTime,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectWeekCommission" resultType="java.math.BigDecimal">
+    select
+      IFNULL(SUM(money_num), 0.00)
+    from w_finance_detail
+    where user_id = #{userId,jdbcType=VARCHAR}
+      and direction = 0
+      and status = 1
+      and tag in ('commission', 'renew')
+      and create_time &gt;= #{startTime,jdbcType=VARCHAR}
+      and create_time &lt;= #{endTime,jdbcType=VARCHAR}
+  </select>
+  <select id="selectBillCountByUserId" resultType="java.lang.Integer">
+    select COUNT(*)
+    from w_finance_detail
+    where user_id = #{userId,jdbcType=VARCHAR}
+  </select>
+
+  <!-- 财务账单充值记录模块的 -->
+  <select id="selectTotalRecharge" resultType="java.math.BigDecimal">
+    select IFNULL(SUM(money_num), 0.00)
+    from w_finance_detail
+    where user_id = #{userId,jdbcType=VARCHAR}
+      and tag = 'topup'
+      and status = 1
+  </select>
+
+  <select id="selectRechargeCount" resultType="java.lang.Integer">
+    select COUNT(*)
+    from w_finance_detail
+    where user_id = #{userId,jdbcType=VARCHAR}
+      and tag = 'topup'
+      and status = 1
+  </select>
+
+  <select id="selectRechargeList" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from w_finance_detail
+    where user_id = #{userId,jdbcType=VARCHAR}
+    and tag = 'topup'
+    order by create_time desc
+  </select>
+
+  <select id="selectBillListByUserIdWithConvert" resultType="com.example.core.common.vo.finance.BillListVO">
+    select
+    finance_no as financeNo,
+    money_num as moneyNum,
+    direction as direction,
+    create_time as createTime,
+    CASE tag
+    WHEN 'topup' THEN '充值 (USDT)'
+    WHEN 'buy' THEN '购买服务'
+    WHEN 'commission' THEN '量化运行分润'
+    WHEN 'withdraw' THEN '提现到链上'
+    WHEN 'renew' THEN '策略运行服务费回款'
+    WHEN 'deduct' THEN IFNULL(remarks, '扣款')
+    ELSE IFNULL(remarks, '其他')
+    END as title,
+    CASE tag
+    WHEN 'topup' THEN '入金'
+    WHEN 'buy' THEN '出金'
+    WHEN 'commission' THEN '分润'
+    WHEN 'withdraw' THEN '出金'
+    WHEN 'renew' THEN '分润'
+    WHEN 'deduct' THEN '扣款'
+    ELSE '其他'
+    END as tagName
+    from w_finance_detail
+    where user_id = #{userId,jdbcType=VARCHAR}
+    <if test="direction != null">
+      and direction = #{direction,jdbcType=INTEGER}
+    </if>
+    <if test="tags != null and tags.size() > 0">
+      and tag in
+      <foreach collection="tags" item="item" open="(" separator="," close=")">
+        #{item,jdbcType=VARCHAR}
+      </foreach>
+    </if>
+    <if test="startTime != null and startTime != ''">
+      and create_time &gt;= #{startTime,jdbcType=VARCHAR}
+    </if>
+    <if test="endTime != null and endTime != ''">
+      and create_time &lt;= #{endTime,jdbcType=VARCHAR}
+    </if>
+    order by create_time desc
+  </select>
+
+  <!-- 新增：充值记录列表查询（SQL层完成类型解析） -->
+  <select id="selectRechargeListWithConvert" resultType="com.example.core.common.vo.finance.RechargeRecordVO">
+    select
+      money_num as moneyNum,
+      create_time as createTime,
+      tx_hash as txHash,
+      coin_type as tradeType,
+      chain_type as chainType
+    from w_finance_detail
+    where user_id = #{userId,jdbcType=VARCHAR}
+      and tag = 'topup'
+    order by create_time desc
+  </select>
+  <select id="selectAdminBillList" parameterType="com.example.core.common.so.finance.QueryBillListAdminSO" resultType="com.example.core.common.entity.FinanceDetail">
+    select * from w_finance_detail
+    <where>
+      <if test="userId != null and userId != ''">
+        and user_id = #{userId}
+      </if>
+      <if test="direction != null">
+        and direction = #{direction}
+      </if>
+      <if test="tag != null and tag != ''">
+        and tag = #{tag}
+      </if>
+      <if test="startTime != null and startTime != ''">
+        and create_time &gt;= #{startTime}
+      </if>
+      <if test="endTime != null and endTime != ''">
+        and create_time &lt;= #{endTime}
+      </if>
+    </where>
+    order by id desc
+  </select>
+</mapper>
