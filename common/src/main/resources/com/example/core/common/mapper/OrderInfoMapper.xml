@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.core.common.mapper.OrderInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.example.core.common.entity.OrderInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+    <result column="order_name" property="orderName" jdbcType="VARCHAR" />
+    <result column="main_no" property="mainNo" jdbcType="VARCHAR" />
+    <result column="product_id" property="productId" jdbcType="INTEGER" />
+    <result column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="apikey_id" property="apikeyId" jdbcType="INTEGER" />
+    <result column="symbol" property="symbol" jdbcType="VARCHAR" />
+    <result column="node_time" property="nodeTime" jdbcType="VARCHAR" />
+    <result column="param_str" property="paramStr" jdbcType="INTEGER" />
+    <result column="income" property="income" jdbcType="DECIMAL" />
+    <result column="income_rate" property="incomeRate" jdbcType="DECIMAL" />
+    <result column="annualized_rate" property="annualizedRate" jdbcType="DECIMAL" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="ent_time" property="entTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, order_no, order_name, main_no, product_id, user_id, apikey_id, symbol, node_time, 
+    param_str, income, income_rate, annualized_rate, status, remark, create_time, ent_time, 
+    update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from w_order_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from w_order_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.example.core.common.entity.OrderInfo" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into w_order_info (order_no, order_name, main_no, 
+      product_id, user_id, apikey_id, 
+      symbol, node_time, param_str, 
+      income, income_rate, annualized_rate, 
+      status, remark, create_time, 
+      ent_time, update_time)
+    values (#{orderNo,jdbcType=VARCHAR}, #{orderName,jdbcType=VARCHAR}, #{mainNo,jdbcType=VARCHAR}, 
+      #{productId,jdbcType=INTEGER}, #{userId,jdbcType=VARCHAR}, #{apikeyId,jdbcType=INTEGER}, 
+      #{symbol,jdbcType=VARCHAR}, #{nodeTime,jdbcType=VARCHAR}, #{paramStr,jdbcType=INTEGER}, 
+      #{income,jdbcType=DECIMAL}, #{incomeRate,jdbcType=DECIMAL}, #{annualizedRate,jdbcType=DECIMAL}, 
+      #{status,jdbcType=INTEGER}, #{remark,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{entTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.example.core.common.entity.OrderInfo" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into w_order_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="orderNo != null" >
+        order_no,
+      </if>
+      <if test="orderName != null" >
+        order_name,
+      </if>
+      <if test="mainNo != null" >
+        main_no,
+      </if>
+      <if test="productId != null" >
+        product_id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="apikeyId != null" >
+        apikey_id,
+      </if>
+      <if test="symbol != null" >
+        symbol,
+      </if>
+      <if test="nodeTime != null" >
+        node_time,
+      </if>
+      <if test="paramStr != null" >
+        param_str,
+      </if>
+      <if test="income != null" >
+        income,
+      </if>
+      <if test="incomeRate != null" >
+        income_rate,
+      </if>
+      <if test="annualizedRate != null" >
+        annualized_rate,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="entTime != null" >
+        ent_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="orderNo != null" >
+        #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="orderName != null" >
+        #{orderName,jdbcType=VARCHAR},
+      </if>
+      <if test="mainNo != null" >
+        #{mainNo,jdbcType=VARCHAR},
+      </if>
+      <if test="productId != null" >
+        #{productId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="apikeyId != null" >
+        #{apikeyId,jdbcType=INTEGER},
+      </if>
+      <if test="symbol != null" >
+        #{symbol,jdbcType=VARCHAR},
+      </if>
+      <if test="nodeTime != null" >
+        #{nodeTime,jdbcType=VARCHAR},
+      </if>
+      <if test="paramStr != null" >
+        #{paramStr,jdbcType=INTEGER},
+      </if>
+      <if test="income != null" >
+        #{income,jdbcType=DECIMAL},
+      </if>
+      <if test="incomeRate != null" >
+        #{incomeRate,jdbcType=DECIMAL},
+      </if>
+      <if test="annualizedRate != null" >
+        #{annualizedRate,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="entTime != null" >
+        #{entTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.example.core.common.entity.OrderInfo" >
+    update w_order_info
+    <set >
+      <if test="orderNo != null" >
+        order_no = #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="orderName != null" >
+        order_name = #{orderName,jdbcType=VARCHAR},
+      </if>
+      <if test="mainNo != null" >
+        main_no = #{mainNo,jdbcType=VARCHAR},
+      </if>
+      <if test="productId != null" >
+        product_id = #{productId,jdbcType=INTEGER},
+      </if>
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="apikeyId != null" >
+        apikey_id = #{apikeyId,jdbcType=INTEGER},
+      </if>
+      <if test="symbol != null" >
+        symbol = #{symbol,jdbcType=VARCHAR},
+      </if>
+      <if test="nodeTime != null" >
+        node_time = #{nodeTime,jdbcType=VARCHAR},
+      </if>
+      <if test="paramStr != null" >
+        param_str = #{paramStr,jdbcType=INTEGER},
+      </if>
+      <if test="income != null" >
+        income = #{income,jdbcType=DECIMAL},
+      </if>
+      <if test="incomeRate != null" >
+        income_rate = #{incomeRate,jdbcType=DECIMAL},
+      </if>
+      <if test="annualizedRate != null" >
+        annualized_rate = #{annualizedRate,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="entTime != null" >
+        ent_time = #{entTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.example.core.common.entity.OrderInfo" >
+    update w_order_info
+    set order_no = #{orderNo,jdbcType=VARCHAR},
+      order_name = #{orderName,jdbcType=VARCHAR},
+      main_no = #{mainNo,jdbcType=VARCHAR},
+      product_id = #{productId,jdbcType=INTEGER},
+      user_id = #{userId,jdbcType=VARCHAR},
+      apikey_id = #{apikeyId,jdbcType=INTEGER},
+      symbol = #{symbol,jdbcType=VARCHAR},
+      node_time = #{nodeTime,jdbcType=VARCHAR},
+      param_str = #{paramStr,jdbcType=INTEGER},
+      income = #{income,jdbcType=DECIMAL},
+      income_rate = #{incomeRate,jdbcType=DECIMAL},
+      annualized_rate = #{annualizedRate,jdbcType=DECIMAL},
+      status = #{status,jdbcType=INTEGER},
+      remark = #{remark,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      ent_time = #{entTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

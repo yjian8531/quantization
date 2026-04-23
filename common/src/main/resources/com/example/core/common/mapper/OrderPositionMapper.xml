@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.core.common.mapper.OrderPositionMapper" >
+  <resultMap id="BaseResultMap" type="com.example.core.common.entity.OrderPosition" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+    <result column="trade_bl" property="tradeBl" jdbcType="VARCHAR" />
+    <result column="open_price" property="openPrice" jdbcType="DECIMAL" />
+    <result column="close_price" property="closePrice" jdbcType="DECIMAL" />
+    <result column="trade_num" property="tradeNum" jdbcType="DECIMAL" />
+    <result column="income" property="income" jdbcType="DECIMAL" />
+    <result column="income_rate" property="incomeRate" jdbcType="DECIMAL" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, order_no, trade_bl, open_price, close_price, trade_num, income, income_rate, 
+    remark, start_time, end_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from w_order_position
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from w_order_position
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.example.core.common.entity.OrderPosition" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into w_order_position (order_no, trade_bl, open_price, 
+      close_price, trade_num, income, 
+      income_rate, remark, start_time, 
+      end_time)
+    values (#{orderNo,jdbcType=VARCHAR}, #{tradeBl,jdbcType=VARCHAR}, #{openPrice,jdbcType=DECIMAL}, 
+      #{closePrice,jdbcType=DECIMAL}, #{tradeNum,jdbcType=DECIMAL}, #{income,jdbcType=DECIMAL}, 
+      #{incomeRate,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, #{startTime,jdbcType=TIMESTAMP}, 
+      #{endTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.example.core.common.entity.OrderPosition" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into w_order_position
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="orderNo != null" >
+        order_no,
+      </if>
+      <if test="tradeBl != null" >
+        trade_bl,
+      </if>
+      <if test="openPrice != null" >
+        open_price,
+      </if>
+      <if test="closePrice != null" >
+        close_price,
+      </if>
+      <if test="tradeNum != null" >
+        trade_num,
+      </if>
+      <if test="income != null" >
+        income,
+      </if>
+      <if test="incomeRate != null" >
+        income_rate,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="startTime != null" >
+        start_time,
+      </if>
+      <if test="endTime != null" >
+        end_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="orderNo != null" >
+        #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="tradeBl != null" >
+        #{tradeBl,jdbcType=VARCHAR},
+      </if>
+      <if test="openPrice != null" >
+        #{openPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="closePrice != null" >
+        #{closePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="tradeNum != null" >
+        #{tradeNum,jdbcType=DECIMAL},
+      </if>
+      <if test="income != null" >
+        #{income,jdbcType=DECIMAL},
+      </if>
+      <if test="incomeRate != null" >
+        #{incomeRate,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.example.core.common.entity.OrderPosition" >
+    update w_order_position
+    <set >
+      <if test="orderNo != null" >
+        order_no = #{orderNo,jdbcType=VARCHAR},
+      </if>
+      <if test="tradeBl != null" >
+        trade_bl = #{tradeBl,jdbcType=VARCHAR},
+      </if>
+      <if test="openPrice != null" >
+        open_price = #{openPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="closePrice != null" >
+        close_price = #{closePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="tradeNum != null" >
+        trade_num = #{tradeNum,jdbcType=DECIMAL},
+      </if>
+      <if test="income != null" >
+        income = #{income,jdbcType=DECIMAL},
+      </if>
+      <if test="incomeRate != null" >
+        income_rate = #{incomeRate,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.example.core.common.entity.OrderPosition" >
+    update w_order_position
+    set order_no = #{orderNo,jdbcType=VARCHAR},
+      trade_bl = #{tradeBl,jdbcType=VARCHAR},
+      open_price = #{openPrice,jdbcType=DECIMAL},
+      close_price = #{closePrice,jdbcType=DECIMAL},
+      trade_num = #{tradeNum,jdbcType=DECIMAL},
+      income = #{income,jdbcType=DECIMAL},
+      income_rate = #{incomeRate,jdbcType=DECIMAL},
+      remark = #{remark,jdbcType=VARCHAR},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

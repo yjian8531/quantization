@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.core.common.mapper.MainInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.example.core.common.entity.MainInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="main_no" property="mainNo" jdbcType="VARCHAR" />
+    <result column="config_id" property="configId" jdbcType="INTEGER" />
+    <result column="service_no" property="serviceNo" jdbcType="VARCHAR" />
+    <result column="connect_ip" property="connectIp" jdbcType="VARCHAR" />
+    <result column="connect_port" property="connectPort" jdbcType="INTEGER" />
+    <result column="connect_account" property="connectAccount" jdbcType="VARCHAR" />
+    <result column="connect_pwd" property="connectPwd" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, main_no, config_id, service_no, connect_ip, connect_port, connect_account, connect_pwd, 
+    remark, end_time, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from w_main_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from w_main_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.example.core.common.entity.MainInfo" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into w_main_info (main_no, config_id, service_no, 
+      connect_ip, connect_port, connect_account, 
+      connect_pwd, remark, end_time, 
+      create_time, update_time)
+    values (#{mainNo,jdbcType=VARCHAR}, #{configId,jdbcType=INTEGER}, #{serviceNo,jdbcType=VARCHAR}, 
+      #{connectIp,jdbcType=VARCHAR}, #{connectPort,jdbcType=INTEGER}, #{connectAccount,jdbcType=VARCHAR}, 
+      #{connectPwd,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{endTime,jdbcType=TIMESTAMP}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.example.core.common.entity.MainInfo" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into w_main_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="mainNo != null" >
+        main_no,
+      </if>
+      <if test="configId != null" >
+        config_id,
+      </if>
+      <if test="serviceNo != null" >
+        service_no,
+      </if>
+      <if test="connectIp != null" >
+        connect_ip,
+      </if>
+      <if test="connectPort != null" >
+        connect_port,
+      </if>
+      <if test="connectAccount != null" >
+        connect_account,
+      </if>
+      <if test="connectPwd != null" >
+        connect_pwd,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="endTime != null" >
+        end_time,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="mainNo != null" >
+        #{mainNo,jdbcType=VARCHAR},
+      </if>
+      <if test="configId != null" >
+        #{configId,jdbcType=INTEGER},
+      </if>
+      <if test="serviceNo != null" >
+        #{serviceNo,jdbcType=VARCHAR},
+      </if>
+      <if test="connectIp != null" >
+        #{connectIp,jdbcType=VARCHAR},
+      </if>
+      <if test="connectPort != null" >
+        #{connectPort,jdbcType=INTEGER},
+      </if>
+      <if test="connectAccount != null" >
+        #{connectAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="connectPwd != null" >
+        #{connectPwd,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.example.core.common.entity.MainInfo" >
+    update w_main_info
+    <set >
+      <if test="mainNo != null" >
+        main_no = #{mainNo,jdbcType=VARCHAR},
+      </if>
+      <if test="configId != null" >
+        config_id = #{configId,jdbcType=INTEGER},
+      </if>
+      <if test="serviceNo != null" >
+        service_no = #{serviceNo,jdbcType=VARCHAR},
+      </if>
+      <if test="connectIp != null" >
+        connect_ip = #{connectIp,jdbcType=VARCHAR},
+      </if>
+      <if test="connectPort != null" >
+        connect_port = #{connectPort,jdbcType=INTEGER},
+      </if>
+      <if test="connectAccount != null" >
+        connect_account = #{connectAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="connectPwd != null" >
+        connect_pwd = #{connectPwd,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="endTime != null" >
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.example.core.common.entity.MainInfo" >
+    update w_main_info
+    set main_no = #{mainNo,jdbcType=VARCHAR},
+      config_id = #{configId,jdbcType=INTEGER},
+      service_no = #{serviceNo,jdbcType=VARCHAR},
+      connect_ip = #{connectIp,jdbcType=VARCHAR},
+      connect_port = #{connectPort,jdbcType=INTEGER},
+      connect_account = #{connectAccount,jdbcType=VARCHAR},
+      connect_pwd = #{connectPwd,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

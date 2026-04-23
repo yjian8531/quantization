@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.core.common.mapper.OrderProductMapper" >
+  <resultMap id="BaseResultMap" type="com.example.core.common.entity.OrderProduct" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="product_name" property="productName" jdbcType="VARCHAR" />
+    <result column="level" property="level" jdbcType="INTEGER" />
+    <result column="estimate_rate" property="estimateRate" jdbcType="DECIMAL" />
+    <result column="monthly_fee" property="monthlyFee" jdbcType="DECIMAL" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+    <result column="param_config" property="paramConfig" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, product_name, level, estimate_rate, monthly_fee, description, param_config, status, 
+    remark, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from w_order_product
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from w_order_product
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.example.core.common.entity.OrderProduct" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into w_order_product (product_name, level, estimate_rate, 
+      monthly_fee, description, param_config, 
+      status, remark, create_time, 
+      update_time)
+    values (#{productName,jdbcType=VARCHAR}, #{level,jdbcType=INTEGER}, #{estimateRate,jdbcType=DECIMAL}, 
+      #{monthlyFee,jdbcType=DECIMAL}, #{description,jdbcType=VARCHAR}, #{paramConfig,jdbcType=VARCHAR}, 
+      #{status,jdbcType=INTEGER}, #{remark,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.example.core.common.entity.OrderProduct" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into w_order_product
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="productName != null" >
+        product_name,
+      </if>
+      <if test="level != null" >
+        level,
+      </if>
+      <if test="estimateRate != null" >
+        estimate_rate,
+      </if>
+      <if test="monthlyFee != null" >
+        monthly_fee,
+      </if>
+      <if test="description != null" >
+        description,
+      </if>
+      <if test="paramConfig != null" >
+        param_config,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="productName != null" >
+        #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="level != null" >
+        #{level,jdbcType=INTEGER},
+      </if>
+      <if test="estimateRate != null" >
+        #{estimateRate,jdbcType=DECIMAL},
+      </if>
+      <if test="monthlyFee != null" >
+        #{monthlyFee,jdbcType=DECIMAL},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="paramConfig != null" >
+        #{paramConfig,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.example.core.common.entity.OrderProduct" >
+    update w_order_product
+    <set >
+      <if test="productName != null" >
+        product_name = #{productName,jdbcType=VARCHAR},
+      </if>
+      <if test="level != null" >
+        level = #{level,jdbcType=INTEGER},
+      </if>
+      <if test="estimateRate != null" >
+        estimate_rate = #{estimateRate,jdbcType=DECIMAL},
+      </if>
+      <if test="monthlyFee != null" >
+        monthly_fee = #{monthlyFee,jdbcType=DECIMAL},
+      </if>
+      <if test="description != null" >
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="paramConfig != null" >
+        param_config = #{paramConfig,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.example.core.common.entity.OrderProduct" >
+    update w_order_product
+    set product_name = #{productName,jdbcType=VARCHAR},
+      level = #{level,jdbcType=INTEGER},
+      estimate_rate = #{estimateRate,jdbcType=DECIMAL},
+      monthly_fee = #{monthlyFee,jdbcType=DECIMAL},
+      description = #{description,jdbcType=VARCHAR},
+      param_config = #{paramConfig,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      remark = #{remark,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
