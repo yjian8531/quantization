@@ -5,9 +5,9 @@ import java.util.Date;
 
 public class UserDiscount {
     private Integer id;
-
+    //
     private String userId;
-
+    //
     private BigDecimal discount;
 
     private String config;

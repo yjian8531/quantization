@@ -1,115 +1,67 @@
 package com.example.core.common.entity;
 
+import lombok.Data;
+
 import java.util.Date;
 
+/**
+ * 交易所APIKey记录表
+ */
+@Data
 public class ApikeyInfo {
+    /**
+     * 主键id
+     */
     private Integer id;
 
+    /**
+     * 用户ID
+     */
     private String userId;
 
+    /**
+     * 交易所平台(0:币安,1:gate)
+     */
     private Integer footplate;
 
+    /**
+     * 类型(0:现货,1:期货)
+     */
     private Integer type;
 
+    /**
+     * 名称
+     */
     private String name;
 
+    /**
+     * APP_key
+     */
     private String apikey;
 
+    /**
+     * APP_secret
+     */
     private String secret;
 
+    /**
+     * 状态(0:正常,1:禁用)
+     */
     private Integer status;
 
+    /**
+     * 备注
+     */
     private String remark;
 
+    /**
+     * 创建时间
+     */
     private Date createTime;
 
+    /**
+     * 最后更新时间
+     */
     private Date updateTime;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId == null ? null : userId.trim();
-    }
-
-    public Integer getFootplate() {
-        return footplate;
-    }
-
-    public void setFootplate(Integer footplate) {
-        this.footplate = footplate;
-    }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public void setType(Integer type) {
-        this.type = type;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name == null ? null : name.trim();
-    }
-
-    public String getApikey() {
-        return apikey;
-    }
-
-    public void setApikey(String apikey) {
-        this.apikey = apikey == null ? null : apikey.trim();
-    }
-
-    public String getSecret() {
-        return secret;
-    }
-
-    public void setSecret(String secret) {
-        this.secret = secret == null ? null : secret.trim();
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark == null ? null : remark.trim();
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
 }

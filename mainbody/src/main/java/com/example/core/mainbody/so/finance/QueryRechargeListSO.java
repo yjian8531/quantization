@@ -8,9 +8,10 @@ import lombok.Data;
 @Data
 public class QueryRechargeListSO {
 
-    /** 交易方式(0:支付宝,1:微信,2:账号余额) **/
-    private Integer way;
-
+    /** 币种类型 BSC TRX */
+    private String coinType;
+    /** 链类型 (TRC20/BEP20) */
+    private String chainType;
     /** 开始时间 **/
     private String startTime;
 

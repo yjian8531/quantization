@@ -134,7 +134,9 @@ public class AdminInterceptor implements HandlerInterceptor {
             }
 
         }
-        response.setStatus(3333);
+        ServletOutputStream out = response.getOutputStream();
+        ResultMessage result = new ResultMessage("3333","invalid_hash_value");
+        out.print(JSONObject.fromObject(result).toString());
         return false;
 
     }

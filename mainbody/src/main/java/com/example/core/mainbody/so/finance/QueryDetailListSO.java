@@ -12,7 +12,7 @@ public class QueryDetailListSO {
 
     /** 0:收入,1:支出 **/
     private Integer direction;
-    /**标签**/
+    /** 标签列表 **/
     private List<String> tags;
     /** 开始时间 **/
     private String startTime;

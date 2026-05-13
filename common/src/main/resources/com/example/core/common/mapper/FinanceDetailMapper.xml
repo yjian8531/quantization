@@ -402,14 +402,27 @@
   <!-- 新增：充值记录列表查询（SQL层完成类型解析） -->
   <select id="selectRechargeListWithConvert" resultType="com.example.core.common.vo.finance.RechargeRecordVO">
     select
-      money_num as moneyNum,
-      create_time as createTime,
-      tx_hash as txHash,
-      coin_type as tradeType,
-      chain_type as chainType
+    money_num as moneyNum,
+    coin_type as coinType,
+    chain_type as chainType,
+    tx_hash as txHash,
+    create_time as createTime
     from w_finance_detail
     where user_id = #{userId,jdbcType=VARCHAR}
-      and tag = 'topup'
+    and tag = 'topup'
+    and status = 1
+    <if test="coinType != null and coinType != ''">
+      and coin_type = #{coinType,jdbcType=VARCHAR}
+    </if>
+    <if test="chainType != null and chainType != ''">
+      and chain_type = #{chainType,jdbcType=VARCHAR}
+    </if>
+    <if test="startTime != null and startTime != ''">
+      and create_time &gt;= #{startTime,jdbcType=VARCHAR}
+    </if>
+    <if test="endTime != null and endTime != ''">
+      and create_time &lt;= #{endTime,jdbcType=VARCHAR}
+    </if>
     order by create_time desc
   </select>
   <select id="selectAdminBillList" parameterType="com.example.core.common.so.finance.QueryBillListAdminSO" resultType="com.example.core.common.entity.FinanceDetail">

@@ -11,7 +11,7 @@
     <result column="apikey_id" property="apikeyId" jdbcType="INTEGER" />
     <result column="symbol" property="symbol" jdbcType="VARCHAR" />
     <result column="node_time" property="nodeTime" jdbcType="VARCHAR" />
-    <result column="param_str" property="paramStr" jdbcType="INTEGER" />
+    <result column="param_str" property="paramStr" jdbcType="LONGVARCHAR" />
     <result column="income" property="income" jdbcType="DECIMAL" />
     <result column="income_rate" property="incomeRate" jdbcType="DECIMAL" />
     <result column="annualized_rate" property="annualizedRate" jdbcType="DECIMAL" />
@@ -48,7 +48,7 @@
       ent_time, update_time)
     values (#{orderNo,jdbcType=VARCHAR}, #{orderName,jdbcType=VARCHAR}, #{mainNo,jdbcType=VARCHAR}, 
       #{productId,jdbcType=INTEGER}, #{userId,jdbcType=VARCHAR}, #{apikeyId,jdbcType=INTEGER}, 
-      #{symbol,jdbcType=VARCHAR}, #{nodeTime,jdbcType=VARCHAR}, #{paramStr,jdbcType=INTEGER}, 
+      #{symbol,jdbcType=VARCHAR}, #{nodeTime,jdbcType=VARCHAR}, #{paramStr,jdbcType=LONGVARCHAR},
       #{income,jdbcType=DECIMAL}, #{incomeRate,jdbcType=DECIMAL}, #{annualizedRate,jdbcType=DECIMAL}, 
       #{status,jdbcType=INTEGER}, #{remark,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
       #{entTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
@@ -193,7 +193,7 @@
         node_time = #{nodeTime,jdbcType=VARCHAR},
       </if>
       <if test="paramStr != null" >
-        param_str = #{paramStr,jdbcType=INTEGER},
+        param_str = #{paramStr,jdbcType=LONGVARCHAR},
       </if>
       <if test="income != null" >
         income = #{income,jdbcType=DECIMAL},
@@ -232,7 +232,7 @@
       apikey_id = #{apikeyId,jdbcType=INTEGER},
       symbol = #{symbol,jdbcType=VARCHAR},
       node_time = #{nodeTime,jdbcType=VARCHAR},
-      param_str = #{paramStr,jdbcType=INTEGER},
+      param_str = #{paramStr,jdbcType=LONGVARCHAR},
       income = #{income,jdbcType=DECIMAL},
       income_rate = #{incomeRate,jdbcType=DECIMAL},
       annualized_rate = #{annualizedRate,jdbcType=DECIMAL},
@@ -243,4 +243,78 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+  <select id="selectUserRobotList" resultType="com.example.core.common.vo.robot.RobotListVO">
+    select
+    o.id,
+    o.order_no as orderNo,
+    o.order_name as orderName,
+    u.nick_name as investorName,
+    CASE a.footplate
+    WHEN 0 THEN '币安'
+    WHEN 1 THEN '波场'
+    ELSE '未知'
+    END as exchangeName,
+    o.symbol,
+    o.annualized_rate as annualizedRate,
+    o.income,
+    o.status,
+    o.create_time as createTime,
+    DATEDIFF(NOW(), o.create_time) as runDays
+    from w_order_info o
+    left join w_user_info u on u.user_id = o.user_id
+    left join w_apikey_info a on a.id = o.apikey_id
+    where o.user_id = #{userId}
+    <if test="exchange != null">
+      and a.footplate = #{exchange}
+    </if>
+    order by o.create_time desc
+  </select>
+
+  <select id="selectRobotDetail" resultType="com.example.core.common.vo.robot.RobotDetailVO">
+    select
+      o.id,
+      o.order_no as orderNo,
+      o.order_name as orderName,
+      u.nick_name as investorName,
+      u.user_id as userId,
+      o.main_no as serverIp,
+      CASE a.footplate
+        WHEN 0 THEN '币安'
+        WHEN 1 THEN 'Gate'
+        ELSE '未知'
+        END as exchangeName,
+      o.status,
+      CASE o.status
+        WHEN 0 THEN '启动中'
+        WHEN 1 THEN '运行中'
+        WHEN 2 THEN '暂停'
+        WHEN 3 THEN '已结束'
+        ELSE '未知'
+        END as statusName,
+      DATE_FORMAT(o.create_time, '%Y-%m-%d %H:%i:%s') as createTime,
+      o.income,
+      o.income_rate as incomeRate,
+      o.annualized_rate as annualizedRate,
+      DATE_FORMAT(o.update_time, '%Y-%m-%d %H:%i:%s') as updateTime,
+      op.trade_num as positionNum,
+      op.open_price as positionAvgPrice,
+      op.income as unrealizedPnl,
+      0.00 as liquidationPrice,
+      op.leverage as leverage,
+      op.take_profit_price as takeProfitPrice,
+      DATE_FORMAT(op.start_time, '%Y-%m-%d %H:%i:%s') as positionStartTime,
+      DATE_FORMAT(op.update_time, '%Y-%m-%d %H:%i:%s') as positionUpdateTime
+    from w_order_info o
+           left join w_user_info u on u.user_id = o.user_id
+           left join w_apikey_info a on a.id = o.apikey_id
+           left join (
+      select order_no, trade_num, open_price, income, leverage, take_profit_price, start_time, update_time
+      from w_order_position
+      where end_time is null
+      order by start_time desc
+        limit 1
+    ) op on op.order_no = o.order_no
+    where o.id = #{orderId}
+      and o.user_id = #{userId}
+  </select>
 </mapper>

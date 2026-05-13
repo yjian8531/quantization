@@ -1,116 +1,69 @@
 package com.example.core.common.entity;
 
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
+/**
+ * 策略订单历史仓位
+ */
+@Data
 public class OrderPosition {
+    /**
+     * 主键 ID
+     */
     private Integer id;
 
+    /**
+     * 订单编号
+     */
     private String orderNo;
 
+    /**
+     * 交易方向(buy:多单/sell:空单)
+     */
     private String tradeBl;
 
+    /**
+     * 开仓金额
+     */
     private BigDecimal openPrice;
 
+    /**
+     * 平仓金额
+     */
     private BigDecimal closePrice;
 
+    /**
+     * 交易数量
+     */
     private BigDecimal tradeNum;
 
+    /**
+     * 收益金额
+     */
     private BigDecimal income;
 
+    /**
+     * 收益率（%）
+     */
     private BigDecimal incomeRate;
 
+    /**
+     * 备注
+     */
     private String remark;
 
+    /**
+     * 开始时间
+     */
     private Date startTime;
 
+    /**
+     * 关闭时间
+     */
     private Date endTime;
 
-    public Integer getId() {
-        return id;
-    }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getOrderNo() {
-        return orderNo;
-    }
-
-    public void setOrderNo(String orderNo) {
-        this.orderNo = orderNo == null ? null : orderNo.trim();
-    }
-
-    public String getTradeBl() {
-        return tradeBl;
-    }
-
-    public void setTradeBl(String tradeBl) {
-        this.tradeBl = tradeBl == null ? null : tradeBl.trim();
-    }
-
-    public BigDecimal getOpenPrice() {
-        return openPrice;
-    }
-
-    public void setOpenPrice(BigDecimal openPrice) {
-        this.openPrice = openPrice;
-    }
-
-    public BigDecimal getClosePrice() {
-        return closePrice;
-    }
-
-    public void setClosePrice(BigDecimal closePrice) {
-        this.closePrice = closePrice;
-    }
-
-    public BigDecimal getTradeNum() {
-        return tradeNum;
-    }
-
-    public void setTradeNum(BigDecimal tradeNum) {
-        this.tradeNum = tradeNum;
-    }
-
-    public BigDecimal getIncome() {
-        return income;
-    }
-
-    public void setIncome(BigDecimal income) {
-        this.income = income;
-    }
-
-    public BigDecimal getIncomeRate() {
-        return incomeRate;
-    }
-
-    public void setIncomeRate(BigDecimal incomeRate) {
-        this.incomeRate = incomeRate;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark == null ? null : remark.trim();
-    }
-
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
-
-    public Date getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
-    }
 }

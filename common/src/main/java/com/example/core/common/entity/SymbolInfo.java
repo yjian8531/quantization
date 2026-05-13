@@ -1,66 +1,43 @@
 package com.example.core.common.entity;
 
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
+/**
+ * 币对列表
+ */
+@Data
 public class SymbolInfo {
+    /**
+     * 主键id
+     */
     private Integer id;
 
+    /**
+     * 币对
+     */
     private String symbol;
 
+    /**
+     * 真实值
+     */
     private BigDecimal realVal;
 
+    /**
+     * 状态(0:正常,1:禁用)
+     */
     private Integer status;
 
+    /**
+     * 创建时间
+     */
     private Date createTime;
 
+    /**
+     * 最后更新时间
+     */
     private Date updateTime;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getSymbol() {
-        return symbol;
-    }
-
-    public void setSymbol(String symbol) {
-        this.symbol = symbol == null ? null : symbol.trim();
-    }
-
-    public BigDecimal getRealVal() {
-        return realVal;
-    }
-
-    public void setRealVal(BigDecimal realVal) {
-        this.realVal = realVal;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
 }

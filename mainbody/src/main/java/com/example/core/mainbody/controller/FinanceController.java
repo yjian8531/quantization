@@ -23,7 +23,7 @@ public class FinanceController extends BaseController {
     private FinanceService financeService;
 
     /**
-     * 查询用户财务明细列表  账单模块
+     * 查询用户财务明细列表
      */
     @PostMapping(value = "/bill/list", produces = {"application/json"})
     public ResultMessage queryBillList(@RequestBody QueryDetailListSO queryDetailListSO) {
@@ -32,7 +32,7 @@ public class FinanceController extends BaseController {
     }
 
     /**
-     * 获取用户财务总览  账单模块
+     * 获取用户财务总览
      */
     @GetMapping(value = "/bill/overview", produces = {"application/json"})
     public ResultMessage getBillOverview() {
@@ -63,7 +63,7 @@ public class FinanceController extends BaseController {
 
     /**
      * 查询推广信息统计
-     * 对应原型图顶部：推广链接 + 6 个指标（总团队人数、团队业绩、当月推荐等）
+     *
      */
     @PostMapping(value = "/stats", produces = {"application/json"})
     public ResultMessage queryPromotionStats() {
@@ -73,8 +73,9 @@ public class FinanceController extends BaseController {
 
     /**
      * 查询推广奖励列表
-     * 对应原型图底部：邀请激活/托管达标/量化分润明细列表
+     *
      */
+    //对应原型图底部：邀请激活/托管达标/量化分润明细列表
     @PostMapping(value = "/reward/list", produces = {"application/json"})
     public ResultMessage queryRewardList(@RequestBody PromotionRewardSO so) {
         UserInfo userInfo = this.getLoginUser();
@@ -83,8 +84,8 @@ public class FinanceController extends BaseController {
 
     /**
      * 查询推广用户列表
-     * 对应原型图"推广用户"Tab
      */
+    // 对应原型图"推广用户"Tab
     @PostMapping(value = "/prouser/list", produces = {"application/json"})
     public ResultMessage queryPromotionUsers(@RequestBody PromotionRewardSO so) {
         UserInfo userInfo = this.getLoginUser();
@@ -92,39 +93,39 @@ public class FinanceController extends BaseController {
     }
 
 
-    /** 查询财务明细列表（管理端） */
+    /** 查询财务明细列表 */
     @PostMapping(value = "/admin/bill/list", produces = {"application/json"})
     public ResultMessage queryBillListForAdmin(@RequestBody QueryBillListAdminSO so) {
         return financeService.queryBillListForAdmin(so);
     }
 
-    /** 查询财务明细详情（管理端） */
+    /** 查询财务明细详情 */
     @PostMapping(value = "/admin/bill/detail", produces = {"application/json"})
     public ResultMessage getBillDetail(@RequestParam Integer id) {
         return financeService.getBillDetail(id);
     }
 
-    /** 查询返佣记录列表（管理端） */
+    /** 查询返佣记录列表 */
     @PostMapping(value = "/admin/commission/list", produces = {"application/json"})
     public ResultMessage queryCommissionList(@RequestBody QueryCommissionListSO so) {
         return financeService.queryCommissionList(so);
     }
 
-    /** 查询折扣配置列表（管理端） */
-    @PostMapping(value = "/admin/discount/list", produces = {"application/json"})
-    public ResultMessage queryDiscountList(@RequestBody QueryDiscountListSO so) {
-        return financeService.queryDiscountList(so);
-    }
-
-    /** 新增/修改折扣配置（管理端） */
-    @PostMapping(value = "/admin/discount/save", produces = {"application/json"})
-    public ResultMessage saveDiscount(@RequestBody UserDiscount discount) {
-        return financeService.saveDiscount(discount);
-    }
-
-    /** 删除折扣配置（管理端） */
-    @PostMapping(value = "/admin/discount/delete", produces = {"application/json"})
-    public ResultMessage deleteDiscount(@RequestParam Integer id) {
-        return financeService.deleteDiscount(id);
-    }
+//    /** 查询折扣配置列表 */
+//    @PostMapping(value = "/admin/discount/list", produces = {"application/json"})
+//    public ResultMessage queryDiscountList(@RequestBody QueryDiscountListSO so) {
+//        return financeService.queryDiscountList(so);
+//    }
+//
+//    /** 新增/修改折扣配置(id不为空是修改,为空是新增)*/
+//    @PostMapping(value = "/admin/discount/save", produces = {"application/json"})
+//    public ResultMessage saveDiscount(@RequestBody UserDiscount discount) {
+//        return financeService.saveDiscount(discount);
+//    }
+//
+//    /** 删除折扣配置（管理端） */
+//    @PostMapping(value = "/admin/discount/delete", produces = {"application/json"})
+//    public ResultMessage deleteDiscount(@RequestParam Integer id) {
+//        return financeService.deleteDiscount(id);
+//    }
 }

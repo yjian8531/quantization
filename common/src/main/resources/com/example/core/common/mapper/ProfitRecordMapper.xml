@@ -142,6 +142,7 @@
   <select id="selectProfitRecordList" resultType="com.example.core.common.vo.profitrecord.ProfitRecordVO">
     select
     product_name as productName,
+    product_no as productNo,
     product_type as productType,
     profit_amount as profitAmount,
     profit_rate as profitRate,
@@ -151,6 +152,9 @@
     where user_id = #{userId,jdbcType=VARCHAR}
     <if test="productName != null and productName != ''">
       and product_name like concat('%', #{productName,jdbcType=VARCHAR}, '%')
+    </if>
+    <if test="productNo != null and productNo != ''">
+      and product_no = #{productNo,jdbcType=VARCHAR}
     </if>
     <if test="startTime != null and startTime != ''">
       <![CDATA[ and create_time >= #{startTime,jdbcType=VARCHAR} ]]>
@@ -200,4 +204,14 @@
     </choose>
     order by timeLabel asc
   </select>
+
+
+  <!-- 查询用户有收益记录的产品列表（用于下拉框筛选） -->
+  <select id="selectUserProducts" resultType="com.example.core.common.vo.profitrecord.UserProductVO">
+    select distinct product_no as productNo, product_name as productName
+    from w_profit_record
+    where user_id = #{userId}
+    order by product_no
+  </select>
+
 </mapper>

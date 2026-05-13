@@ -14,6 +14,7 @@ import com.example.core.mainbody.service.FinanceService;
 import com.example.core.mainbody.so.finance.*;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -129,15 +130,22 @@ public class FinanceServiceImpl implements FinanceService {
      * 对应原型图下方的充值流水列表，展示每条充值的金额、交易类型、链类型、时间和哈希
      */
     @Override
-    public ResultMessage queryRechargeList(String userId, QueryRechargeListSO queryRechargeListSO) {
-        // 1. 开启分页
-        PageHelper.startPage(queryRechargeListSO.getPageNum(), queryRechargeListSO.getPageSize());
-        // 2. 执行查询，SQL层直接从 coin_type 和 chain_type 字段读取数据
-        Page<RechargeRecordVO> page = (Page<RechargeRecordVO>) financeDetailMapper.selectRechargeListWithConvert(userId);
-        // 3. 组装返回结果
+    public ResultMessage queryRechargeList(String userId, QueryRechargeListSO so) {
+        PageHelper.startPage(so.getPageNum(), so.getPageSize());
+
+        List<RechargeRecordVO> list = financeDetailMapper.selectRechargeListWithConvert(
+                userId,
+                so.getCoinType(),
+                so.getChainType(),
+                so.getStartTime(),
+                so.getEndTime()
+        );
+
+        PageInfo<RechargeRecordVO> pageInfo = new PageInfo<>(list);
         Map<String, Object> resultMap = new HashMap<>();
-        resultMap.put("total", page.getTotal());
-        resultMap.put("list", page.getResult());
+        resultMap.put("total", pageInfo.getTotal());
+        resultMap.put("list", pageInfo.getList());
+
         return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, resultMap);
     }
 

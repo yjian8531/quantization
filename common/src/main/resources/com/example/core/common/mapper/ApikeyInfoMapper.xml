@@ -161,4 +161,16 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectUserExchangeList" resultType="com.example.core.common.vo.product.ExchangeListVO">
+    select
+      id,
+      footplate,
+      type,
+      status
+    from w_apikey_info
+    where user_id = #{userId}
+    order by footplate asc, type asc
+  </select>
+
 </mapper>

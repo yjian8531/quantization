@@ -1,6 +1,8 @@
 package com.example.core.common.mapper;
 
 import com.example.core.common.entity.ProfitRecord;
+
+import com.example.core.common.vo.profitrecord.UserProductVO;
 import com.example.core.common.vo.profitrecord.ProfitRecordVO;
 import com.example.core.common.vo.profitrecord.ProfitTrendVO;
 import org.apache.ibatis.annotations.Param;
@@ -26,6 +28,7 @@ public interface ProfitRecordMapper {
      */
     List<ProfitRecordVO> selectProfitRecordList(@Param("userId") String userId,
                                                 @Param("productName") String productName,
+                                                @Param("productNo") String productNo,
                                                 @Param("startTime") String startTime,
                                                 @Param("endTime") String endTime);
 
@@ -37,4 +40,7 @@ public interface ProfitRecordMapper {
                                           @Param("dimension") String dimension,
                                           @Param("startTime") String startTime,
                                           @Param("endTime") String endTime);
+
+    List<UserProductVO> selectUserProducts(@Param("userId") String userId);
+
 }

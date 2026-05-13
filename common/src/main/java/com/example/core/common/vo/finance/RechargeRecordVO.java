@@ -9,14 +9,18 @@ import java.util.Date;
  */
 @Data
 public class RechargeRecordVO {
-    // 充值金额
+    /** 充值金额 */
     private BigDecimal moneyNum;
-    // 交易类型（ETH/BSC等）
-    private String tradeType;
-    // 链类型（ERC-20/BEF20等）
+
+    /** 币种 (如 ETH, BSC) */
+    private String coinType;
+
+    /** 链类型 (如 ERC-20, BEP20) */
     private String chainType;
-    // 充值时间
-    private Date createTime;
-    // 交易哈希（区块链交易ID）
+
+    /** 交易哈希 */
     private String txHash;
+
+    /** 充值时间 */
+    private Date createTime;
 }

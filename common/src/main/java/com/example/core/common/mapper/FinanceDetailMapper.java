@@ -90,10 +90,14 @@ public interface FinanceDetailMapper {
                                                        @Param("tags") List<String> tags,
                                                        @Param("startTime") String startTime,
                                                        @Param("endTime") String endTime);
-
-    // 充值记录
-    List<RechargeRecordVO> selectRechargeListWithConvert(@Param("userId") String userId);
-
+    /**
+     * 查询充值记录列表（包含类型转换和筛选）
+     */
+    List<RechargeRecordVO> selectRechargeListWithConvert(@Param("userId") String userId,
+                                                         @Param("coinType")String coinType,
+                                                         @Param("chainType") String chainType,
+                                                         @Param("startTime") String startTime,
+                                                         @Param("endTime") String endTime);
 
     // 后台查询账单列表
     List<FinanceDetail> selectAdminBillList(QueryBillListAdminSO so);

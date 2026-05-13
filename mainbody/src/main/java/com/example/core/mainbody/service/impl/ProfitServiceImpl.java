@@ -6,6 +6,7 @@ import com.example.core.common.utils.DateUtil;
 import com.example.core.common.utils.ResultMessage;
 import com.example.core.common.vo.profitrecord.ProfitRecordVO;
 import com.example.core.common.vo.profitrecord.ProfitTrendVO;
+import com.example.core.common.vo.profitrecord.UserProductVO;
 import com.example.core.mainbody.service.ProfitService;
 import com.example.core.mainbody.so.profitrecord.QueryProfitRecordSO;
 import com.example.core.mainbody.so.profitrecord.QueryProfitTrendSO;
@@ -76,18 +77,14 @@ public class ProfitServiceImpl implements ProfitService {
      */
     @Override
     public ResultMessage queryProfitRecordList(String userId, QueryProfitRecordSO queryProfitRecordSO) {
-        // 1. 开启分页拦截：设置当前查询的页码和每页条数
         PageHelper.startPage(queryProfitRecordSO.getPageNum(), queryProfitRecordSO.getPageSize());
-
-        // 2. 执行分页查询：根据用户ID、策略名称、时间范围检索收益记录
         Page<ProfitRecordVO> page = (Page<ProfitRecordVO>) profitRecordMapper.selectProfitRecordList(
                 userId,
                 queryProfitRecordSO.getProductName(),
+                queryProfitRecordSO.getProductNo(),
                 queryProfitRecordSO.getStartTime(),
                 queryProfitRecordSO.getEndTime()
         );
-
-        // 3. 组装返回结果：包含总记录数和当前页数据列表
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("total", page.getTotal());
         resultMap.put("list", page.getResult());
@@ -154,6 +151,7 @@ public class ProfitServiceImpl implements ProfitService {
         List<ProfitRecordVO> list = profitRecordMapper.selectProfitRecordList(
                 userId,
                 queryProfitRecordSO.getProductName(),
+                queryProfitRecordSO.getProductNo(),
                 queryProfitRecordSO.getStartTime(),
                 queryProfitRecordSO.getEndTime()
         );
@@ -189,5 +187,18 @@ public class ProfitServiceImpl implements ProfitService {
         String fileName = URLEncoder.encode("收益记录明细_" + System.currentTimeMillis(), "UTF-8") + ".xls";
 
         ExcelUtil.exportExcel(response, excelData, "收益记录", fileName, 20);
+    }
+
+    /**
+     * 查询用户产品列表
+     * 对应原型图左下角的产品列表
+     */
+    @Override
+    public ResultMessage queryUserProducts(String userId) {
+        List<UserProductVO> products = profitRecordMapper.selectUserProducts(userId);
+        if (products == null){
+            return new ResultMessage(ResultMessage.FAILED_CODE, ResultMessage.FAILED_MSG, null);
+        }
+        return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, products);
     }
 }

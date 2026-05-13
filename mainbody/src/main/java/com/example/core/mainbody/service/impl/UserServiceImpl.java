@@ -304,15 +304,9 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    /**
-     * 登录
-     *
-     * @param loginSO
-     * @return
-     */
 //    public ResultMessage login(LoginSO loginSO) {
-//        // 根据邮箱查询用户
-//        UserInfo userInfo = userInfoMapper.selectByPhone(loginSO.getEmail());
+//        // 根据邮箱查询用户（原来是查手机号）
+//        UserInfo userInfo = userInfoMapper.selectByEmail(loginSO.getEmail());
 //        if (userInfo != null) {
 //            if (userInfo.getStatus() == 1) {
 //                return new ResultMessage(ResultMessage.FAILED_CODE, "当前账号已被禁用");
@@ -354,50 +348,62 @@ public class UserServiceImpl implements UserService {
 //            return new ResultMessage(ResultMessage.FAILED_CODE, "邮箱账号错误");
 //        }
 //    }
+
+    // ... existing code ...
+    @Transactional(rollbackFor = Exception.class)
     public ResultMessage login(LoginSO loginSO) {
-        // 根据邮箱查询用户（原来是查手机号）
+        // 1. 根据邮箱查询用户
         UserInfo userInfo = userInfoMapper.selectByEmail(loginSO.getEmail());
-        if (userInfo != null) {
-            if (userInfo.getStatus() == 1) {
-                return new ResultMessage(ResultMessage.FAILED_CODE, "当前账号已被禁用");
-            }
-
-            UserLogin userLogin = new UserLogin();
-            userLogin.setCreateTime(new Date());
-            userLogin.setUserId(userInfo.getUserId());
-            userLogin.setLoginIp(loginSO.getIp());
-
-            // 密码验证
-            if (MD5.MD5Encode(MD5.MD5Encode(MD5.MD5Encode(loginSO.getPwd()))).equals(userInfo.getLoginPwd())) {
-                Map<String, Object> map = new HashMap<>();
-                String str = CommonUtil.getRandomStr(4);
-                map.put("userInfo", userInfo);
-                map.put("str", str);
-                RedisUtil.setEx(userInfo.getUserId(), JSONObject.fromObject(map).toString(), 10800);
-
-                userInfo.setToken(InterceptorUtil.getToken(userInfo.getUserId(), str));
-                userInfo.setLoginIp(loginSO.getIp());
-                userInfo.setLoginTime(new Date());
-                userInfoMapper.updateByPrimaryKeySelective(userInfo);
-                userLogin.setStatus(CommonUtil.STATUS_0);
-                userLoginMapper.insertSelective(userLogin);
-
-                UserWx userWx = userWxMapper.selectByUserId(userInfo.getUserId());
-                if (userWx == null) {
-                    userInfo.setWx(0);
-                } else {
-                    userInfo.setWx(1);
-                }
-                return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, userInfo);
-            } else {
-                userLogin.setStatus(CommonUtil.STATUS_1);
-                userLoginMapper.insertSelective(userLogin);
-                return new ResultMessage(ResultMessage.FAILED_CODE, "密码错误");
-            }
-        } else {
+        if (userInfo == null) {
             return new ResultMessage(ResultMessage.FAILED_CODE, "邮箱账号错误");
         }
+
+        // 2. 检查账号状态
+        if (userInfo.getStatus() == 1) {
+            return new ResultMessage(ResultMessage.FAILED_CODE, "当前账号已被禁用");
+        }
+
+        // 3. 密码验证
+        String inputPwd = MD5.MD5Encode(MD5.MD5Encode(MD5.MD5Encode(loginSO.getPwd())));
+        if (!inputPwd.equals(userInfo.getLoginPwd())) {
+            // 记录登录失败日志
+            UserLogin failLog = new UserLogin();
+            failLog.setCreateTime(new Date());
+            failLog.setUserId(userInfo.getUserId());
+            failLog.setLoginIp(loginSO.getIp());
+            failLog.setStatus(CommonUtil.STATUS_1);
+            userLoginMapper.insertSelective(failLog);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "密码错误");
+        }
+
+        // 4. 密码正确，生成 Token 并更新登录信息
+        String randomStr = CommonUtil.getRandomStr(4);
+        Map<String, Object> redisMap = new HashMap<>();
+        redisMap.put("userInfo", userInfo);
+        redisMap.put("str", randomStr);
+        RedisUtil.setEx(userInfo.getUserId(), JSONObject.fromObject(redisMap).toString(), 10800);
+
+        // 生成 Token
+        String token = InterceptorUtil.getToken(userInfo.getUserId(), randomStr);
+        userInfo.setToken(token);
+        userInfo.setLoginIp(loginSO.getIp());
+        userInfo.setLoginTime(new Date());
+
+        // 更新用户最后登录信息
+        userInfoMapper.updateByPrimaryKeySelective(userInfo);
+
+        // 记录登录成功日志
+        UserLogin successLog = new UserLogin();
+        successLog.setCreateTime(new Date());
+        successLog.setUserId(userInfo.getUserId());
+        successLog.setLoginIp(loginSO.getIp());
+        successLog.setStatus(CommonUtil.STATUS_0);
+        userLoginMapper.insertSelective(successLog);
+
+        return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, userInfo);
     }
+// ... existing code ...
+
 
 
     /**
