@@ -1,9 +1,13 @@
 package com.example.core.mainbody.controller;
 
 import com.example.core.common.controller.BaseController;
+import com.example.core.common.entity.StrategyInfo;
 import com.example.core.common.utils.ResultMessage;
 import com.example.core.mainbody.service.OrderService;
 import com.example.core.mainbody.so.product.ConfigRobotSO;
+import com.example.core.mainbody.so.strategy.CreateStrategyOrderSO;
+import com.example.core.mainbody.so.strategy.PositionPushSO;
+import com.example.core.mainbody.so.strategy.TradeLogPushSO;
 import com.example.core.mainbody.so.robot.QueryHistoryPositionSO;
 import com.example.core.mainbody.so.robot.QueryRobotSO;
 import com.example.core.mainbody.so.robot.QueryTradeRecordSO;
@@ -24,7 +28,6 @@ public class OrderController extends BaseController {
     private OrderService orderService;
 
     /**
-<<<<<<< HEAD
      * 创建策略订单
      * 请求示例：POST /message/create {"productId": 1, "apikeyId": 1, "symbol": "BTC/USDT", "nodeTime": "15", "paramStr": "{}"}
      */
@@ -74,7 +77,7 @@ public class OrderController extends BaseController {
         return orderService.receivePositionInfo(position);
     }
 
-=======
+    /**
      * 查询用户可用交易所列表
      * 用于配置机器人时选择交易所
      * 返回用户已绑定的API Key对应的交易所信息
@@ -157,5 +160,61 @@ public class OrderController extends BaseController {
         String userId = getUserId();
         return orderService.queryTradeRecordList(userId, so);
     }
->>>>>>> origin/main
+
+    /**
+     * 接收策略状态心跳上报
+     */
+    @PostMapping(value = "/status", produces = {"application/json"})
+    public ResultMessage receiveStrategyStatus(@RequestBody String statusJson) {
+        log.info("接收策略状态上报: {}", statusJson);
+        return new ResultMessage(ResultMessage.SUCCEED_CODE, "已接收");
+    }
+
+    // ==================== 策略模板 CRUD ====================
+
+    /**
+     * 新增策略模板
+     */
+    @PostMapping(value = "/strategy/add", produces = {"application/json"})
+    public ResultMessage addStrategyInfo(@RequestBody StrategyInfo strategyInfo) {
+        log.info("新增策略模板: {}", strategyInfo.getStrategyName());
+        return orderService.addStrategyInfo(strategyInfo);
+    }
+
+    /**
+     * 修改策略模板
+     */
+    @PostMapping(value = "/strategy/update", produces = {"application/json"})
+    public ResultMessage updateStrategyInfo(@RequestBody StrategyInfo strategyInfo) {
+        log.info("修改策略模板: id={}", strategyInfo.getId());
+        return orderService.updateStrategyInfo(strategyInfo);
+    }
+
+    /**
+     * 删除策略模板
+     */
+    @PostMapping(value = "/strategy/delete", produces = {"application/json"})
+    public ResultMessage deleteStrategyInfo(@RequestParam Integer id) {
+        log.info("删除策略模板: id={}", id);
+        return orderService.deleteStrategyInfo(id);
+    }
+
+    /**
+     * 查询策略模板详情
+     */
+    @GetMapping(value = "/strategy/detail", produces = {"application/json"})
+    public ResultMessage queryStrategyInfo(@RequestParam String strategyId) {
+        log.info("查询策略模板详情: strategyId={}", strategyId);
+        return orderService.queryStrategyInfo(strategyId);
+    }
+
+    /**
+     * 查询策略模板列表
+     */
+    @GetMapping(value = "/strategy/list", produces = {"application/json"})
+    public ResultMessage queryStrategyInfoList() {
+        log.info("查询策略模板列表");
+        return orderService.queryStrategyInfoList();
+    }
+
 }

@@ -25,6 +25,14 @@
     from w_main_config
     where id = #{id,jdbcType=INTEGER}
   </select>
+
+  <select id="selectNormalConfig" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM w_main_config
+    WHERE status = 0
+    LIMIT 1
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from w_main_config
     where id = #{id,jdbcType=INTEGER}

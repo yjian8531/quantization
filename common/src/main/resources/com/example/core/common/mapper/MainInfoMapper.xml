@@ -25,6 +25,28 @@
     from w_main_info
     where id = #{id,jdbcType=INTEGER}
   </select>
+
+  <select id="selectByMainNo" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM w_main_info
+    WHERE main_no = #{mainNo}
+  </select>
+
+  <select id="selectByServiceNo" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM w_main_info
+    WHERE service_no = #{serviceNo}
+  </select>
+
+  <select id="selectByConfigId" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM w_main_info
+    WHERE config_id = #{configId}
+  </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from w_main_info
     where id = #{id,jdbcType=INTEGER}

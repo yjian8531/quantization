@@ -23,5 +23,7 @@ public interface OrderPositionMapper {
     /** 查询历史仓位列表（已结束） */
     List<HistoryPositionVO> selectHistoryPositionList(@Param("orderNo") String orderNo);
 
+    /** 根据订单号查询仓位列表 */
+    List<OrderPosition> selectByOrderNo(@Param("orderNo") String orderNo);
 
 }

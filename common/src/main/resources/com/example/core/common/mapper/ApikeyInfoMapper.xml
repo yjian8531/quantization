@@ -162,6 +162,14 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
 
+  <select id="selectByIdAndUserId" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from w_apikey_info
+    where id = #{id,jdbcType=INTEGER}
+      and user_id = #{userId,jdbcType=VARCHAR}
+  </select>
+
   <select id="selectUserExchangeList" resultType="com.example.core.common.vo.product.ExchangeListVO">
     select
       id,

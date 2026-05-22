@@ -100,5 +100,14 @@ public class OrderInfo {
      */
     private Date updateTime;
 
+    /**
+     * 策略ID（对应StrategyInfo.strategyId，策略模板标识）
+     */
+    private String strategyId;
+
+    /**
+     * Python策略进程PID
+     */
+    private String pid;
 
 }

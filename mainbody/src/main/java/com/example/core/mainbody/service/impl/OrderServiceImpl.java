@@ -2,7 +2,6 @@ package com.example.core.mainbody.service.impl;
 
 import com.example.core.common.entity.*;
 import com.example.core.common.mapper.*;
-<<<<<<< HEAD
 import com.example.core.common.utils.*;
 import com.example.core.mainbody.service.MainService;
 import com.example.core.mainbody.service.OrderService;
@@ -11,22 +10,18 @@ import com.example.core.mainbody.so.strategy.PositionPushSO;
 import com.example.core.mainbody.so.strategy.TradeLogPushSO;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
-=======
-import com.example.core.common.utils.ResultMessage;
 import com.example.core.common.vo.product.ExchangeListVO;
 import com.example.core.common.vo.product.SymbolListVO;
 import com.example.core.common.vo.robot.HistoryPositionVO;
 import com.example.core.common.vo.robot.RobotDetailVO;
 import com.example.core.common.vo.robot.RobotListVO;
 import com.example.core.common.vo.robot.TradeRecordVO;
-import com.example.core.mainbody.service.OrderService;
 import com.example.core.mainbody.so.product.ConfigRobotSO;
 import com.example.core.mainbody.so.robot.QueryHistoryPositionSO;
 import com.example.core.mainbody.so.robot.QueryRobotSO;
 import com.example.core.mainbody.so.robot.QueryTradeRecordSO;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
->>>>>>> origin/main
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,15 +29,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.*;
 
-<<<<<<< HEAD
 @Slf4j
-=======
->>>>>>> origin/main
 @Service
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
-<<<<<<< HEAD
     private OrderInfoMapper orderInfoMapper;
 
     @Autowired
@@ -52,15 +43,12 @@ public class OrderServiceImpl implements OrderService {
     private OrderPositionMapper orderPositionMapper;
 
     @Autowired
-=======
->>>>>>> origin/main
     private OrderProductMapper orderProductMapper;
 
     @Autowired
     private ApikeyInfoMapper apikeyInfoMapper;
 
     @Autowired
-<<<<<<< HEAD
     private MainInfoMapper mainInfoMapper;
 
     @Autowired
@@ -68,6 +56,21 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private MainConfigMapper mainConfigMapper;
+
+    @Autowired
+    private SymbolInfoMapper symbolInfoMapper;
+
+    @Autowired
+    private UserFinanceMapper userFinanceMapper;
+
+    @Autowired
+    private FinanceDetailMapper financeDetailMapper;
+
+    @Autowired
+    private StrategyInfoMapper strategyInfoMapper;
+
+    @Autowired
+    private OrderTaskMapper orderTaskMapper;
 
 
     /**
@@ -85,7 +88,16 @@ public class OrderServiceImpl implements OrderService {
                 return new ResultMessage(ResultMessage.FAILED_CODE, "产品已下架");
             }
 
-            // 2. 校验APIKey是否存在且属于当前用户
+            // 2. 校验策略模板是否存在
+            if (StringUtils.isEmpty(so.getStrategyInfoId())) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "策略模板ID不能为空");
+            }
+            StrategyInfo strategyInfo = strategyInfoMapper.selectByStrategyId(so.getStrategyInfoId());
+            if (strategyInfo == null) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "策略模板不存在或已禁用");
+            }
+
+            // 3. 校验APIKey是否存在且属于当前用户
             ApikeyInfo apikeyInfo = apikeyInfoMapper.selectByIdAndUserId(so.getApikeyId(), userId);
             if (apikeyInfo == null) {
                 return new ResultMessage(ResultMessage.FAILED_CODE, "APIKey不存在或不属于当前用户");
@@ -94,30 +106,31 @@ public class OrderServiceImpl implements OrderService {
                 return new ResultMessage(ResultMessage.FAILED_CODE, "APIKey已被禁用");
             }
 
-            // 3. 获取可用的主机配置
+            // 4. 获取可用的主机配置
             MainConfig mainConfig = mainConfigMapper.selectNormalConfig();
             if (mainConfig == null) {
                 return new ResultMessage(ResultMessage.FAILED_CODE, "暂无可用的主机配置");
             }
 
-            // 4. 创建云服务器
+            // 5. 创建云服务器
             String instanceId = mainService.create(mainConfig);
             if (StringUtils.isEmpty(instanceId)) {
                 return new ResultMessage(ResultMessage.FAILED_CODE, "创建机器人服务器失败");
             }
             String mainNo = CommonUtil.getRandomStr(12);
-            // 3. 创建主机信息记录（初始状态）
+            // 6. 创建主机信息记录（记录实例ID）
             MainInfo mainInfo = new MainInfo();
             mainInfo.setMainNo(mainNo);
             mainInfo.setConfigId(mainConfig.getId());
+            mainInfo.setServiceNo(instanceId);
             mainInfo.setCreateTime(new Date());
             mainInfo.setUpdateTime(new Date());
             mainInfoMapper.insertSelective(mainInfo);
 
-            // 5. 生成订单编号
+            // 7. 生成订单编号
             String orderNo = CommonUtil.getRandomStr(8);
 
-            // 6. 创建策略订单
+            // 8. 创建策略订单
             OrderInfo orderInfo = new OrderInfo();
             orderInfo.setOrderNo(orderNo);
             orderInfo.setOrderName(product.getProductName());
@@ -128,11 +141,22 @@ public class OrderServiceImpl implements OrderService {
             orderInfo.setSymbol(so.getSymbol());
             orderInfo.setNodeTime(so.getNodeTime());
             orderInfo.setParamStr(so.getParamStr());
+            orderInfo.setStrategyId(strategyInfo.getStrategyId());
             orderInfo.setStatus(StrategyConstant.OrderStatus.STARTING);
             orderInfo.setAnnualizedRate(product.getEstimateRate());
             orderInfo.setCreateTime(new Date());
             int i = orderInfoMapper.insertSelective(orderInfo);
             if(i > 0){
+
+                /** 添加创建策略机器人任务 **/
+                OrderTask orderTask = new OrderTask();
+                orderTask.setOrderNo(orderInfo.getOrderNo());
+                orderTask.setTag(0);
+                orderTask.setStatus(0);
+                orderTask.setCreateTime(new Date());
+                orderTask.setUpdateTime(new Date());
+                orderTaskMapper.insertSelective(orderTask);
+
                 return new ResultMessage(ResultMessage.SUCCEED_CODE, "创建成功，机器人部署中");
             }else{
                 return new ResultMessage(ResultMessage.FAILED_CODE, "创建失败");
@@ -141,24 +165,7 @@ public class OrderServiceImpl implements OrderService {
             log.error("创建策略订单失败", e);
             return new ResultMessage(ResultMessage.FAILED_CODE, "创建失败: " + e.getMessage());
         }
-=======
-    private SymbolInfoMapper symbolInfoMapper;
-
-    @Autowired
-    private OrderInfoMapper orderInfoMapper;
-
-    @Autowired
-    private UserFinanceMapper userFinanceMapper;
-
-    @Autowired
-    private FinanceDetailMapper financeDetailMapper;
-
-    @Autowired
-    private OrderPositionMapper orderPositionMapper;
-
-
-    @Autowired
-    private OrderTradeMapper orderTradeMapper;
+    }
 
 
     /**
@@ -297,48 +304,45 @@ public class OrderServiceImpl implements OrderService {
         resultMap.put("total", page.getTotal());
 
         return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, resultMap);
->>>>>>> origin/main
     }
 
 
     /**
-<<<<<<< HEAD
      * 启动策略
      */
     @Transactional
     public ResultMessage startStrategyOrder(String orderNo) {
         OrderInfo orderInfo = orderInfoMapper.selectByOrderNo(orderNo);
-        MainInfo mainInfo = mainInfoMapper.selectByMainNo(orderInfo.getMainNo());
-        ApikeyInfo apikeyInfo = apikeyInfoMapper.selectByPrimaryKey(orderInfo.getApikeyId());
         if (orderInfo == null) {
             return new ResultMessage(ResultMessage.FAILED_CODE, "订单不存在");
         }
+        MainInfo mainInfo = mainInfoMapper.selectByMainNo(orderInfo.getMainNo());
+        ApikeyInfo apikeyInfo = apikeyInfoMapper.selectByPrimaryKey(orderInfo.getApikeyId());
 
         try{
-            // TODO: 发送恢复指令到云服务器
-            String exchange = apikeyInfo.getFootplate() == 0 ? "binance" : "gateio";// binance 或 gateio
+            String exchange = apikeyInfo.getFootplate() == 0 ? "binance" : "gateio";
             String apiKey = apikeyInfo.getApikey();
             String secret = apikeyInfo.getSecret();
 
-            Map<String, Object> params = (Map<String, Object>)JSONObject.toBean(JSONObject.fromObject(orderInfo.getParamStr()),HashMap.class);
-
             StrategyUtil strategyUtil = new StrategyUtil(mainInfo.getConnectIp());
-            String str = strategyUtil.startStrategy(exchange,apiKey,secret,params);
+            String str = strategyUtil.startStrategy(orderNo, exchange, orderInfo.getSymbol(), apiKey, secret, orderInfo.getParamStr());
             JSONObject result = JSONObject.fromObject(str);
-            if(result.getInt("status") == 0) {
-                orderInfo.setStrategyId(result.getJSONObject("data").getString("strategyId"));
+            if("0000".equals(result.getString("code"))) {
+                JSONObject data = result.getJSONObject("data");
+                // 保存Python进程PID
+                orderInfo.setPid(data.getString("pid"));
                 orderInfo.setStatus(StrategyConstant.OrderStatus.RUNNING);
                 orderInfo.setUpdateTime(new Date());
                 orderInfoMapper.updateByPrimaryKeySelective(orderInfo);
 
-                return new ResultMessage(ResultMessage.SUCCEED_CODE, "成功");
+                return new ResultMessage(ResultMessage.SUCCEED_CODE, "启动成功");
 
             }else{
-                return new ResultMessage(ResultMessage.FAILED_CODE, "启动策略失败",result.getString("msg"));
+                return new ResultMessage(ResultMessage.FAILED_CODE, "启动策略失败", result.getString("msg"));
             }
         }catch (Exception e){
-            e.printStackTrace();
-            return new ResultMessage(ResultMessage.FAILED_CODE, "启动策略异常",e.getMessage());
+            log.error("启动策略异常", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "启动策略异常", e.getMessage());
         }
 
     }
@@ -350,15 +354,18 @@ public class OrderServiceImpl implements OrderService {
      */
     public ResultMessage stopStrategyOrder(String orderNo){
         OrderInfo orderInfo = orderInfoMapper.selectByOrderNo(orderNo);
+        if (orderInfo == null) {
+            return new ResultMessage(ResultMessage.FAILED_CODE, "订单不存在");
+        }
         MainInfo mainInfo = mainInfoMapper.selectByMainNo(orderInfo.getMainNo());
 
         StrategyUtil strategyUtil = new StrategyUtil(mainInfo.getConnectIp());
-        String str = strategyUtil.stopStrategy(orderInfo.getStrategyId());
+        String str = strategyUtil.stopStrategy(orderNo);
         JSONObject result = JSONObject.fromObject(str);
-        if(result.getInt("status") == 0) {
-            return new ResultMessage(ResultMessage.SUCCEED_CODE, "成功");
+        if("0000".equals(result.getString("code"))) {
+            return new ResultMessage(ResultMessage.SUCCEED_CODE, "停止成功");
         }else{
-            return new ResultMessage(ResultMessage.FAILED_CODE, "启动策略失败",result.getString("msg"));
+            return new ResultMessage(ResultMessage.FAILED_CODE, "停止策略失败", result.getString("msg"));
         }
     }
 
@@ -488,7 +495,7 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
-=======
+    /**
      * 查询用户交易所列表
      */
     @Override
@@ -514,5 +521,118 @@ public class OrderServiceImpl implements OrderService {
         }
         return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, list);
     }
->>>>>>> origin/main
+
+    // ==================== 策略模板 CRUD ====================
+
+    /**
+     * 新增策略模板
+     */
+    @Override
+    public ResultMessage addStrategyInfo(StrategyInfo strategyInfo) {
+        try {
+            if (StringUtils.isEmpty(strategyInfo.getStrategyId())) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "策略ID不能为空");
+            }
+            if (StringUtils.isEmpty(strategyInfo.getStrategyName())) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "策略名称不能为空");
+            }
+            strategyInfo.setCreateTime(new Date());
+            strategyInfo.setUpdateTime(new Date());
+            int i = strategyInfoMapper.insertSelective(strategyInfo);
+            if (i > 0) {
+                return new ResultMessage(ResultMessage.SUCCEED_CODE, "新增策略模板成功");
+            }
+            return new ResultMessage(ResultMessage.FAILED_CODE, "新增策略模板失败");
+        } catch (Exception e) {
+            log.error("新增策略模板失败", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "新增失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 修改策略模板
+     */
+    @Override
+    public ResultMessage updateStrategyInfo(StrategyInfo strategyInfo) {
+        try {
+            if (strategyInfo.getId() == null) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "策略模板ID不能为空");
+            }
+            StrategyInfo exist = strategyInfoMapper.selectByPrimaryKey(strategyInfo.getId());
+            if (exist == null) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "策略模板不存在");
+            }
+            strategyInfo.setUpdateTime(new Date());
+            int i = strategyInfoMapper.updateByPrimaryKeySelective(strategyInfo);
+            if (i > 0) {
+                return new ResultMessage(ResultMessage.SUCCEED_CODE, "修改策略模板成功");
+            }
+            return new ResultMessage(ResultMessage.FAILED_CODE, "修改策略模板失败");
+        } catch (Exception e) {
+            log.error("修改策略模板失败", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "修改失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 删除策略模板
+     */
+    @Override
+    public ResultMessage deleteStrategyInfo(Integer id) {
+        try {
+            if (id == null) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "策略模板ID不能为空");
+            }
+            StrategyInfo exist = strategyInfoMapper.selectByPrimaryKey(id);
+            if (exist == null) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "策略模板不存在");
+            }
+            int i = strategyInfoMapper.deleteByPrimaryKey(id);
+            if (i > 0) {
+                return new ResultMessage(ResultMessage.SUCCEED_CODE, "删除策略模板成功");
+            }
+            return new ResultMessage(ResultMessage.FAILED_CODE, "删除策略模板失败");
+        } catch (Exception e) {
+            log.error("删除策略模板失败", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "删除失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 根据策略ID查询策略模板详情
+     */
+    @Override
+    public ResultMessage queryStrategyInfo(String strategyId) {
+        try {
+            if (StringUtils.isEmpty(strategyId)) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "策略ID不能为空");
+            }
+            StrategyInfo strategyInfo = strategyInfoMapper.selectByStrategyId(strategyId);
+            if (strategyInfo == null) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "策略模板不存在");
+            }
+            return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, strategyInfo);
+        } catch (Exception e) {
+            log.error("查询策略模板失败", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "查询失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 查询策略模板列表
+     */
+    @Override
+    public ResultMessage queryStrategyInfoList() {
+        try {
+            List<StrategyInfo> list = strategyInfoMapper.selectAll();
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("total", list.size());
+            resultMap.put("list", list);
+            return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, resultMap);
+        } catch (Exception e) {
+            log.error("查询策略模板列表失败", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "查询失败: " + e.getMessage());
+        }
+    }
+
 }

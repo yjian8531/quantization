@@ -20,11 +20,13 @@
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="ent_time" property="entTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="strategy_id" property="strategyId" jdbcType="VARCHAR" />
+    <result column="pid" property="pid" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, order_no, order_name, main_no, product_id, user_id, apikey_id, symbol, node_time, 
     param_str, income, income_rate, annualized_rate, status, remark, create_time, ent_time, 
-    update_time
+    update_time, strategy_id, pid
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -45,13 +47,15 @@
       symbol, node_time, param_str, 
       income, income_rate, annualized_rate, 
       status, remark, create_time, 
-      ent_time, update_time)
+      ent_time, update_time, strategy_id, 
+      pid)
     values (#{orderNo,jdbcType=VARCHAR}, #{orderName,jdbcType=VARCHAR}, #{mainNo,jdbcType=VARCHAR}, 
       #{productId,jdbcType=INTEGER}, #{userId,jdbcType=VARCHAR}, #{apikeyId,jdbcType=INTEGER}, 
       #{symbol,jdbcType=VARCHAR}, #{nodeTime,jdbcType=VARCHAR}, #{paramStr,jdbcType=LONGVARCHAR},
       #{income,jdbcType=DECIMAL}, #{incomeRate,jdbcType=DECIMAL}, #{annualizedRate,jdbcType=DECIMAL}, 
       #{status,jdbcType=INTEGER}, #{remark,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{entTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+      #{entTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{strategyId,jdbcType=VARCHAR}, 
+      #{pid,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.example.core.common.entity.OrderInfo" >
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
@@ -110,6 +114,12 @@
       <if test="updateTime != null" >
         update_time,
       </if>
+      <if test="strategyId != null" >
+        strategy_id,
+      </if>
+      <if test="pid != null" >
+        pid,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="orderNo != null" >
@@ -137,7 +147,7 @@
         #{nodeTime,jdbcType=VARCHAR},
       </if>
       <if test="paramStr != null" >
-        #{paramStr,jdbcType=INTEGER},
+        #{paramStr,jdbcType=LONGVARCHAR},
       </if>
       <if test="income != null" >
         #{income,jdbcType=DECIMAL},
@@ -162,6 +172,12 @@
       </if>
       <if test="updateTime != null" >
         #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="strategyId != null" >
+        #{strategyId,jdbcType=VARCHAR},
+      </if>
+      <if test="pid != null" >
+        #{pid,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -219,6 +235,12 @@
       <if test="updateTime != null" >
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="strategyId != null" >
+        strategy_id = #{strategyId,jdbcType=VARCHAR},
+      </if>
+      <if test="pid != null" >
+        pid = #{pid,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -240,7 +262,9 @@
       remark = #{remark,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       ent_time = #{entTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      strategy_id = #{strategyId,jdbcType=VARCHAR},
+      pid = #{pid,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
   <select id="selectUserRobotList" resultType="com.example.core.common.vo.robot.RobotListVO">
@@ -316,5 +340,19 @@
     ) op on op.order_no = o.order_no
     where o.id = #{orderId}
       and o.user_id = #{userId}
+  </select>
+
+  <select id="selectByOrderNo" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from w_order_info
+    where order_no = #{orderNo}
+  </select>
+
+  <select id="selectByStrategyId" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from w_order_info
+    where strategy_id = #{strategyId}
   </select>
 </mapper>

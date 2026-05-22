@@ -28,4 +28,10 @@ public interface OrderInfoMapper {
     /** 查询机器人详情（包含当前仓位） */
     RobotDetailVO selectRobotDetail(@Param("orderId") Integer orderId, @Param("userId") String userId);
 
+    /** 根据订单号查询 */
+    OrderInfo selectByOrderNo(@Param("orderNo") String orderNo);
+
+    /** 根据策略ID查询 */
+    OrderInfo selectByStrategyId(@Param("strategyId") String strategyId);
+
 }

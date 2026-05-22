@@ -22,4 +22,7 @@ public interface ApikeyInfoMapper {
     /** 查询用户可用交易所列表 */
     List<ExchangeListVO> selectUserExchangeList(@Param("userId") String userId);
 
+    /** 根据ID和用户ID查询APIKey */
+    ApikeyInfo selectByIdAndUserId(@Param("id") Integer id, @Param("userId") String userId);
+
 }

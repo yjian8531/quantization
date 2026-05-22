@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.core.common.mapper.StrategyInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.example.core.common.entity.StrategyInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="strategy_id" property="strategyId" jdbcType="VARCHAR" />
+    <result column="strategy_name" property="strategyName" jdbcType="VARCHAR" />
+    <result column="version_no" property="versionNo" jdbcType="VARCHAR" />
+    <result column="sort" property="sort" jdbcType="INTEGER" />
+    <result column="footplate" property="footplate" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="ent_time" property="entTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.example.core.common.entity.StrategyInfo" extends="BaseResultMap" >
+    <result column="content" property="content" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, strategy_id, strategy_name, version_no, sort, footplate, status, remark, create_time, 
+    ent_time, update_time
+  </sql>
+  <sql id="Blob_Column_List" >
+    content
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from w_strategy_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from w_strategy_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.example.core.common.entity.StrategyInfo" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into w_strategy_info (strategy_id, strategy_name, version_no, 
+      sort, footplate, status, 
+      remark, create_time, ent_time, 
+      update_time, content)
+    values (#{strategyId,jdbcType=VARCHAR}, #{strategyName,jdbcType=VARCHAR}, #{versionNo,jdbcType=VARCHAR}, 
+      #{sort,jdbcType=INTEGER}, #{footplate,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
+      #{remark,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{entTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.example.core.common.entity.StrategyInfo" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into w_strategy_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="strategyId != null" >
+        strategy_id,
+      </if>
+      <if test="strategyName != null" >
+        strategy_name,
+      </if>
+      <if test="versionNo != null" >
+        version_no,
+      </if>
+      <if test="sort != null" >
+        sort,
+      </if>
+      <if test="footplate != null" >
+        footplate,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="entTime != null" >
+        ent_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="strategyId != null" >
+        #{strategyId,jdbcType=VARCHAR},
+      </if>
+      <if test="strategyName != null" >
+        #{strategyName,jdbcType=VARCHAR},
+      </if>
+      <if test="versionNo != null" >
+        #{versionNo,jdbcType=VARCHAR},
+      </if>
+      <if test="sort != null" >
+        #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="footplate != null" >
+        #{footplate,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="entTime != null" >
+        #{entTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.example.core.common.entity.StrategyInfo" >
+    update w_strategy_info
+    <set >
+      <if test="strategyId != null" >
+        strategy_id = #{strategyId,jdbcType=VARCHAR},
+      </if>
+      <if test="strategyName != null" >
+        strategy_name = #{strategyName,jdbcType=VARCHAR},
+      </if>
+      <if test="versionNo != null" >
+        version_no = #{versionNo,jdbcType=VARCHAR},
+      </if>
+      <if test="sort != null" >
+        sort = #{sort,jdbcType=INTEGER},
+      </if>
+      <if test="footplate != null" >
+        footplate = #{footplate,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="entTime != null" >
+        ent_time = #{entTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.example.core.common.entity.StrategyInfo" >
+    update w_strategy_info
+    set strategy_id = #{strategyId,jdbcType=VARCHAR},
+      strategy_name = #{strategyName,jdbcType=VARCHAR},
+      version_no = #{versionNo,jdbcType=VARCHAR},
+      sort = #{sort,jdbcType=INTEGER},
+      footplate = #{footplate,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      remark = #{remark,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      ent_time = #{entTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      content = #{content,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.example.core.common.entity.StrategyInfo" >
+    update w_strategy_info
+    set strategy_id = #{strategyId,jdbcType=VARCHAR},
+      strategy_name = #{strategyName,jdbcType=VARCHAR},
+      version_no = #{versionNo,jdbcType=VARCHAR},
+      sort = #{sort,jdbcType=INTEGER},
+      footplate = #{footplate,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      remark = #{remark,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      ent_time = #{entTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <select id="selectByStrategyId" resultMap="ResultMapWithBLOBs" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from w_strategy_info
+    where strategy_id = #{strategyId,jdbcType=VARCHAR}
+    and status = 0
+    order by sort desc, version_no desc
+    limit 1
+  </select>
+  
+  <select id="selectAll" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from w_strategy_info
+    order by sort desc, create_time desc
+  </select>
+</mapper>

@@ -162,6 +162,14 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
 
+  <select id="selectByOrderNo" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select
+    <include refid="Base_Column_List" />
+    from w_order_position
+    where order_no = #{orderNo,jdbcType=VARCHAR}
+    order by start_time desc
+  </select>
+
   <select id="selectHistoryPositionList" resultType="com.example.core.common.vo.robot.HistoryPositionVO">
     select
       id,

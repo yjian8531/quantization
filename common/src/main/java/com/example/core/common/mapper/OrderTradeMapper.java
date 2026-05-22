@@ -22,4 +22,7 @@ public interface OrderTradeMapper {
 
     /** 查询交易记录列表 */
     List<TradeRecordVO> selectTradeRecordList(@Param("orderNo") String orderNo);
+
+    /** 根据订单号查询交易列表 */
+    List<OrderTrade> selectByOrderNo(@Param("orderNo") String orderNo);
 }

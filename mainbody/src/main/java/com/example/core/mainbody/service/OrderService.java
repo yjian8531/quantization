@@ -1,15 +1,19 @@
 package com.example.core.mainbody.service;
 
+import com.example.core.common.entity.StrategyInfo;
 import com.example.core.common.utils.ResultMessage;
 import com.example.core.mainbody.so.strategy.CreateStrategyOrderSO;
 import com.example.core.mainbody.so.strategy.PositionPushSO;
 import com.example.core.mainbody.so.strategy.TradeLogPushSO;
+import com.example.core.mainbody.so.product.ConfigRobotSO;
+import com.example.core.mainbody.so.robot.QueryHistoryPositionSO;
+import com.example.core.mainbody.so.robot.QueryRobotSO;
+import com.example.core.mainbody.so.robot.QueryTradeRecordSO;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface OrderService {
 
     /**
-<<<<<<< HEAD
      * 创建策略订单
      */
     @Transactional
@@ -42,8 +46,13 @@ public interface OrderService {
     @Transactional
     ResultMessage receivePositionInfo(PositionPushSO position);
 
-=======
+    /**
      * 配置机器人（创建策略订单）
+     * 对应原型图：产品详情页 -> 点击"创建"按钮
+     * 功能：
+     * 1. 校验产品和余额
+     * 2. 冻结余额 -> 创建订单 -> 实际扣款
+     * 3. 生成策略订单记录
      */
     ResultMessage configRobot(String userId, ConfigRobotSO so);
 
@@ -95,30 +104,19 @@ public interface OrderService {
     ResultMessage querySymbolList();
 
 
-    // ========== TODO: 待实现接口 ==========
+    /** 新增策略模板 */
+    ResultMessage addStrategyInfo(StrategyInfo strategyInfo);
 
-    /**
-     * 重启订单
-     * TODO: 需要实现
-     * 流程：
-     * 1. 校验订单状态（只能重启已暂停status=2或已停止status=3的订单）
-     * 2. 调用量化服务器重启API（需要mainNo/serverIp + 订单号）
-     * 3. 等待API响应成功后，更新order_info.status = 1（运行中）
-     * 4. 清空ent_time结束时间
-     * 待确认：量化服务器API地址、请求参数、鉴权方式
-     */
-//    ResultMessage restartOrder(String userId, Integer orderId);
+    /** 修改策略模板 */
+    ResultMessage updateStrategyInfo(StrategyInfo strategyInfo);
 
-    /**
-     * 停止订单
-     * TODO: 需要实现
-     * 流程：
-     * 1. 校验订单状态（只能停止运行中status=1或启动中status=0的订单）
-     * 2. 调用量化服务器停止API（需要mainNo/serverIp + 订单号）
-     * 3. 等待API响应成功后，更新order_info.status = 3（已结束）
-     * 4. 设置ent_time = NOW() 记录结束时间
-     * 待确认：量化服务器API地址、请求参数、鉴权方式
-     */
-//    ResultMessage stopOrder(String userId, Integer orderId);
->>>>>>> origin/main
+    /** 删除策略模板 */
+    ResultMessage deleteStrategyInfo(Integer id);
+
+    /** 根据策略ID查询策略模板详情 */
+    ResultMessage queryStrategyInfo(String strategyId);
+
+    /** 查询策略模板列表 */
+    ResultMessage queryStrategyInfoList();
+
 }

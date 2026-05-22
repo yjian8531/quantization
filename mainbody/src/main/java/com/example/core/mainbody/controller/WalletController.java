@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/deposit")
-public class FinanceWalletController extends BaseController {
+@RequestMapping("/wallet")
+public class WalletController extends BaseController {
     @Autowired
     private FinanceWalletService financeWalletService;
 

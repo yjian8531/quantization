@@ -14,4 +14,10 @@ public interface MainConfigMapper {
     int updateByPrimaryKeySelective(MainConfig record);
 
     int updateByPrimaryKey(MainConfig record);
+
+    /**
+     * 查询状态正常的主机配置（取第一条）
+     * @return 主机配置
+     */
+    MainConfig selectNormalConfig();
 }
