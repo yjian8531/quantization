@@ -5,21 +5,37 @@ import java.util.Date;
 
 public class ProfitRecord {
     private Integer id;
-
+    /**
+     * 用户ID
+     */
     private String userId;
-
+    /**
+     * 产品编号
+     */
     private String productNo;
-
+    /**
+     * 产品名称
+     */
     private String productName;
-
+    /**
+     * 产品类型
+     */
     private String productType;
-
+    /**
+     * 收益金额
+     */
     private BigDecimal profitAmount;
-
+    /**
+     * 收益率
+     */
     private BigDecimal profitRate;
-
+    /**
+     * 状态
+     */
     private Boolean status;
-
+    /**
+     * 创建时间
+     */
     private Date createTime;
 
     public Integer getId() {

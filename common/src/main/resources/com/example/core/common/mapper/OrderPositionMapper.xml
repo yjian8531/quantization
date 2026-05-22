@@ -161,4 +161,27 @@
       end_time = #{endTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectHistoryPositionList" resultType="com.example.core.common.vo.robot.HistoryPositionVO">
+    select
+      id,
+      order_no as orderNo,
+      trade_bl as tradeBl,
+      CASE trade_bl
+        WHEN 'buy' THEN '多单'
+        WHEN 'sell' THEN '空单'
+        ELSE '未知'
+        END as tradeBlName,
+      open_price as openPrice,
+      close_price as closePrice,
+      trade_num as tradeNum,
+      income,
+      income_rate as incomeRate,
+      DATE_FORMAT(start_time, '%Y-%m-%d %H:%i:%s') as startTime,
+      DATE_FORMAT(end_time, '%Y-%m-%d %H:%i:%s') as endTime
+    from w_order_position
+    where order_no = #{orderNo}
+      and end_time is not null
+    order by end_time desc
+  </select>
 </mapper>

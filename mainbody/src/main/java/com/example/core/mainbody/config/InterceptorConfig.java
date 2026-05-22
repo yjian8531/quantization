@@ -30,10 +30,10 @@ public class InterceptorConfig extends WebMvcConfigurerAdapter {
                 .addPathPatterns("/user/**")
                 .excludePathPatterns(
                         "/user/verify/img",              // 注册图形验证码
-                        "/user/verify/login/phone",      // 获取注册邮箱验证码
+                        "/user/verify/login/email",      // 获取注册邮箱验证码
                         "/user/register",                // 用户注册
                         "/user/update/img",              // 改密图形验证码
-                        "/user/verify/update/phone",     // 获取改密手机验证码
+                        "/user/verify/update/email",     // 获取改密手机验证码
                         "/user/update/pwd",              // 更新密码
                         "/user/login"                    // 用户登录
                 );

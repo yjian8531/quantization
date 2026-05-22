@@ -1,6 +1,10 @@
 package com.example.core.common.mapper;
 
 import com.example.core.common.entity.OrderTrade;
+import com.example.core.common.vo.robot.TradeRecordVO;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface OrderTradeMapper {
     int deleteByPrimaryKey(Integer id);
@@ -14,4 +18,8 @@ public interface OrderTradeMapper {
     int updateByPrimaryKeySelective(OrderTrade record);
 
     int updateByPrimaryKey(OrderTrade record);
+
+
+    /** 查询交易记录列表 */
+    List<TradeRecordVO> selectTradeRecordList(@Param("orderNo") String orderNo);
 }

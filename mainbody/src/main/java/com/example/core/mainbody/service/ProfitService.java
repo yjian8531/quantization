@@ -40,6 +40,9 @@ public interface ProfitService {
      */
     void exportProfitRecordList(String userId, QueryProfitRecordSO queryProfitRecordSO, HttpServletResponse response) throws Exception;
 
+
+    ResultMessage queryUserProducts(String userId);
+
 }
 
 

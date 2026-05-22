@@ -1,116 +1,90 @@
 package com.example.core.common.entity;
 
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
+/**
+ * 订单产品信息表
+ */
+@Data
 public class OrderProduct {
+    /**
+     * 主键 ID
+     */
     private Integer id;
-
+    /**
+     * 产品编号
+     */
+    private String productNo;
+    /**
+     * 产品名称（如：2 万5 万 USDT）
+     */
     private String productName;
 
+    /**
+     * 产品等级：1=入门，2=标准，3=高级
+     */
     private Integer level;
 
+    /**
+     * 预估年化率（%）
+     */
     private BigDecimal estimateRate;
 
+    /**
+     * 月租金额（USDT）
+     */
     private BigDecimal monthlyFee;
 
+    /**
+     * 产品说明
+     */
     private String description;
 
+    /**
+     * 参数配置(JSON)
+     */
     private String paramConfig;
 
+    /**
+     * 累计交易额（USDT）
+     */
+    private BigDecimal totalAmount;
+
+    /**
+     * 盈利占比（%）
+     */
+    private BigDecimal profitRatio;
+
+    /** 产品累计盈利（USDT） */
+    private BigDecimal cumulativeProfit;
+
+    /**
+     * 已购买人数
+     */
+    private Integer buyCount;
+
+    /**
+     * 状态：0=正常，1=禁用
+     */
     private Integer status;
 
+    /**
+     * 备注
+     */
     private String remark;
 
+    /**
+     * 创建时间
+     */
     private Date createTime;
 
+    /**
+     * 更新时间
+     */
     private Date updateTime;
 
-    public Integer getId() {
-        return id;
-    }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public void setProductName(String productName) {
-        this.productName = productName == null ? null : productName.trim();
-    }
-
-    public Integer getLevel() {
-        return level;
-    }
-
-    public void setLevel(Integer level) {
-        this.level = level;
-    }
-
-    public BigDecimal getEstimateRate() {
-        return estimateRate;
-    }
-
-    public void setEstimateRate(BigDecimal estimateRate) {
-        this.estimateRate = estimateRate;
-    }
-
-    public BigDecimal getMonthlyFee() {
-        return monthlyFee;
-    }
-
-    public void setMonthlyFee(BigDecimal monthlyFee) {
-        this.monthlyFee = monthlyFee;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description == null ? null : description.trim();
-    }
-
-    public String getParamConfig() {
-        return paramConfig;
-    }
-
-    public void setParamConfig(String paramConfig) {
-        this.paramConfig = paramConfig == null ? null : paramConfig.trim();
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark == null ? null : remark.trim();
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
 }

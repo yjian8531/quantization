@@ -12,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-
+/**
+ * 收益模块Controller
+ */
 @Slf4j
 @RestController
 @RequestMapping("/profit")
@@ -22,7 +24,7 @@ public class ProfitController extends BaseController {
     private ProfitService profitService;
 
 
-    /** 基础新增 */
+    /** 新增收益记录 */
     @PostMapping(value = "/add", produces = {"application/json"})
     public ResultMessage addProfitRecord(@RequestBody ProfitRecord record) {
         try {
@@ -39,7 +41,7 @@ public class ProfitController extends BaseController {
         }
     }
 
-    /** 基础修改 */
+    /** 修改收益记录 */
     @PostMapping(value = "/update", produces = {"application/json"})
     public ResultMessage updateProfitRecord(@RequestBody ProfitRecord record) {
         try {
@@ -56,7 +58,7 @@ public class ProfitController extends BaseController {
         }
     }
 
-    /** 基础删除 */
+    /** 删除收益记录*/
     @PostMapping(value = "/delete", produces = {"application/json"})
     public ResultMessage deleteProfitRecord(@RequestParam Integer id) {
         try {
@@ -73,7 +75,7 @@ public class ProfitController extends BaseController {
         }
     }
 
-    /** 基础查询详情 */
+    /** 查询收益记录详情 */
     @GetMapping(value = "/detail", produces = {"application/json"})
     public ResultMessage getProfitRecordDetail(@RequestParam Integer id) {
         try {
@@ -109,12 +111,18 @@ public class ProfitController extends BaseController {
 
     /**
      * 导出收益记录列表（Excel）
-     * 对应原型图右侧蓝色下载图标
      */
     @PostMapping(value = "/record/export", produces = {"application/json"})
     public void exportProfitRecordList(@RequestBody QueryProfitRecordSO queryProfitRecordSO, HttpServletResponse response) throws Exception {
         UserInfo userInfo = this.getLoginUser();
         profitService.exportProfitRecordList(userInfo.getUserId(), queryProfitRecordSO, response);
+    }
+
+    /** 查询用户持有的产品列表（下拉框） */
+    @GetMapping(value = "/products", produces = {"application/json"})
+    public ResultMessage queryUserProducts() {
+        UserInfo userInfo = this.getLoginUser();
+        return profitService.queryUserProducts(userInfo.getUserId());
     }
 }
 

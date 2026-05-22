@@ -41,6 +41,47 @@ public class RedisUtil {
         RedisShardedPool.returnResource(jedis);
         return result;
     }
+    /**
+     * 添加数据集合
+     * @param key
+     * @param members
+     * @return
+     */
+    public static Long sadd(String key, String... members) {
+        ShardedJedis jedis = null;
+        Long result = null;
+        try {
+            jedis = RedisShardedPool.getJedis();
+            result = jedis.sadd(key, members);
+        } catch (Exception e) {
+            log.error("sadd key:{} error", key, e);
+            RedisShardedPool.returnBrokenResource(jedis);
+            return result;
+        }
+        RedisShardedPool.returnResource(jedis);
+        return result;
+    }
+
+    /**
+     * 判断某个数据是否在集合中
+     * @param key
+     * @param member
+     * @return
+     */
+    public static Boolean sismember(String key, String member) {
+        ShardedJedis jedis = null;
+        Boolean result = null;
+        try {
+            jedis = RedisShardedPool.getJedis();
+            result = jedis.sismember(key, member);
+        } catch (Exception e) {
+            log.error("sismember key:{} member:{} error", key, member, e);
+            RedisShardedPool.returnBrokenResource(jedis);
+            return result;
+        }
+        RedisShardedPool.returnResource(jedis);
+        return result;
+    }
 
     public static String set(String key,String value){
         ShardedJedis jedis = null;
@@ -119,6 +160,26 @@ public class RedisUtil {
         return result;
     }
 
+
+    /**
+     * 获取 Set 集合中的所有成员
+     * @param key Redis 键名
+     * @return Set 集合
+     */
+    public static java.util.Set<String> smembers(String key) {
+        ShardedJedis jedis = null;
+        java.util.Set<String> result = null;
+        try {
+            jedis = RedisShardedPool.getJedis();
+            result = jedis.smembers(key);
+        } catch (Exception e) {
+            log.error("smembers key:{} error", key, e);
+            RedisShardedPool.returnBrokenResource(jedis);
+            return result;
+        }
+        RedisShardedPool.returnResource(jedis);
+        return result;
+    }
 
 
 }

@@ -131,18 +131,21 @@
     select
     <include refid="Base_Column_List"/>
     from w_system_message
-    where user_id IS NULL OR user_id = #{userId}
-    <if test="type != null">
-     and type = #{type}
-    </if>
+    <where>
+      and (user_id IS NULL OR user_id = '' OR user_id = #{userId})
+      <if test="type != null">
+        and type = #{type}
+      </if>
+    </where>
     order by create_time desc
   </select>
+
 
   <!-- 统计未读消息数 -->
   <select id="countUnread" resultType="int">
     select count(*)
     from w_system_message
-    where (user_id IS NULL OR user_id = #{userId})
+    where (user_id IS NULL OR user_id = '' OR user_id = #{userId})
       and is_read = 0
   </select>
 
@@ -152,6 +155,22 @@
     set is_read   = 1,
         read_time = NOW()
     where id = #{id}
-      and (user_id IS NULL OR user_id = #{userId})
+      and (user_id IS NULL OR user_id = '' OR user_id = #{userId})
   </update>
+
+  <select id="selectAdminMessageList" resultType="com.example.core.common.entity.SystemMessage">
+    select * from w_system_message
+    <where>
+      <if test="userId != null and userId != ''">
+        and user_id = #{userId}
+      </if>
+      <if test="type != null">
+        and type = #{type}
+      </if>
+      <if test="isRead != null">
+        and is_read = #{isRead}
+      </if>
+    </where>
+    order by create_time desc
+  </select>
 </mapper>

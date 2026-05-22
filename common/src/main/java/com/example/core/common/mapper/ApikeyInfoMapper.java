@@ -1,6 +1,10 @@
 package com.example.core.common.mapper;
 
 import com.example.core.common.entity.ApikeyInfo;
+import com.example.core.common.vo.product.ExchangeListVO;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface ApikeyInfoMapper {
     int deleteByPrimaryKey(Integer id);
@@ -14,4 +18,8 @@ public interface ApikeyInfoMapper {
     int updateByPrimaryKeySelective(ApikeyInfo record);
 
     int updateByPrimaryKey(ApikeyInfo record);
+
+    /** 查询用户可用交易所列表 */
+    List<ExchangeListVO> selectUserExchangeList(@Param("userId") String userId);
+
 }

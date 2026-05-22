@@ -1,8 +1,8 @@
 package com.example.core.mainbody.service;
 
-import com.example.core.common.entity.ProductInfo;
-import com.example.core.common.entity.ProductParam;
+import com.example.core.common.entity.OrderProduct;
 import com.example.core.common.utils.ResultMessage;
+import com.example.core.mainbody.so.product.ConfigRobotSO;
 import com.example.core.mainbody.so.product.QueryProductSO;
 /**
  * 产品服务
@@ -10,7 +10,7 @@ import com.example.core.mainbody.so.product.QueryProductSO;
  *
  */
 public interface ProductService {
-    
+
     /**
      * 查询产品列表
      * @param so 查询参数（包含等级筛选）
@@ -30,23 +30,38 @@ public interface ProductService {
     ResultMessage queryProductListForAdmin(QueryProductSO so);
 
     /** 新增产品 */
-    ResultMessage addProduct(ProductInfo product);
+    ResultMessage addProduct(OrderProduct product);
 
     /** 修改产品 */
-    ResultMessage updateProduct(ProductInfo product);
+    ResultMessage updateProduct(OrderProduct product);
 
     /** 删除产品 */
     ResultMessage deleteProduct(Integer id);
 
-    /** 查询产品参数列表 */
-    ResultMessage queryParamList(Integer productId);
+//    /**
+//     * 查询用户可用交易所列表
+//     */
+//    ResultMessage queryExchangeList(String userId);
+//
+//
+//    /** 查询可用币对列表 */
+//    ResultMessage querySymbolList();
+//
+//    /**
+//     * 配置机器人（创建策略订单）
+//     * @param userId 当前用户 ID
+//     * @param so 配置参数
+//     */
+//    ResultMessage configRobot(String userId, ConfigRobotSO so);
+//
+//
+//    /**
+//     * 查询用户机器人列表
+//     * @param userId 用户ID
+//     * @param so 查询参数
+//     */
+//    ResultMessage queryRobotList(String userId, com.example.core.mainbody.so.robot.QueryRobotSO so);
 
-    /** 新增产品参数 */
-    ResultMessage addParam(ProductParam param);
 
-    /** 修改产品参数 */
-    ResultMessage updateParam(ProductParam param);
 
-    /** 删除产品参数 */
-    ResultMessage deleteParam(Integer id);
 }

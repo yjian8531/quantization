@@ -1,125 +1,73 @@
 package com.example.core.common.entity;
 
+import lombok.Data;
+
 import java.util.Date;
 
+/**
+ * 主机配置表
+ */
+@Data
 public class MainConfig {
+    /**
+     * 主键id
+     */
     private Integer id;
 
+    /**
+     * 主机平台标签
+     */
     private String label;
 
+    /**
+     * 账号
+     */
     private String account;
 
+    /**
+     * KEY
+     */
     private String keyNo;
 
+    /**
+     * 私钥
+     */
     private String keySecret;
 
+    /**
+     * 平台区域标识
+     */
     private String region;
 
+    /**
+     * 分区标识
+     */
     private String zone;
 
+    /**
+     * 镜像快照
+     */
     private String snapshot;
 
+    /**
+     * 状态(0:正常,1:禁用)
+     */
     private Integer status;
 
+    /**
+     * 备注
+     */
     private String remark;
 
+    /**
+     * 创建时间
+     */
     private Date createTime;
 
+    /**
+     * 最后更新时间
+     */
     private Date updateTime;
 
-    public Integer getId() {
-        return id;
-    }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label == null ? null : label.trim();
-    }
-
-    public String getAccount() {
-        return account;
-    }
-
-    public void setAccount(String account) {
-        this.account = account == null ? null : account.trim();
-    }
-
-    public String getKeyNo() {
-        return keyNo;
-    }
-
-    public void setKeyNo(String keyNo) {
-        this.keyNo = keyNo == null ? null : keyNo.trim();
-    }
-
-    public String getKeySecret() {
-        return keySecret;
-    }
-
-    public void setKeySecret(String keySecret) {
-        this.keySecret = keySecret == null ? null : keySecret.trim();
-    }
-
-    public String getRegion() {
-        return region;
-    }
-
-    public void setRegion(String region) {
-        this.region = region == null ? null : region.trim();
-    }
-
-    public String getZone() {
-        return zone;
-    }
-
-    public void setZone(String zone) {
-        this.zone = zone == null ? null : zone.trim();
-    }
-
-    public String getSnapshot() {
-        return snapshot;
-    }
-
-    public void setSnapshot(String snapshot) {
-        this.snapshot = snapshot == null ? null : snapshot.trim();
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark == null ? null : remark.trim();
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
 }

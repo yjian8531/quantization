@@ -172,4 +172,32 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+  <select id="selectTradeRecordList" resultType="com.example.core.common.vo.robot.TradeRecordVO">
+    select
+      ot.id,
+      ot.order_no as orderNo,
+      ot.trade_no as tradeNo,
+      ot.trade_bl as tradeBl,
+      CASE ot.trade_bl
+        WHEN 'buy' THEN '买'
+        WHEN 'sell' THEN '卖'
+        ELSE '未知'
+        END as tradeBlName,
+      CASE a.footplate
+        WHEN 0 THEN '币安'
+        WHEN 1 THEN '波场'
+        ELSE '未知'
+        END as exchangeName,
+      o.symbol,
+      ot.amount,
+      ot.trade_num as tradeNum,
+      ot.price,
+      ot.income,
+      DATE_FORMAT(ot.create_time, '%Y-%m-%d %H:%i:%s') as createTime
+    from w_order_trade ot
+           left join w_order_info o on o.order_no = ot.order_no
+           left join w_apikey_info a on a.id = o.apikey_id
+    where ot.order_no = #{orderNo}
+    order by ot.create_time desc
+  </select>
 </mapper>
