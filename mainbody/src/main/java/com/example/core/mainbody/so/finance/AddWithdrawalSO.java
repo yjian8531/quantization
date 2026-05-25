@@ -5,7 +5,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 /**
- * 用户提现申请SO
+ *  用户提现申请SO
  */
 @Data
 public class AddWithdrawalSO {

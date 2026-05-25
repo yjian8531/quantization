@@ -3,7 +3,7 @@ package com.example.core.mainbody.so.profitrecord;
 import lombok.Data;
 
 /**
- * 查询用户利润记录的SO
+ *  查询用户利润记录的SO
  */
 @Data
 public class QueryProfitRecordSO {

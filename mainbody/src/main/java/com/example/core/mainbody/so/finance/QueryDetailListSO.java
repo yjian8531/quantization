@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * 查询账单明细列表(用户)SO
+ *  查询账单明细列表(用户)SO
  */
 @Data
 public class QueryDetailListSO {

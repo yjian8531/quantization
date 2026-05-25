@@ -13,4 +13,5 @@ public class QuerySummaryListSO {
 
     /** 结束日期 **/
     private String endTime;
+
 }

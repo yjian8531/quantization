@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class QueryFinanceStatisticsListSO {
 
-    /** 开始统计时间 **/
+     /** 开始统计时间 **/
     private String startTime;
 
     /** 结束统计时间 **/

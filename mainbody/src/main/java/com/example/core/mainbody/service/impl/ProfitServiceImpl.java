@@ -191,7 +191,6 @@ public class ProfitServiceImpl implements ProfitService {
 
     /**
      * 查询用户产品列表
-     * 对应原型图左下角的产品列表
      */
     @Override
     public ResultMessage queryUserProducts(String userId) {

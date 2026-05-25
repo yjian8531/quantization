@@ -10,7 +10,7 @@ import java.util.Date;
 @Data
 public class ApikeyInfo {
     /**
-     * 主键id
+     * id
      */
     private Integer id;
 

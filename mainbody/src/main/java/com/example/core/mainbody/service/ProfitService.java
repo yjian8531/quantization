@@ -9,8 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 
 public interface ProfitService {
 
-
-
     /** 基础新增（推荐使用 insertSelective） */
     int addProfitRecord(ProfitRecord record);
 

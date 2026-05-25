@@ -5,7 +5,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 /**
- * 更新用户余额
+ *  更新用户余额
  */
 @Data
 public class UpdateUserFinanceSO {

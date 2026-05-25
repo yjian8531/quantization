@@ -1,7 +1,7 @@
 package com.example.core.mainbody.so.strategy;
 
 /**
- * 创建策略订单请求参数
+ *  创建策略订单请求参数
  */
 public class CreateStrategyOrderSO {
 

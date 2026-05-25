@@ -3,7 +3,7 @@ package com.example.core.mainbody.so.user;
 import lombok.Data;
 
 /***
- * 用户注册SO
+ *  用户注册SO
  */
 @Data
 public class RegisterSO {

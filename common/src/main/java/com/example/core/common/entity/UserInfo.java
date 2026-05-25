@@ -4,6 +4,9 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.Date;
+/**
+ * 用户信息表
+ */
 @Data
 public class UserInfo {
     /**id*/

@@ -3,7 +3,7 @@ package com.example.core.mainbody.so.user;
 import lombok.Data;
 
 /**
- * 修改密码SO
+ *  修改密码SO
  */
 @Data
 public class UpdatePwdSO {

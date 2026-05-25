@@ -2,7 +2,7 @@ package com.example.core.mainbody.utils;
 
 public class InterceptorUtil {
 
-    private static String cKey = "E801491D65C44A76";
+     private static String cKey = "E801491D65C44A76";
 
     /**
      * 获取用户登录token

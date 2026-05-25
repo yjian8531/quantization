@@ -30,7 +30,7 @@ public class WalletIncome {
     private BigDecimal gasLimit;
     //确认数
     private Integer confirmations;
-    //状态(0:待确认,1:已确认,2:失败)
+    //状态 (0:待确认,1:已确认,2:失败)
     private Integer status;
     //备注
     private String remark;

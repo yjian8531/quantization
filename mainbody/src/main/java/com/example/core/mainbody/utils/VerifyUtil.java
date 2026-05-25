@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Random;
 
 /**
- * 图形验证码工具类
+ *  图形验证码工具类
  */
 public class VerifyUtil {
 

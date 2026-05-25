@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class SelectOfflineListSO {
 
-    /** 交易方式(0:银行卡,1:微信,2:支付宝) **/
+     /** 交易方式(0:银行卡,1:微信,2:支付宝) **/
     private Integer way;
 
     /** 0:收入,1:支出 **/

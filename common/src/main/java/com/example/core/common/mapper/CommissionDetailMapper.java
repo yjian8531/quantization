@@ -30,8 +30,10 @@ public interface CommissionDetailMapper {
 
 
     // 查询管理员佣金列表
-    // 查询管理员佣金列表
     List<CommissionDetail> selectAdminCommissionList(QueryCommissionListSO so);
+
+    // 查询用户佣金列表
+    List<CommissionDetail> selectByUserId(String userId);
 
 //    /**
 //     * 查询团队总消费

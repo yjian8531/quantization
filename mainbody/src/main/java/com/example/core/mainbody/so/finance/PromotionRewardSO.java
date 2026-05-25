@@ -9,5 +9,5 @@ public class PromotionRewardSO {
     /**
      * 类型(0:购买返佣,1:续费返佣,2邀请激活,3托管达标,4量化分润)
      */
-    private Integer type;
+     private Integer type;
 }

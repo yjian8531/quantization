@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class WeChatWebPaySO {
 
-    /** 充值金额 **/
+     /** 充值金额 **/
     private String money;
 
     /** 订单编号 **/

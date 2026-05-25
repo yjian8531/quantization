@@ -125,7 +125,8 @@
       u.nick_name as nickName,
       u.phone,
       up.create_time as registerTime,
-      (select IFNULL(sum(consumption), 0) from w_commission_detail where user_id = up.user_id) as totalPerformance
+--       (select IFNULL(sum(consumption), 0) from w_commission_detail where user_id = up.user_id) as totalPerformance
+  (select IFNULL(sum(consumption), 0) from w_commission_detail where low_user_id = up.user_id) as totalPerformance
     from w_user_pro up
            left join w_user_info u on up.user_id = u.user_id
     where up.pro_user_id = #{proUserId} and up.status = 0

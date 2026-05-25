@@ -46,15 +46,6 @@ public interface OrderService {
     @Transactional
     ResultMessage receivePositionInfo(PositionPushSO position);
 
-    /**
-     * 配置机器人（创建策略订单）
-     * 对应原型图：产品详情页 -> 点击"创建"按钮
-     * 功能：
-     * 1. 校验产品和余额
-     * 2. 冻结余额 -> 创建订单 -> 实际扣款
-     * 3. 生成策略订单记录
-     */
-    ResultMessage configRobot(String userId, ConfigRobotSO so);
 
     /**
      * 查询用户机器人列表
@@ -116,7 +107,7 @@ public interface OrderService {
     /** 根据策略ID查询策略模板详情 */
     ResultMessage queryStrategyInfo(String strategyId);
 
-    /** 查询策略模板列表 */
+    /**  查询策略模板列表 */
     ResultMessage queryStrategyInfoList();
 
 }

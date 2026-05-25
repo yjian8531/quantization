@@ -7,7 +7,7 @@ import lombok.Data;
  */
 @Data
 public class UpdateWithdrawalSO {
-    /** 提现编号 **/
+     /** 提现编号 **/
     private String withdrawalNo;
 
     /** 审核结果(Y:通过/N:驳回) **/

@@ -3,7 +3,7 @@ package com.example.core.mainbody.so.finance;
 import lombok.Data;
 
 /**
- * 删除线下财务账单SO
+ *  删除线下财务账单SO
  */
 @Data
 public class DelOfflineSO {

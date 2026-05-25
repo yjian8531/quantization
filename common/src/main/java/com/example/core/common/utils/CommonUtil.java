@@ -9,7 +9,9 @@ import org.apache.commons.codec.binary.Base64;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-
+/**
+ * 通用工具类
+ */
 public class CommonUtil {
 
 

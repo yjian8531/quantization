@@ -10,7 +10,9 @@ import net.sf.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/**
+ * 阿里云调用工具类
+ */
 public class AliyunCaller {
 
     private static Map<String,Client> clientMap = new HashMap<>();

@@ -55,4 +55,11 @@ public interface FinancialWalletMapper {
      */
     int bindAddressToUser(@Param("address") String address, @Param("userId") String userId);
 
+
+    /** 分页查询财务钱包列表 */
+    List<FinancialWallet> selectFinanceWalletList(@Param("userId") String userId,
+                                                  @Param("type") String type,
+                                                  @Param("address") String address,
+                                                  @Param("status") Integer status);
+
 }

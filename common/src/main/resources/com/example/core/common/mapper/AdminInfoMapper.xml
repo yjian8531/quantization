@@ -205,7 +205,7 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
 
-  <!-- 账号查询 -->
+   <!-- 账号查询 -->
   <select id="selectByAccount" resultMap="BaseResultMap2" parameterType="java.lang.String" >
     select
     <include refid="Base_Column_List" />

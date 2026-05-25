@@ -1,7 +1,9 @@
 package com.example.core.common.entity;
 
 import java.util.Date;
-
+/**
+ * 管理员信息
+ */
 public class AdminInfo {
     private Integer id;
 

@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Data
 public class ConfigRobotSO {
 
-    /** 产品 ID */
+     /** 产品 ID */
     private Integer productId;
 
     /** 交易所 API Key ID */

@@ -1,5 +1,9 @@
 package com.example.core.common.utils;
-
+/**
+ * 时间样式
+ *
+ * @author zhangyu
+ */
 public enum DateStyle {
 
     YYYYMM("yyyyMM", false),

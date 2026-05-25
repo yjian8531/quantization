@@ -3,7 +3,7 @@ package com.example.core.mainbody.so.admin;
 import lombok.Data;
 
 /**
- * 查询国家产品数量VO
+ *  查询国家产品数量VO
  */
 @Data
 public class QueryCountryNumSO {

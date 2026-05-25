@@ -124,7 +124,7 @@ public class UserController extends BaseController {
 
 
     /**
-     * 获取改密邮箱验证码
+     * 获取重置密码邮箱验证码
      * @return
      */
     @PostMapping(value = "/verify/update/email", produces = {"application/json"})
@@ -139,7 +139,7 @@ public class UserController extends BaseController {
         //获取redis改过的验证码
         String redisCode = RedisUtil.get("USER:UPDATE:" + session.getId());
         //判断是否一致
-        if (loginEmailVerifySO.getCode().toUpperCase().equals(redisCode) || loginEmailVerifySO.getCode().equals("6666")){
+        if (loginEmailVerifySO.getCode().toUpperCase().equals(redisCode)){
             //一致的话删除
             RedisUtil.del("USER:UPDATE:" + session.getId());
             //随机生成一个六位的验证码
@@ -156,7 +156,9 @@ public class UserController extends BaseController {
     }
 
     /**
-     * 更新密码
+     * 忘记密码重置
+     * 通过邮箱验证码重置
+     * 调用/verify/update/email获取邮箱验证码
      * @param updatePwdSO
      * @return
      */
@@ -164,7 +166,7 @@ public class UserController extends BaseController {
     public ResultMessage updatePwd(@RequestBody UpdatePwdSO updatePwdSO){
         String code = updatePwdSO.getCode();
         if(StringUtils.isNotEmpty(code)){
-            // 1. 优先验证邮箱验证码
+            // 验证邮箱验证码
             String emailCode = RedisUtil.get("UPDATE:EMAIL:" + updatePwdSO.getEmail().trim());
             if(StringUtils.isNotEmpty(emailCode) && code.toUpperCase().equals(emailCode)){
                 ResultMessage r = userService.updatePwd(updatePwdSO, null);
@@ -174,24 +176,23 @@ public class UserController extends BaseController {
                 return r;
             }
 
-            // 2. 其次验证公众号验证码
-            String openId = RedisUtil.get("USER:UPDATE:R:" + updatePwdSO.getCode());
-            if(StringUtils.isNotEmpty(openId)){
-                ResultMessage r = userService.updatePwd(updatePwdSO, openId);
-                if(r.getCode().equals(ResultMessage.SUCCEED_CODE)){
-                    RedisUtil.del("USER:UPDATE:R:" + updatePwdSO.getCode());
-                    RedisUtil.del("USER:UPDATE:X:" + openId);
-                }
-                return r;
-            }
-
-            return new ResultMessage(ResultMessage.FAILED_CODE, "改密校验码错误");
+            return new ResultMessage(ResultMessage.FAILED_CODE, "邮箱验证码错误");
         }else{
-            return new ResultMessage(ResultMessage.FAILED_CODE, "改密校验码不能为空");
+            return new ResultMessage(ResultMessage.FAILED_CODE, "验证码不能为空");
         }
     }
 
 
+    /**
+     * 修改密码（登录状态下，需要验证旧密码）
+     * @param so 修改密码参数
+     * @return
+     */
+    @PostMapping(value = "/update/password", produces = {"application/json"})
+    public ResultMessage updatePassword(@RequestBody UpdatePasswordSO so){
+        UserInfo userInfo = this.getLoginUser();
+        return userService.updatePassword(userInfo.getUserId(), so);
+    }
 
     /**
      * 登录

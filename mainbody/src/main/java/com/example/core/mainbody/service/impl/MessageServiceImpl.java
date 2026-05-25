@@ -24,7 +24,7 @@ public class MessageServiceImpl implements MessageService {
 
 
     /**
-     * 查询未读消息数量
+      * 查询未读消息数量
      */
     @Override
     public ResultMessage queryUnreadCount(String userId) {

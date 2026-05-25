@@ -6,7 +6,9 @@ import org.apache.commons.lang.StringUtils;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Properties;
-
+/**
+ * 读取redis.properties文件
+ */
 @Slf4j
 public class RedisProperties {
 

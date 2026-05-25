@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+//Http请求
 public class HttpRequest {
 
     public static void main(String[] args){

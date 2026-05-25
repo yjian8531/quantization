@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class StatisticsSO {
 
-    /** 开始时间 **/
+     /** 开始时间 **/
     private String startDay;
 
     /** 结束时间 **/

@@ -1,5 +1,5 @@
 package com.example.core.common.utils;
-
+//状态码工具类
 public class ResultMessage {
 
     public static String SUCCEED_CODE = "0000";

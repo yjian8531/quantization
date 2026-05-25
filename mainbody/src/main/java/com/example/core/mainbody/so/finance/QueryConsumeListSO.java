@@ -3,7 +3,7 @@ package com.example.core.mainbody.so.finance;
 import lombok.Data;
 
 /**
- * 查询用户消费列表SO
+ *  查询用户消费列表SO
  */
 @Data
 public class QueryConsumeListSO {

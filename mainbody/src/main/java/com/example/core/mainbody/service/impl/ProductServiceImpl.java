@@ -163,145 +163,32 @@ public class ProductServiceImpl implements ProductService {
         return new ResultMessage(ResultMessage.SUCCEED_CODE, "删除成功");
     }
 
-//    /**
-//     * 查询用户交易所列表
-//     */
-//    @Override
-//    public ResultMessage queryExchangeList(String userId) {
-//        List<ExchangeListVO> list = apikeyInfoMapper.selectUserExchangeList(userId);
-//        if (list == null) {
-//            return new ResultMessage(ResultMessage.FAILED_CODE, "用户未绑定交易所");
-//        }
-//        Map<String, Object> resultMap = new HashMap<>();
-//        resultMap.put("list", list);
-//        resultMap.put("total", list.size());
-//        return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, resultMap);
-//    }
-//
-//    /**
-//     * 查询交易币对列表
-//     */
-//    @Override
-//    public ResultMessage querySymbolList() {
-//        List<SymbolListVO> list = symbolInfoMapper.selectSymbolList();
-//        if (list == null) {
-//            return new ResultMessage(ResultMessage.FAILED_CODE, "查询失败");
-//        }
-//        return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, list);
-//    }
-//
-//
-//    /**
-//     * 配置机器人（创建策略订单） 后续根据实际逻辑修改
-//     * 采用标准扣费流程：1.冻结余额 -> 2.创建记录 -> 3.实际扣款
-//     */
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public ResultMessage configRobot(String userId, ConfigRobotSO so) {
-//        // 1. 查询产品信息，确保产品有效
-//        OrderProduct product = orderProductMapper.selectByPrimaryKey(so.getProductId());
-//        if (product == null || product.getStatus() != 0) {
-//            return new ResultMessage(ResultMessage.FAILED_CODE, "产品不存在或已下架");
-//        }
-//
-//        // 2. 查询用户财务信息
-//        UserFinance finance = userFinanceMapper.selectByUserId(userId);
-//        BigDecimal fee = product.getMonthlyFee();
-//
-//        // 校验可用余额是否足够
-//        if (finance == null || finance.getValidNum().compareTo(fee) < 0) {
-//            return new ResultMessage(ResultMessage.FAILED_CODE, "可用余额不足，请先充值");
-//        }
-//
-//        // ---------------------------------------------------------
-//        // 步骤一：冻结余额 (SEAL)
-//        // 逻辑：将金额从【可用余额】转移到【冻结金额】，此时总资产不变。
-//        // 目的：防止用户在下单过程中把钱转走，确保资金安全。
-//        // ---------------------------------------------------------
-//        finance.setValidNum(finance.getValidNum().subtract(fee));
-//        finance.setFrozenNum(finance.getFrozenNum().add(fee));
-//        userFinanceMapper.updateByPrimaryKeySelective(finance);
-//
-//        // ---------------------------------------------------------
-//        // 步骤二：创建账单记录 (状态=0 未完成)
-//        // 逻辑：记录一笔支出流水，但标记为“处理中/未完成”。
-//        // ---------------------------------------------------------
-//        FinanceDetail detail = new FinanceDetail();
-//        detail.setUserId(userId);
-//        detail.setFinanceNo("FIN" + System.currentTimeMillis());
-//        detail.setType(1); // 1=消费
-//        detail.setCoinType("USDT");
-//        detail.setMoneyNum(fee);
-//        detail.setTag("buy"); // 购买服务
-//        detail.setDirection(1); // 1=支出
-//        detail.setStatus(0); // 0=未完成 (等待实际扣款)
-//        detail.setRemarks("购买" + product.getProductName() + "服务");
-//        detail.setCreateTime(new Date());
-//        financeDetailMapper.insertSelective(detail);
-//
-//        // ---------------------------------------------------------
-//        // 步骤三：创建策略订单记录
-//        // 逻辑：生成机器人的运行订单。
-//        // ---------------------------------------------------------
-//        OrderInfo orderInfo = new OrderInfo();
-//        orderInfo.setOrderNo("ORD" + System.currentTimeMillis() + new Random().nextInt(1000));
-//        orderInfo.setOrderName(product.getProductName());
-//        orderInfo.setProductId(product.getId());
-//        orderInfo.setUserId(userId);
-//        orderInfo.setApikeyId(so.getApikeyId());
-//        orderInfo.setSymbol(so.getSymbol());
-//        orderInfo.setNodeTime(so.getNodeTime());
-//        orderInfo.setParamStr(so.getParamStr()); // 优先使用前端传入参数
-//        orderInfo.setAnnualizedRate(product.getEstimateRate());
-//        orderInfo.setIncome(BigDecimal.ZERO);
-//        orderInfo.setIncomeRate(BigDecimal.ZERO);
-//        orderInfo.setStatus(0); // 0=启动中
-//        orderInfo.setCreateTime(new Date());
-//        orderInfo.setUpdateTime(new Date());
-//        orderInfoMapper.insertSelective(orderInfo);
-//
-//        // ---------------------------------------------------------
-//        // 步骤四：实际扣款 (MINUS)
-//        // 逻辑：上述步骤全部执行成功后，才进行真正的资产扣除。
-//        // 动作：冻结金额减少，总资产减少。
-//        // ---------------------------------------------------------
-//        finance.setFrozenNum(finance.getFrozenNum().subtract(fee)); // 从冻结中扣除
-//        finance.setTotalNum(finance.getTotalNum().subtract(fee));   // 总资产实际减少
-//        userFinanceMapper.updateByPrimaryKeySelective(finance);
-//
-//        // ---------------------------------------------------------
-//        // 步骤五：更新账单状态为已完成
-//        // 逻辑：钱已经扣了，将流水状态改为“已完成”。
-//        // ---------------------------------------------------------
-//        detail.setStatus(1); // 1=已完成
-//        financeDetailMapper.updateByPrimaryKeySelective(detail);
-//
-//        // ---------------------------------------------------------
-//        // 步骤六：更新产品统计数据
-//        // ---------------------------------------------------------
-//        product.setBuyCount(product.getBuyCount() == null ? 1 : product.getBuyCount() + 1);
-//        if (product.getTotalAmount() == null) {
-//            product.setTotalAmount(BigDecimal.ZERO);
-//        }
-//        product.setTotalAmount(product.getTotalAmount().add(fee));
-//        orderProductMapper.updateByPrimaryKeySelective(product);
-//
-//        return new ResultMessage(ResultMessage.SUCCEED_CODE, "配置成功，机器人启动中");
-//    }
-//    /**
-//     * 查询用户机器人列表
-//     */
-//    @Override
-//    public ResultMessage queryRobotList(String userId, QueryRobotSO so) {
-//        PageHelper.startPage(so.getPageNum(), so.getPageSize());
-//
-//        Page<RobotListVO> page = (Page<RobotListVO>) orderInfoMapper.selectUserRobotList(userId, so.getExchange());
-//
-//        Map<String, Object> resultMap = new HashMap<>();
-//        resultMap.put("list", page.getResult());
-//        resultMap.put("total", page.getTotal());
-//
-//        return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, resultMap);
-//    }
+    /**
+     * 查询用户交易所列表
+     */
+    @Override
+    public ResultMessage queryExchangeList(String userId) {
+        List<ExchangeListVO> list = apikeyInfoMapper.selectUserExchangeList(userId);
+        if (list == null) {
+            return new ResultMessage(ResultMessage.FAILED_CODE, "用户未绑定交易所");
+        }
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("list", list);
+        resultMap.put("total", list.size());
+        return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, resultMap);
+    }
+
+    /**
+     * 查询交易币对列表
+     */
+    @Override
+    public ResultMessage querySymbolList() {
+        List<SymbolListVO> list = symbolInfoMapper.selectSymbolList();
+        if (list == null) {
+            return new ResultMessage(ResultMessage.FAILED_CODE, "查询失败");
+        }
+        return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, list);
+    }
+
 
 }

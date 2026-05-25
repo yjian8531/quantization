@@ -1,30 +1,57 @@
 package com.example.core.common.entity;
 
 import java.util.Date;
-
+/**
+ * 策略信息表
+ */
 public class StrategyInfo {
+    /**
+     * 主键 ID
+     */
     private Integer id;
-
+    /**
+     * 策略 ID
+     */
     private String strategyId;
-
+    /**
+     * 策略名称
+     */
     private String strategyName;
-
+    /**
+     * 版本号
+     */
     private String versionNo;
-
+    /**
+     * 排序
+     */
     private Integer sort;
-
+    /**
+     * 交易所平台(0:币安,1:gate)
+     */
     private Integer footplate;
-
+    /**
+     * 状态(0:正常,1:禁用)
+     */
     private Integer status;
-
+    /**
+     * 备注
+     */
     private String remark;
-
+    /**
+     * 创建时间
+     */
     private Date createTime;
-
+    /**
+     * 结束时间
+     */
     private Date entTime;
-
+    /**
+     * 更新时间
+     */
     private Date updateTime;
-
+    /**
+     * 策略内容
+     */
     private String content;
 
     public Integer getId() {

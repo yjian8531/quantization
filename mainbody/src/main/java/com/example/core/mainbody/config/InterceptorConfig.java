@@ -52,11 +52,18 @@ public class InterceptorConfig extends WebMvcConfigurerAdapter {
 
         // 5. 产品模块（全部需要 token）
         registry.addInterceptor(userInterceptor)
-                .addPathPatterns("/product/**");
+                .addPathPatterns("/product/**")
+                .excludePathPatterns(
+                        "/product/list",                 // 产品列表
+                        "/product/detail",               // 产品详情
+                        "/product/level/list"            // 产品等级列表
+                );
+
 
         // 6. 消息模块（全部需要 token）
         registry.addInterceptor(userInterceptor)
                 .addPathPatterns("/message/**");
+
 
         // ==================== 管理端拦截器（h-admin-token） ====================
         

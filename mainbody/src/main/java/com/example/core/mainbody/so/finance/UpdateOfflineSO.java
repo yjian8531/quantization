@@ -12,7 +12,7 @@ public class UpdateOfflineSO {
 
     private Integer id;
 
-    /** 金额 **/
+     /** 金额 **/
     private BigDecimal amountNum;
 
     /** 交易方式(0:银行卡,1:微信,2:支付宝) **/

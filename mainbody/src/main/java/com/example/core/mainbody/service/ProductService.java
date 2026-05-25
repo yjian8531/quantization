@@ -38,30 +38,7 @@ public interface ProductService {
     /** 删除产品 */
     ResultMessage deleteProduct(Integer id);
 
-//    /**
-//     * 查询用户可用交易所列表
-//     */
-//    ResultMessage queryExchangeList(String userId);
-//
-//
-//    /** 查询可用币对列表 */
-//    ResultMessage querySymbolList();
-//
-//    /**
-//     * 配置机器人（创建策略订单）
-//     * @param userId 当前用户 ID
-//     * @param so 配置参数
-//     */
-//    ResultMessage configRobot(String userId, ConfigRobotSO so);
-//
-//
-//    /**
-//     * 查询用户机器人列表
-//     * @param userId 用户ID
-//     * @param so 查询参数
-//     */
-//    ResultMessage queryRobotList(String userId, com.example.core.mainbody.so.robot.QueryRobotSO so);
+    ResultMessage queryExchangeList(String userId);
 
-
-
+    ResultMessage querySymbolList();
 }

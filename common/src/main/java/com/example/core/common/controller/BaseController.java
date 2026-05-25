@@ -50,7 +50,7 @@ public class BaseController {
     }
 
     /**
-     * 重复提交限制
+     * 重复提交限制方法
      * @param params
      * @return
      */

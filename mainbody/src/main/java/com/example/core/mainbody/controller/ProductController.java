@@ -76,4 +76,5 @@ public class ProductController extends BaseController {
     public ResultMessage deleteProduct(@RequestParam Integer id) {
         return productService.deleteProduct(id);
     }
+
 }

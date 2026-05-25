@@ -26,7 +26,7 @@ public class OrderTrade {
     private String tradeNo;
 
     /**
-     * 交易方向(buy:买/sell:卖)
+     * 交易方向 (buy:买/sell:卖)
      */
     private String tradeBl;
 

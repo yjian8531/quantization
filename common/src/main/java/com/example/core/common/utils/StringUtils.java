@@ -1,7 +1,10 @@
 package com.example.core.common.utils;
 
 import java.util.List;
-
+/**
+ * 字符串处理工具类
+ * @author zhongj
+ */
 public class StringUtils {
 
     /**

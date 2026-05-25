@@ -4,7 +4,7 @@ import lombok.Data;
 
 import java.util.Date;
 /**
- * 产品参数表
+ * 产品参数 表
  */
 @Data
 public class ProductParam {

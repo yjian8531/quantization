@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class QueryWithdrawalListAdminSO {
 
-    /** 用户账号 **/
+     /** 用户账号 **/
     private String account;
 
     /** 状态(0:申请中,1:审核失败,2:提现成功) **/

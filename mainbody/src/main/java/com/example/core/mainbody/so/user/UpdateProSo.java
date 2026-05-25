@@ -3,7 +3,7 @@ package com.example.core.mainbody.so.user;
 import lombok.Data;
 
 /**
- * 更新推荐人SO
+ *  更新推荐人SO
  */
 @Data
 public class UpdateProSo {

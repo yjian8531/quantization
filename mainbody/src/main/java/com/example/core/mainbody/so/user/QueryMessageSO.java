@@ -3,7 +3,7 @@ package com.example.core.mainbody.so.user;
 import lombok.Data;
 
 /**
- * 查询消息列表参数
+ *  查询消息列表参数
  */
 @Data
 public class QueryMessageSO {

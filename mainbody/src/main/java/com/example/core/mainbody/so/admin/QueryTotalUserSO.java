@@ -16,5 +16,4 @@ public class QueryTotalUserSO {
 
     /** 结束日期 **/
     private String endTime;
-
 }

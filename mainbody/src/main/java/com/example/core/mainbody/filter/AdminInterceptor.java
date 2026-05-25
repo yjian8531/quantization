@@ -41,7 +41,6 @@ public class AdminInterceptor implements HandlerInterceptor {
     @Autowired
     private PowerBindingMapper powerBindingMapper;
 
-
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
 

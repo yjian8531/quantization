@@ -25,4 +25,11 @@ public interface OrderTradeMapper {
 
     /** 根据订单号查询交易列表 */
     List<OrderTrade> selectByOrderNo(@Param("orderNo") String orderNo);
+
+
+
+
+
+
+
 }

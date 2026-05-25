@@ -34,7 +34,7 @@ public class ProfitRecord {
      */
     private Boolean status;
     /**
-     * 创建时间
+     *  创建时间
      */
     private Date createTime;
 

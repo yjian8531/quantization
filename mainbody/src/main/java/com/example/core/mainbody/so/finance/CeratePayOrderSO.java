@@ -3,7 +3,7 @@ package com.example.core.mainbody.so.finance;
 import lombok.Data;
 
 /**
- * 创建充值收款订单SO
+ *  创建充值收款订单SO
  */
 @Data
 public class CeratePayOrderSO {

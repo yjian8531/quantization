@@ -11,7 +11,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * 用户财务明细Mapper
+ * 用户财务明细Mapper接口
+ * 该接口定义了与用户财务明细相关的数据库操作方法，包括查询、插入、更新和删除等功能
  */
 @Mapper
 public interface FinanceDetailMapper {

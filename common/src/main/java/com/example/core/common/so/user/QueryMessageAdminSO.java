@@ -3,7 +3,7 @@ package com.example.core.common.so.user;
 import lombok.Data;
 
 /**
- * 消息查询参数（管理端）
+ *  消息查询参数（管理端）
  */
 @Data
 public class QueryMessageAdminSO {

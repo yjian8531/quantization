@@ -360,6 +360,7 @@
     finance_no as financeNo,
     money_num as moneyNum,
     direction as direction,
+    tag as tag,
     create_time as createTime,
     CASE tag
     WHEN 'topup' THEN '充值 (USDT)'

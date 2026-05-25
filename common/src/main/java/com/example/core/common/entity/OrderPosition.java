@@ -21,7 +21,7 @@ public class OrderPosition {
     private String orderNo;
 
     /**
-     * 交易方向(buy:多单/sell:空单)
+     * 交易方向 (buy:多单/sell:空单)
      */
     private String tradeBl;
 

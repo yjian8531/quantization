@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 @Data
 public class UserAssetOverviewVO {
     
-    /** 总资产**/
+     /** 总资产**/
     private BigDecimal totalAsset;
     
     /** 累计收益**/

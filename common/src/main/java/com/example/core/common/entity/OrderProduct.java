@@ -19,7 +19,7 @@ public class OrderProduct {
      */
     private String productNo;
     /**
-     * 产品名称（如：2 万5 万 USDT）
+     * 产品名称 （如：2 万5 万 USDT）
      */
     private String productName;
 

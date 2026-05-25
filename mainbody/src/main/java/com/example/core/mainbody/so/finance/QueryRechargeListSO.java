@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class QueryRechargeListSO {
 
-    /** 币种类型 BSC TRX */
+     /** 币种类型 BSC TRX */
     private String coinType;
     /** 链类型 (TRC20/BEP20) */
     private String chainType;

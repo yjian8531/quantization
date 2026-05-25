@@ -137,7 +137,7 @@
 
   <select id="selectUnusedAddress" resultMap="BaseResultMap">
     SELECT <include refid="Base_Column_List"/>
-    FROM t_financial_wallet
+    FROM w_financial_wallet
     WHERE type = #{type}
     AND user_id IS NULL
     AND status = 0
@@ -146,10 +146,32 @@
 
   <!-- 绑定地址到用户 -->
   <update id="bindAddressToUser">
-    UPDATE t_financial_wallet
+    UPDATE w_financial_wallet
     SET user_id = #{userId},
         update_time = NOW()
     WHERE address = #{address}
       AND user_id IS NULL
   </update>
+
+  <!-- 分页查询财务钱包列表 -->
+  <select id="selectFinanceWalletList" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from w_financial_wallet
+    <where>
+      <if test="userId != null and userId != ''">
+        and user_id = #{userId}
+      </if>
+      <if test="type != null and type != ''">
+        and type = #{type}
+      </if>
+      <if test="address != null and address != ''">
+        and address = #{address}
+      </if>
+      <if test="status != null">
+        and status = #{status}
+      </if>
+    </where>
+    order by create_time desc
+  </select>
 </mapper>

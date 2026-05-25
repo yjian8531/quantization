@@ -3,7 +3,7 @@ package com.example.core.mainbody.so.admin;
 import lombok.Data;
 
 /***
- * 管理员登录
+ *  管理员登录
  */
 @Data
 public class LoginSO {

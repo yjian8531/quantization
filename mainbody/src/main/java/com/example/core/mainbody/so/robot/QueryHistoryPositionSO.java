@@ -3,7 +3,7 @@ package com.example.core.mainbody.so.robot;
 import lombok.Data;
 
 /**
- * 历史仓位查询SO
+ *  历史仓位查询SO
  */
 @Data
 public class QueryHistoryPositionSO {

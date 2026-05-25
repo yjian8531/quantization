@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 仓位信息推送数据
+ *  仓位信息推送数据
  * 用于接收Python策略脚本推送的仓位信息
  */
 @Data

@@ -7,7 +7,10 @@ import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
+/**
+ * 日期处理
+ *
+ */
 public class DateUtil {
 
     private static final ThreadLocal<SimpleDateFormat> threadLocal = new ThreadLocal<SimpleDateFormat>();

@@ -1,7 +1,7 @@
 package com.example.core.mainbody.so.robot;
 
 import lombok.Data;
-
+// 机器人列表查询 SO
 @Data
 public class QueryRobotSO {
 

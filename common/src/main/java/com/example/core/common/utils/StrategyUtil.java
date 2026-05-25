@@ -10,7 +10,9 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-
+/**
+ * 策略工具类
+ */
 public class StrategyUtil {
 
     private final String ENCRYPT_KEY = "EF01781D65D45A76"; // 必须与 Python 端一致
@@ -22,7 +24,7 @@ public class StrategyUtil {
     }
 
     /**
-     * 查询策略状态
+     *  查询策略状态
      * @param orderNo 策略订单号
      * @return
      */

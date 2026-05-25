@@ -5,7 +5,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 /**
- * 添加财务统计记录SO
+ *  添加财务统计记录SO
  */
 @Data
 public class AddFinanceStatisticsSO {

@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 用户财务明细实体类
+ * 用户财务明细
  */
 @Data
 public class FinanceDetail {

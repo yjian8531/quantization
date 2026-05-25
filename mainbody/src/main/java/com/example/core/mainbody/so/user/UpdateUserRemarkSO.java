@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class UpdateUserRemarkSO {
 
-    /** 用户ID **/
+     /** 用户ID **/
     private String userId;
 
     /** 备注 **/

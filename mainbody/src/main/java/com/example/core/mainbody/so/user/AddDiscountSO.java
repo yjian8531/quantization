@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * 添加用户折扣SO
+ *  添加用户折扣SO
  */
 @Data
 public class AddDiscountSO {

@@ -216,4 +216,5 @@
     WHERE hash = #{hash}
     LIMIT 1
   </select>
+
 </mapper>

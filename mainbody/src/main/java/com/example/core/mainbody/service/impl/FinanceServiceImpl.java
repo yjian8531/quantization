@@ -1,9 +1,6 @@
 package com.example.core.mainbody.service.impl;
 
-import com.example.core.common.entity.CommissionDetail;
-import com.example.core.common.entity.FinanceDetail;
-import com.example.core.common.entity.UserDiscount;
-import com.example.core.common.entity.UserInfo;
+import com.example.core.common.entity.*;
 import com.example.core.common.mapper.*;
 import com.example.core.common.so.finance.QueryBillListAdminSO;
 import com.example.core.common.so.finance.QueryCommissionListSO;
@@ -125,7 +122,7 @@ public class FinanceServiceImpl implements FinanceService {
         return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, vo);
     }
 
-    /**
+     /**
      * 查询充值记录列表
      * 对应原型图下方的充值流水列表，展示每条充值的金额、交易类型、链类型、时间和哈希
      */
@@ -216,6 +213,8 @@ public class FinanceServiceImpl implements FinanceService {
 
         // 使用 Map 替代 switch，结构更清晰
         Map<Integer, String[]> typeMap = new HashMap<>();
+        typeMap.put(0, new String[]{"购买返佣", "注册", "首开认购金额 $"});
+        typeMap.put(1, new String[]{"续费返佣", "注册", "首开认购金额 $"});
         typeMap.put(2, new String[]{"邀请激活", "注册", "首开认购金额 $"});
         typeMap.put(3, new String[]{"托管达标奖励", "托管", "统计口径内托管资产 $"});
         typeMap.put(4, new String[]{"量化运行分润", "分润", "本季度可分润基数 $"});
@@ -341,5 +340,296 @@ public class FinanceServiceImpl implements FinanceService {
     public ResultMessage deleteDiscount(Integer id) {
         userDiscountMapper.deleteByPrimaryKey(id);
         return new ResultMessage(ResultMessage.SUCCEED_CODE, "删除成功");
+    }
+
+    @Autowired
+    private UserFinanceMapper userFinanceMapper;
+
+    /**
+     * 新增用户财务信息
+     * @param userFinance 用户财务信息对象
+     * @return 操作结果
+     */
+    @Override
+    public ResultMessage addUserFinance(UserFinance userFinance) {
+        try {
+            if (userFinance == null) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "参数不能为空");
+            }
+            log.info("新增用户财务信息，参数: {}", userFinance);
+            int result = userFinanceMapper.insertSelective(userFinance);
+            return result > 0 ? new ResultMessage(ResultMessage.SUCCEED_CODE, "新增成功")
+                    : new ResultMessage(ResultMessage.FAILED_CODE, "新增失败");
+        } catch (Exception e) {
+            log.error("新增用户财务信息异常", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "系统异常");
+        }
+    }
+
+    /**
+     * 修改用户财务信息
+     * @param userFinance 用户财务信息对象
+     * @return 操作结果
+     */
+    @Override
+    public ResultMessage updateUserFinance(UserFinance userFinance) {
+        try {
+            if (userFinance == null || userFinance.getId() == null) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "参数不能为空");
+            }
+            log.info("修改用户财务信息，参数: {}", userFinance);
+            int result = userFinanceMapper.updateByPrimaryKeySelective(userFinance);
+            return result > 0 ? new ResultMessage(ResultMessage.SUCCEED_CODE, "修改成功")
+                    : new ResultMessage(ResultMessage.FAILED_CODE, "修改失败");
+        } catch (Exception e) {
+            log.error("修改用户财务信息异常", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "系统异常");
+        }
+    }
+
+    /**
+     * 删除用户财务信息
+     * @param id 主键ID
+     * @return 操作结果
+     */
+    @Override
+    public ResultMessage deleteUserFinance(Integer id) {
+        try {
+            if (id == null) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "ID不能为空");
+            }
+            log.info("删除用户财务信息，ID: {}", id);
+            int result = userFinanceMapper.deleteByPrimaryKey(id);
+            return result > 0 ? new ResultMessage(ResultMessage.SUCCEED_CODE, "删除成功")
+                    : new ResultMessage(ResultMessage.FAILED_CODE, "删除失败");
+        } catch (Exception e) {
+            log.error("删除用户财务信息异常", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "系统异常");
+        }
+    }
+
+    /**
+     * 查询用户财务信息详情
+     * @param id 主键ID
+     * @return 用户财务信息对象
+     */
+    @Override
+    public ResultMessage getUserFinanceDetail(Integer id) {
+        try {
+            if (id == null) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "ID不能为空");
+            }
+            UserFinance userFinance = userFinanceMapper.selectByPrimaryKey(id);
+            return userFinance != null ? new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, userFinance)
+                    : new ResultMessage(ResultMessage.FAILED_CODE, "未找到记录");
+        } catch (Exception e) {
+            log.error("查询用户财务信息详情异常", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "系统异常");
+        }
+    }
+
+    /**
+     * 根据用户ID查询财务信息
+     * @param userId 用户ID
+     * @return 用户财务信息对象
+     */
+    @Override
+    public ResultMessage getUserFinanceByUserId(String userId) {
+        try {
+            if (userId == null || userId.isEmpty()) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "用户ID不能为空");
+            }
+            UserFinance userFinance = userFinanceMapper.selectByUserId(userId);
+            return userFinance != null ? new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, userFinance)
+                    : new ResultMessage(ResultMessage.FAILED_CODE, "未找到记录");
+        } catch (Exception e) {
+            log.error("根据用户ID查询财务信息异常", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "系统异常");
+        }
+    }
+
+    /**
+     * 更新用户余额
+     * @param userId 用户ID
+     * @param tag 操作类型（add：增加,minus：减少,unbind：解冻,seal：冻结）
+     * @param amount 金额
+     * @return 操作结果
+     */
+    @Override
+    public ResultMessage updateBalance(String userId, String tag, BigDecimal amount) {
+        try {
+            if (userId == null || userId.isEmpty()) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "用户ID不能为空");
+            }
+            if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "金额必须大于0");
+            }
+            log.info("更新用户余额，用户ID: {}, 操作类型: {}, 金额: {}", userId, tag, amount);
+            int result = userFinanceMapper.updateBalanceByUserId(userId, tag, amount);
+            return result > 0 ? new ResultMessage(ResultMessage.SUCCEED_CODE, "更新成功")
+                    : new ResultMessage(ResultMessage.FAILED_CODE, "更新失败");
+        } catch (Exception e) {
+            log.error("更新用户余额异常", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "系统异常");
+        }
+    }
+
+    /**
+     * 分页查询用户财务信息列表
+     * @param pageNum 页码
+     * @param pageSize 每页数量
+     * @param userId 用户ID（可选）
+     * @return 用户财务信息列表
+     */
+    @Override
+    public ResultMessage queryUserFinanceList(Integer pageNum, Integer pageSize, String userId) {
+        try {
+            PageHelper.startPage(pageNum, pageSize);
+
+            // 注意：当前Mapper中没有通用的列表查询方法，需要后续添加
+            List<UserFinance> list = new java.util.ArrayList<>();
+
+            Page<UserFinance> page = (Page<UserFinance>) list;
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("total", page.getTotal());
+            resultMap.put("list", page.getResult());
+
+            return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, resultMap);
+        } catch (Exception e) {
+            log.error("查询用户财务信息列表异常", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "系统异常");
+        }
+    }
+
+
+
+    /**
+     * 新增佣金明细记录
+     * @param commissionDetail 佣金明细对象
+     * @return 操作结果
+     */
+    @Override
+    public ResultMessage addCommissionDetail(CommissionDetail commissionDetail) {
+        try {
+            if (commissionDetail == null) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "参数不能为空");
+            }
+            log.info("新增佣金明细记录，参数: {}", commissionDetail);
+            int result = commissionDetailMapper.insertSelective(commissionDetail);
+            return result > 0 ? new ResultMessage(ResultMessage.SUCCEED_CODE, "新增成功")
+                    : new ResultMessage(ResultMessage.FAILED_CODE, "新增失败");
+        } catch (Exception e) {
+            log.error("新增佣金明细记录异常", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "系统异常");
+        }
+    }
+
+    /**
+     * 修改佣金明细记录
+     * @param commissionDetail 佣金明细对象
+     * @return 操作结果
+     */
+    @Override
+    public ResultMessage updateCommissionDetail(CommissionDetail commissionDetail) {
+        try {
+            if (commissionDetail == null || commissionDetail.getId() == null) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "参数不能为空");
+            }
+            log.info("修改佣金明细记录，参数: {}", commissionDetail);
+            int result = commissionDetailMapper.updateByPrimaryKeySelective(commissionDetail);
+            return result > 0 ? new ResultMessage(ResultMessage.SUCCEED_CODE, "修改成功")
+                    : new ResultMessage(ResultMessage.FAILED_CODE, "修改失败");
+        } catch (Exception e) {
+            log.error("修改佣金明细记录异常", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "系统异常");
+        }
+    }
+
+    /**
+     * 删除佣金明细记录
+     * @param id 主键ID
+     * @return 操作结果
+     */
+    @Override
+    public ResultMessage deleteCommissionDetail(Integer id) {
+        try {
+            if (id == null) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "ID不能为空");
+            }
+            log.info("删除佣金明细记录，ID: {}", id);
+            int result = commissionDetailMapper.deleteByPrimaryKey(id);
+            return result > 0 ? new ResultMessage(ResultMessage.SUCCEED_CODE, "删除成功")
+                    : new ResultMessage(ResultMessage.FAILED_CODE, "删除失败");
+        } catch (Exception e) {
+            log.error("删除佣金明细记录异常", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "系统异常");
+        }
+    }
+
+    /**
+     * 查询佣金明细详情
+     * @param id 主键ID
+     * @return 佣金明细对象
+     */
+    @Override
+    public ResultMessage getCommissionDetail(Integer id) {
+        try {
+            if (id == null) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "ID不能为空");
+            }
+            CommissionDetail commissionDetail = commissionDetailMapper.selectByPrimaryKey(id);
+            return commissionDetail != null ? new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, commissionDetail)
+                    : new ResultMessage(ResultMessage.FAILED_CODE, "未找到记录");
+        } catch (Exception e) {
+            log.error("查询佣金明细详情异常", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "系统异常");
+        }
+    }
+
+    /**
+     * 根据用户ID查询佣金明细列表
+     * @param userId 用户ID
+     * @return 佣金明细列表
+     */
+    @Override
+    public ResultMessage getCommissionDetailsByUserId(String userId) {
+        try {
+            if (userId == null || userId.isEmpty()) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "用户ID不能为空");
+            }
+            List<CommissionDetail> list = commissionDetailMapper.selectByUserId(userId);
+            return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, list);
+        } catch (Exception e) {
+            log.error("根据用户ID查询佣金明细列表异常", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "系统异常");
+        }
+    }
+
+    /**
+     * 分页查询佣金明细列表
+     * @param pageNum 页码
+     * @param pageSize 每页数量
+     * @param userId 用户ID（可选）
+     * @param type 类型（可选）
+     * @return 佣金明细列表
+     */
+    @Override
+    public ResultMessage queryCommissionDetailList(Integer pageNum, Integer pageSize, String userId, Integer type) {
+        try {
+            PageHelper.startPage(pageNum, pageSize);
+
+            // 注意：当前Mapper中没有通用的列表查询方法，需要后续添加
+            List<CommissionDetail> list = new java.util.ArrayList<>();
+
+            Page<CommissionDetail> page = (Page<CommissionDetail>) list;
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("total", page.getTotal());
+            resultMap.put("list", page.getResult());
+
+            return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, resultMap);
+        } catch (Exception e) {
+            log.error("查询佣金明细列表异常", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "系统异常");
+        }
     }
 }

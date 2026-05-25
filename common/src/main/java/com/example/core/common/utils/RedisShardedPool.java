@@ -9,7 +9,9 @@ import redis.clients.util.Sharded;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * redis连接池
+ */
 public class RedisShardedPool {
     private static ShardedJedisPool pool;//sharded jedis连接池
     private static Integer maxTotal = Integer.parseInt(RedisProperties.getProperty("redis.max.total","20")); //最大连接数

@@ -3,7 +3,7 @@ package com.example.core.mainbody.so.user;
 import lombok.Data;
 
 /**
- * 登录SO
+ *  登录SO
  */
 @Data
 public class LoginSO {

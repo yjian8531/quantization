@@ -1,7 +1,9 @@
 package com.example.core.common.entity;
 
 import java.util.Date;
-
+/**
+ * 管理员日志
+ */
 public class AdminLog {
     private Integer id;
 

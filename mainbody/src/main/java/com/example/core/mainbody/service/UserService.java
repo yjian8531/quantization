@@ -31,6 +31,17 @@ public interface UserService {
      */
     ResultMessage updatePwd(UpdatePwdSO updatePwdSO, String openId);
 
+
+
+    /**
+     * 修改密码（登录状态下，需要验证旧密码）
+     * @param userId 用户ID
+     * @param so 修改密码参数
+     * @return 操作结果
+     */
+    ResultMessage updatePassword(String userId, UpdatePasswordSO so);
+
+
     /**
      * 登录
      * @param loginSO

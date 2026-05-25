@@ -25,7 +25,6 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-
 @Service
 @Slf4j
 public class AdminServiceImpl implements AdminService {
@@ -56,7 +55,6 @@ public class AdminServiceImpl implements AdminService {
 
     /**
      * 登录
-     *
      * @param loginSO
      * @return
      */

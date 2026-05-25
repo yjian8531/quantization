@@ -1,15 +1,21 @@
 package com.example.core.mainbody.controller;
 import com.example.core.common.controller.BaseController;
+import com.example.core.common.entity.CommissionDetail;
 import com.example.core.common.entity.UserDiscount;
+import com.example.core.common.entity.UserFinance;
 import com.example.core.common.entity.UserInfo;
 import com.example.core.common.so.finance.QueryBillListAdminSO;
 import com.example.core.common.so.finance.QueryCommissionListSO;
 import com.example.core.common.utils.ResultMessage;
 import com.example.core.mainbody.service.FinanceService;
+import com.example.core.mainbody.service.FinanceWalletService;
 import com.example.core.mainbody.so.finance.*;
+import com.example.core.mainbody.so.financewallet.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
 
 /**
  * 财务模块Controller
@@ -22,8 +28,11 @@ public class FinanceController extends BaseController {
     @Autowired
     private FinanceService financeService;
 
+    @Autowired
+    private FinanceWalletService financeWalletService;
+
     /**
-     * 查询用户财务明细列表
+     * 查询用户余额信息明细列表
      */
     @PostMapping(value = "/bill/list", produces = {"application/json"})
     public ResultMessage queryBillList(@RequestBody QueryDetailListSO queryDetailListSO) {
@@ -32,7 +41,7 @@ public class FinanceController extends BaseController {
     }
 
     /**
-     * 获取用户财务总览
+     * 获取用户余额信息总览
      */
     @GetMapping(value = "/bill/overview", produces = {"application/json"})
     public ResultMessage getBillOverview() {
@@ -111,21 +120,163 @@ public class FinanceController extends BaseController {
         return financeService.queryCommissionList(so);
     }
 
-//    /** 查询折扣配置列表 */
-//    @PostMapping(value = "/admin/discount/list", produces = {"application/json"})
-//    public ResultMessage queryDiscountList(@RequestBody QueryDiscountListSO so) {
-//        return financeService.queryDiscountList(so);
-//    }
-//
-//    /** 新增/修改折扣配置(id不为空是修改,为空是新增)*/
-//    @PostMapping(value = "/admin/discount/save", produces = {"application/json"})
-//    public ResultMessage saveDiscount(@RequestBody UserDiscount discount) {
-//        return financeService.saveDiscount(discount);
-//    }
-//
-//    /** 删除折扣配置（管理端） */
-//    @PostMapping(value = "/admin/discount/delete", produces = {"application/json"})
-//    public ResultMessage deleteDiscount(@RequestParam Integer id) {
-//        return financeService.deleteDiscount(id);
-//    }
+
+
+    /**
+     * 删除用户余额信息
+     * @param deleteSO 删除请求对象
+     * @return 操作结果
+     */
+    @PostMapping(value = "/userFinance/delete", produces = {"application/json"})
+    public ResultMessage deleteUserFinance(@RequestBody UserFinanceDeleteSO deleteSO) {
+        log.info("删除用户余额信息请求，ID: {}", deleteSO.getId());
+        return financeService.deleteUserFinance(deleteSO.getId());
+    }
+
+
+    /**
+     * 查询用户余额信息详情
+     * @param detailSO 详情查询请求对象
+     * @return 用户余额信息对象
+     */
+    @PostMapping(value = "/userFinance/detail", produces = {"application/json"})
+    public ResultMessage getUserFinanceDetail(@RequestBody IdSO detailSO) {
+        log.info("查询用户余额信息详情，ID: {}", detailSO.getId());
+        return financeService.getUserFinanceDetail(detailSO.getId());
+    }
+
+
+    /**
+     * 根据用户ID查询财务信息
+     * @param userIdSO 用户ID查询请求对象
+     * @return 用户余额信息对象
+     */
+    @PostMapping(value = "/userFinance/detail/user", produces = {"application/json"})
+    public ResultMessage getUserFinanceByUserId(@RequestBody UserIdSO userIdSO) {
+        log.info("根据用户ID查询财务信息，用户ID: {}", userIdSO.getUserId());
+        return financeService.getUserFinanceByUserId(userIdSO.getUserId());
+    }
+
+
+    /**
+     * 更新用户余额
+     * @param balanceSO 余额更新请求对象
+     * @return 操作结果
+     */
+    @PostMapping(value = "/userFinance/update/balance", produces = {"application/json"})
+    public ResultMessage updateBalance(@RequestBody UserBalanceUpdateSO balanceSO) {
+        log.info("更新用户余额请求，用户ID: {}, 操作类型: {}, 金额: {}",
+                balanceSO.getUserId(), balanceSO.getTag(), balanceSO.getAmount());
+        return financeService.updateBalance(balanceSO.getUserId(), balanceSO.getTag(), balanceSO.getAmount());
+    }
+
+
+    /**
+     * 分页查询用户余额信息列表
+     * @param listSO 列表查询请求对象
+     * @return 用户余额信息列表
+     */
+    @PostMapping(value = "/userFinance/list", produces = {"application/json"})
+    public ResultMessage queryUserFinanceList(@RequestBody UserFinanceListSO listSO) {
+        log.info("查询用户余额信息列表");
+        return financeService.queryUserFinanceList(
+                listSO.getPageNum() != null ? listSO.getPageNum() : 1,
+                listSO.getPageSize() != null ? listSO.getPageSize() : 10,
+                listSO.getUserId());
+    }
+
+
+    /**
+     * 删除佣金明细记录
+     * @param deleteSO 删除请求对象
+     * @return 操作结果
+     */
+    @PostMapping(value = "/commission/delete", produces = {"application/json"})
+    public ResultMessage deleteCommissionDetail(@RequestBody CommissionDeleteSO deleteSO) {
+        log.info("删除佣金明细记录请求，ID: {}", deleteSO.getId());
+        return financeService.deleteCommissionDetail(deleteSO.getId());
+    }
+
+
+    /**
+     * 查询佣金明细详情
+     * @param detailSO 详情查询请求对象
+     * @return 佣金明细对象
+     */
+    @PostMapping(value = "/commission/detail", produces = {"application/json"})
+    public ResultMessage getCommissionDetail(@RequestBody IdSO detailSO) {
+        log.info("查询佣金明细详情，ID: {}", detailSO.getId());
+        return financeService.getCommissionDetail(detailSO.getId());
+    }
+
+
+    /**
+     * 根据用户ID查询佣金明细列表
+     * @param userIdSO 用户ID查询请求对象
+     * @return 佣金明细列表
+     */
+    @PostMapping(value = "/commission/list/user", produces = {"application/json"})
+    public ResultMessage getCommissionDetailsByUserId(@RequestBody UserIdSO userIdSO) {
+        log.info("根据用户ID查询佣金明细列表，用户ID: {}", userIdSO.getUserId());
+        return financeService.getCommissionDetailsByUserId(userIdSO.getUserId());
+    }
+
+
+    /**
+     * 分页查询佣金明细列表
+     * @param listSO 列表查询请求对象
+     * @return 佣金明细列表
+     */
+    @PostMapping(value = "/commission/list", produces = {"application/json"})
+    public ResultMessage queryCommissionDetailList(@RequestBody CommissionListSO listSO) {
+        log.info("查询佣金明细列表");
+        return financeService.queryCommissionDetailList(
+                listSO.getPageNum() != null ? listSO.getPageNum() : 1,
+                listSO.getPageSize() != null ? listSO.getPageSize() : 10,
+                listSO.getUserId(),
+                listSO.getType());
+    }
+
+
+// ===================== 管理端接口 =====================
+
+    /**
+     * 查询钱包列表（管理端）
+     */
+    @PostMapping(value = "/admin/wallet/list", produces = {"application/json"})
+    public ResultMessage queryFinanceWalletList(@RequestBody QueryFinanceWalletSO so) {
+        return financeWalletService.queryFinanceWalletList(so);
+    }
+
+    /**
+     * 查询钱包详情（管理端）
+     */
+    @PostMapping(value = "/admin/wallet/detail", produces = {"application/json"})
+    public ResultMessage getFinanceWalletDetail(@RequestBody FinanceWalletDetailSO so) {
+        return financeWalletService.getFinanceWalletDetail(so);
+    }
+
+    /**
+     * 新增钱包/导入地址池（管理端）
+     */
+    @PostMapping(value = "/admin/wallet/add", produces = {"application/json"})
+    public ResultMessage addFinanceWallet(@RequestBody AddFinanceWalletSO so) {
+        return financeWalletService.addFinanceWallet(so);
+    }
+
+    /**
+     * 更新钱包状态（管理端）
+     */
+    @PostMapping(value = "/admin/wallet/update", produces = {"application/json"})
+    public ResultMessage updateFinanceWallet(@RequestBody UpdateFinanceWalletSO so) {
+        return financeWalletService.updateFinanceWallet(so);
+    }
+
+    /**
+     * 删除钱包（管理端）
+     */
+    @PostMapping(value = "/admin/wallet/delete", produces = {"application/json"})
+    public ResultMessage deleteFinanceWallet(@RequestBody DeleteFinanceWalletSO so) {
+        return financeWalletService.deleteFinanceWallet(so);
+    }
 }

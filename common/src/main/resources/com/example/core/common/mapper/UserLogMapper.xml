@@ -111,5 +111,4 @@
       and alias like  '%${alias}%'
     </if>
   </select>
-
 </mapper>

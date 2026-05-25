@@ -6,7 +6,7 @@ import lombok.Data;
  */
 @Data
 public class QueryWithdrawalListSO {
-    /** 状态(0:申请中,1:审核失败,2:提现成功) **/
+     /** 状态(0:申请中,1:审核失败,2:提现成功) **/
     private Integer status;
 
     /** 提现编号 **/

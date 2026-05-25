@@ -168,75 +168,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-    /**
-     * 配置机器人（创建策略订单）
-     * 采用标准扣费流程：1.冻结余额 -> 2.创建记录 -> 3.实际扣款
-     */
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public ResultMessage configRobot(String userId, ConfigRobotSO so) {
-        OrderProduct product = orderProductMapper.selectByPrimaryKey(so.getProductId());
-        if (product == null || product.getStatus() != 0) {
-            return new ResultMessage(ResultMessage.FAILED_CODE, "产品不存在或已下架");
-        }
-
-        UserFinance finance = userFinanceMapper.selectByUserId(userId);
-        BigDecimal fee = product.getMonthlyFee();
-
-        if (finance == null || finance.getValidNum().compareTo(fee) < 0) {
-            return new ResultMessage(ResultMessage.FAILED_CODE, "可用余额不足，请先充值");
-        }
-
-        finance.setValidNum(finance.getValidNum().subtract(fee));
-        finance.setFrozenNum(finance.getFrozenNum().add(fee));
-        userFinanceMapper.updateByPrimaryKeySelective(finance);
-
-        FinanceDetail detail = new FinanceDetail();
-        detail.setUserId(userId);
-        detail.setFinanceNo("FIN" + System.currentTimeMillis());
-        detail.setType(1);
-        detail.setCoinType("USDT");
-        detail.setMoneyNum(fee);
-        detail.setTag("buy");
-        detail.setDirection(1);
-        detail.setStatus(0);
-        detail.setRemarks("购买" + product.getProductName() + "服务");
-        detail.setCreateTime(new Date());
-        financeDetailMapper.insertSelective(detail);
-
-        OrderInfo orderInfo = new OrderInfo();
-        orderInfo.setOrderNo("ORD" + System.currentTimeMillis() + new Random().nextInt(1000));
-        orderInfo.setOrderName(product.getProductName());
-        orderInfo.setProductId(product.getId());
-        orderInfo.setUserId(userId);
-        orderInfo.setApikeyId(so.getApikeyId());
-        orderInfo.setSymbol(so.getSymbol());
-        orderInfo.setNodeTime(so.getNodeTime());
-        orderInfo.setParamStr(so.getParamStr());
-        orderInfo.setAnnualizedRate(product.getEstimateRate());
-        orderInfo.setIncome(BigDecimal.ZERO);
-        orderInfo.setIncomeRate(BigDecimal.ZERO);
-        orderInfo.setStatus(0);
-        orderInfo.setCreateTime(new Date());
-        orderInfo.setUpdateTime(new Date());
-        orderInfoMapper.insertSelective(orderInfo);
-
-        finance.setFrozenNum(finance.getFrozenNum().subtract(fee));
-        finance.setTotalNum(finance.getTotalNum().subtract(fee));
-        userFinanceMapper.updateByPrimaryKeySelective(finance);
-
-        detail.setStatus(1);
-        financeDetailMapper.updateByPrimaryKeySelective(detail);
-
-        product.setBuyCount(product.getBuyCount() == null ? 1 : product.getBuyCount() + 1);
-        if (product.getTotalAmount() == null) {
-            product.setTotalAmount(BigDecimal.ZERO);
-        }
-        product.setTotalAmount(product.getTotalAmount().add(fee));
-        orderProductMapper.updateByPrimaryKeySelective(product);
-
-        return new ResultMessage(ResultMessage.SUCCEED_CODE, "配置成功，机器人启动中");
-    }
 
     /**
      * 查询用户机器人列表
@@ -254,6 +185,7 @@ public class OrderServiceImpl implements OrderService {
         return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, resultMap);
     }
 
+    /**
     /**
      * 查询用户机器人详情
      */
@@ -634,5 +566,7 @@ public class OrderServiceImpl implements OrderService {
             return new ResultMessage(ResultMessage.FAILED_CODE, "查询失败: " + e.getMessage());
         }
     }
+
+
 
 }

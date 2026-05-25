@@ -2,7 +2,9 @@ package com.example.core.common.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import redis.clients.jedis.ShardedJedis;
-
+/**
+ * Redis工具类
+ */
 @Slf4j
 public class RedisUtil {
     /**

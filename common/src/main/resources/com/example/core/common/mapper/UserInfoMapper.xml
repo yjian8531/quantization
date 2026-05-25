@@ -467,4 +467,5 @@
         from w_user_info
         where email = #{email,jdbcType=VARCHAR}
     </select>
+
 </mapper>

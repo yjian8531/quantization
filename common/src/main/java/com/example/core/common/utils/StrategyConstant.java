@@ -1,7 +1,7 @@
 package com.example.core.common.utils;
 
 /**
- * 策略订单相关常量
+ *  策略订单相关常量
  */
 public class StrategyConstant {
 

@@ -222,32 +222,33 @@
     select
     id,
     product_no as productNo,
-    product_name,
+    product_name as productName,
     level,
     estimate_rate as annualRate,
-    monthly_fee,
-    buy_count,
-    total_amount,
-    profit_ratio
+    monthly_fee as monthlyFee,
+    buy_count as buyCount,
+    total_amount as totalAmount,
+    profit_ratio as profitRatio
     from w_order_product
     where status = 0
-    <if test="level != null">
+    <if test="level != null and level != 0">
       and level = #{level}
     </if>
     order by level asc, id asc
   </select>
 
+
   <select id="selectProductDetail" resultType="com.example.core.common.vo.product.ProductDetailVO">
     select
       id,
-      product_no,
-      product_name,
+      product_no as productNo,
+      product_name as productName,
       level,
-      estimate_rate,
-      monthly_fee,
+      estimate_rate as annualRate,
+      monthly_fee as monthlyFee,
       description,
-      param_config,
-      cumulative_profit
+      param_config as paramConfig,
+      cumulative_profit as cumulativeProfit,
     from w_order_product
     where id = #{id} and status = 0
   </select>

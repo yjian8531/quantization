@@ -6,7 +6,7 @@ public class OrderTask {
     private Integer id;
     /** 订单编号 **/
     private String orderNo;
-    /** 标记(0:机器人服务器创建,1:启动机器人) **/
+    /** 标记 (0:机器人服务器创建,1:启动机器人) **/
     private Integer tag;
     /** 备注 **/
     private String remark;

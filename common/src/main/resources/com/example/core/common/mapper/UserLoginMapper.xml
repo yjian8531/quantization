@@ -109,5 +109,4 @@
     where user_id = #{userId,jdbcType=VARCHAR}
     order by id desc
   </select>
-
 </mapper>

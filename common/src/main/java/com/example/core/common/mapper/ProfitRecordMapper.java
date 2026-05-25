@@ -24,7 +24,7 @@ public interface ProfitRecordMapper {
 
     /**
      * 查询用户收益记录列表（分页）
-     * 对应原型图下方的收益明细列表
+     *  对应原型图下方的收益明细列表
      */
     List<ProfitRecordVO> selectProfitRecordList(@Param("userId") String userId,
                                                 @Param("productName") String productName,

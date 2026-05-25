@@ -3,7 +3,7 @@ package com.example.core.mainbody.so.admin;
 import lombok.Data;
 
 /**
- * 查询登录日志SO
+ *  查询登录日志SO
  */
 @Data
 public class QueryAdminLogSO {

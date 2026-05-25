@@ -51,7 +51,7 @@ public class OrderInfo {
     private String symbol;
 
     /**
-     * K线时间节点(分钟)
+     * K线时间节点 (分钟)
      */
     private String nodeTime;
 

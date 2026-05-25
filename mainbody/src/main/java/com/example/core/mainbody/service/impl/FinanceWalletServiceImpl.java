@@ -5,12 +5,16 @@ import com.example.core.common.mapper.FinancialWalletMapper;
 import com.example.core.common.utils.RedisUtil;
 import com.example.core.common.utils.ResultMessage;
 import com.example.core.mainbody.service.FinanceWalletService;
+import com.example.core.mainbody.so.financewallet.*;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -97,5 +101,118 @@ public class FinanceWalletServiceImpl implements FinanceWalletService {
         resultMap.put("address", address);
         resultMap.put("networkType", networkType);
         return new ResultMessage(ResultMessage.SUCCEED_CODE, "获取成功", resultMap);
+    }
+
+    /**
+     * 查询财务钱包列表
+     */
+    @Override
+    public ResultMessage queryFinanceWalletList(QueryFinanceWalletSO so) {
+        PageHelper.startPage(so.getPageNum(), so.getPageSize());
+        Page<FinancialWallet> page = (Page<FinancialWallet>) financialWalletMapper.selectFinanceWalletList(
+                so.getUserId(),
+                so.getType(),
+                so.getAddress(),
+                so.getStatus()
+        );
+
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("list", page.getResult());
+        resultMap.put("total", page.getTotal());
+        return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, resultMap);
+    }
+
+    /**
+     * 查询财务钱包详情
+     */
+    @Override
+    public ResultMessage getFinanceWalletDetail(FinanceWalletDetailSO so) {
+        if (so.getId() == null) {
+            return new ResultMessage(ResultMessage.FAILED_CODE, "钱包ID不能为空");
+        }
+
+        FinancialWallet wallet = financialWalletMapper.selectByPrimaryKey(so.getId());
+        if (wallet == null) {
+            return new ResultMessage(ResultMessage.FAILED_CODE, "钱包不存在");
+        }
+
+        return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, wallet);
+    }
+
+    /**
+     * 新增财务钱包
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ResultMessage addFinanceWallet(AddFinanceWalletSO so) {
+        // 校验地址是否已存在
+        FinancialWallet existing = financialWalletMapper.selectByAddress(so.getAddress());
+        if (existing != null) {
+            return new ResultMessage(ResultMessage.FAILED_CODE, "钱包地址已存在");
+        }
+
+        FinancialWallet wallet = new FinancialWallet();
+        wallet.setUserId(so.getUserId());
+        wallet.setType(so.getType());
+        wallet.setAddress(so.getAddress());
+        wallet.setStatus(so.getStatus() != null ? so.getStatus() : 0);
+        wallet.setCreateTime(new Date());
+        wallet.setUpdateTime(new Date());
+
+        int result = financialWalletMapper.insertSelective(wallet);
+        if (result > 0) {
+            return new ResultMessage(ResultMessage.SUCCEED_CODE, "新增成功");
+        } else {
+            return new ResultMessage(ResultMessage.FAILED_CODE, "新增失败");
+        }
+    }
+
+    /**
+     * 更新财务钱包信息
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ResultMessage updateFinanceWallet(UpdateFinanceWalletSO so) {
+        if (so.getId() == null) {
+            return new ResultMessage(ResultMessage.FAILED_CODE, "钱包ID不能为空");
+        }
+
+        FinancialWallet wallet = financialWalletMapper.selectByPrimaryKey(so.getId());
+        if (wallet == null) {
+            return new ResultMessage(ResultMessage.FAILED_CODE, "钱包不存在");
+        }
+
+        wallet.setStatus(so.getStatus());
+        wallet.setUpdateTime(new Date());
+
+        int result = financialWalletMapper.updateByPrimaryKeySelective(wallet);
+        if (result > 0) {
+            return new ResultMessage(ResultMessage.SUCCEED_CODE, "更新成功");
+        } else {
+            return new ResultMessage(ResultMessage.FAILED_CODE, "更新失败");
+        }
+    }
+
+    /**
+     * 删除财务钱包
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ResultMessage deleteFinanceWallet(DeleteFinanceWalletSO so) {
+        if (so.getId() == null) {
+            return new ResultMessage(ResultMessage.FAILED_CODE, "钱包ID不能为空");
+        }
+
+        FinancialWallet wallet = financialWalletMapper.selectByPrimaryKey(so.getId());
+        if (wallet == null) {
+            return new ResultMessage(ResultMessage.FAILED_CODE, "钱包不存在");
+        }
+
+        int result = financialWalletMapper.deleteByPrimaryKey(so.getId());
+        if (result > 0) {
+            return new ResultMessage(ResultMessage.SUCCEED_CODE, "删除成功");
+        } else {
+            return new ResultMessage(ResultMessage.FAILED_CODE, "删除失败");
+        }
     }
 }

@@ -6,9 +6,9 @@ import lombok.Data;
  * 产品列表查询 SO
  */
 @Data
-public class QueryProductSO {
+public class  QueryProductSO {
 
-    /** 页码，默认第 1 页 */
+     /** 页码，默认第 1 页 */
     private Integer pageNum = 1;
 
     /** 每页条数，默认 10 条 */

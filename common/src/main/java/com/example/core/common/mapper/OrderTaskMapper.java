@@ -19,4 +19,5 @@ public interface OrderTaskMapper {
     int updateByPrimaryKeySelective(OrderTask record);
 
     int updateByPrimaryKey(OrderTask record);
+
 }

@@ -16,7 +16,7 @@ public interface PowerBindingMapper {
     PowerBinding selectByPrimaryKey(Integer id);
 
     /**
-     * 查询管理员的分组权限
+     *  查询管理员的分组权限
      * @param adminId
      * @return
      */

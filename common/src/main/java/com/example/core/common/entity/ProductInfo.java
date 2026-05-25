@@ -47,7 +47,7 @@ public class ProductInfo {
      */
     private BigDecimal cumulativeProfit;
     /**
-     * 状态：0=上架，1=下架
+     * 状态： 0=上架，1=下架
      */
     private Integer status;
     /**

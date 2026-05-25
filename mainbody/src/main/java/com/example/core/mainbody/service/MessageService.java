@@ -28,6 +28,6 @@ public interface MessageService {
     /** 删除消息（管理端） */
     ResultMessage deleteMessage(Integer id);
 
-    /** 批量推送公告（管理端） */
+    /**  批量推送公告（管理端） */
     ResultMessage broadcastMessage(SystemMessage message);
 }

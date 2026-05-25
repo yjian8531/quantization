@@ -36,4 +36,5 @@ public class WalletController extends BaseController {
         log.info("用户请求获取充值地址：userId={}, networkType={}", currentUser.getUserId(), networkType);
         return financeWalletService.getDepositAddress(currentUser.getUserId(), networkType);
     }
+
 }

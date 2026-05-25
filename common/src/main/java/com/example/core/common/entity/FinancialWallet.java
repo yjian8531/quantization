@@ -8,8 +8,8 @@ import java.util.Date;
  */
 @Data
 public class FinancialWallet {
+    // 主键id
     private Integer id;
-
     // 用户ID
     private String userId;
     // 钱包类型(ERC20,BEP20,TRC20)

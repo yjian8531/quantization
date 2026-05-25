@@ -173,9 +173,9 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
   <select id="selectRewardList" resultType="com.example.core.common.entity.CommissionDetail">
-    select id, type, commission, consumption, create_time
+    select id, type, commission, consumption, create_time as createTime
     from w_commission_detail
-    where user_id = #{userId} and type IN (2,3,4)
+    where user_id = #{userId} and type IN (1,2,3,4)
     <if test="type != null">and type = #{type}</if>
     order by create_time desc
   </select>
@@ -198,7 +198,9 @@
 <!--    where user_id = #{userId} and create_time &gt;= #{startTime}-->
 <!--  </select>-->
   <select id="selectAdminCommissionList" parameterType="com.example.core.common.so.finance.QueryCommissionListSO" resultType="com.example.core.common.entity.CommissionDetail">
-    select * from w_commission_detail
+    select
+    <include refid="Base_Column_List" />
+    from w_commission_detail
     <where>
       <if test="userId != null and userId != ''">
         and user_id = #{userId}
@@ -215,5 +217,11 @@
     </where>
     order by id desc
   </select>
+    <select id="selectByUserId" resultType="com.example.core.common.entity.CommissionDetail">
+      select
+      <include refid="Base_Column_List" />
+      from w_commission_detail
+      where user_id = #{userId}
+    </select>
 
 </mapper>

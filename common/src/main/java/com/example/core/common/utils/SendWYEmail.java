@@ -7,7 +7,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.util.Date;
 import java.util.Properties;
-
+//邮件发送
 public class SendWYEmail {
 
     /**

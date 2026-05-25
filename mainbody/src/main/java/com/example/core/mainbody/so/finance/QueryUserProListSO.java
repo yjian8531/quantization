@@ -7,7 +7,7 @@ import lombok.Data;
  */
 @Data
 public class QueryUserProListSO {
-
+    /** 用户ID **/
     private String userId;
 
     /** 手机获邮箱 **/

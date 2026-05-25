@@ -111,5 +111,4 @@
     where status = 0
     order by id asc
   </select>
-
 </mapper>

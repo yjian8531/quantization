@@ -27,26 +27,6 @@ public class AdminController extends BaseController {
     }
 
 
-//    /**
-//     * 获取平台汇总数据
-//     * @return
-//     */
-//    @GetMapping(value = "/get/data/collect",produces = {"application/json"})
-//    public ResultMessage getDataCollect(){
-//        return adminService.getDataCollect();
-//    }
-//
-//
-//    /**
-//     * 查询国家产品数量
-//     * @param queryCountryNumSO
-//     * @return
-//     */
-//    @PostMapping(value = "/query/country/num",produces = {"application/json"})
-//    public ResultMessage queryCountryNum(@RequestBody QueryCountryNumSO queryCountryNumSO){
-//        return adminService.queryCountryNum(queryCountryNumSO);
-//    }
-
     /**
      * 获取系统操作日志列表
      * @param queryAdminLogSO
@@ -70,27 +50,6 @@ public class AdminController extends BaseController {
         return new ResultMessage(ResultMessage.SUCCEED_CODE,ResultMessage.SUCCEED_MSG);
     }
 
-
-//    /**
-//     * 查询充值消费统计集
-//     * @param querySummaryListSO
-//     * @return
-//     */
-//    @PostMapping(value = "/query/summary/list",produces = {"application/json"})
-//    public ResultMessage querySummaryList(@RequestBody QuerySummaryListSO querySummaryListSO){
-//        return adminService.querySummaryList(querySummaryListSO);
-//    }
-
-//
-//    /**
-//     * 获取活跃客户统计集
-//     * @param queryTotalUserSO
-//     * @return
-//     */
-//    @PostMapping(value = "/query/total/user",produces = {"application/json"})
-//    public ResultMessage queryTotalUser(@RequestBody QueryTotalUserSO queryTotalUserSO){
-//        return adminService.queryTotalUser(queryTotalUserSO);
-//    }
 
 
 

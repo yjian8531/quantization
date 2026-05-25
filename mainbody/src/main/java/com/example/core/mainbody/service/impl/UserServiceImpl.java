@@ -273,7 +273,7 @@ public class UserServiceImpl implements UserService {
 
 
     /**
-     * 更新密码
+     * 修改密码
      *
      * @param updatePwdSO
      * @return
@@ -300,6 +300,52 @@ public class UserServiceImpl implements UserService {
             return new ResultMessage(ResultMessage.SUCCEED_CODE, "修改成功");
         } else {
             return new ResultMessage(ResultMessage.FAILED_CODE, "修改失败");
+        }
+    }
+
+
+    /**
+     * 修改密码（登录状态下，需要验证旧密码）
+     *
+     * @param userId 用户ID
+     * @param so 修改密码参数
+     * @return 操作结果
+     */
+    @Override
+    public ResultMessage updatePassword(String userId, UpdatePasswordSO so) {
+        // 1. 校验旧密码是否为空
+        if (StringUtils.isEmpty(so.getOldPwd())) {
+            return new ResultMessage(ResultMessage.FAILED_CODE, "请输入旧密码");
+        }
+
+        // 2. 校验新密码是否为空
+        if (StringUtils.isEmpty(so.getNewPwd())) {
+            return new ResultMessage(ResultMessage.FAILED_CODE, "请输入新密码");
+        }
+
+        // 3. 查询用户信息
+        UserInfo userInfo = userInfoMapper.selectByUserId(userId);
+        if (userInfo == null) {
+            return new ResultMessage(ResultMessage.FAILED_CODE, "用户不存在");
+        }
+
+        // 4. 验证旧密码是否正确（三重MD5加密）
+        String encryptedOldPwd = MD5.MD5Encode(MD5.MD5Encode(MD5.MD5Encode(so.getOldPwd())));
+        if (!encryptedOldPwd.equals(userInfo.getLoginPwd())) {
+            return new ResultMessage(ResultMessage.FAILED_CODE, "旧密码错误");
+        }
+
+        // 5. 更新新密码
+        UserInfo entity = new UserInfo();
+        entity.setId(userInfo.getId());
+        entity.setLoginPwd(MD5.MD5Encode(MD5.MD5Encode(MD5.MD5Encode(so.getNewPwd()))));
+        entity.setUpdateTime(new Date());
+
+        int result = userInfoMapper.updateByPrimaryKeySelective(entity);
+        if (result > 0) {
+            return new ResultMessage(ResultMessage.SUCCEED_CODE, "密码修改成功，请重新登录");
+        } else {
+            return new ResultMessage(ResultMessage.FAILED_CODE, "密码修改失败");
         }
     }
 

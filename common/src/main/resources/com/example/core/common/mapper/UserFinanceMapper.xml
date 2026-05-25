@@ -172,6 +172,4 @@
       where user_id = #{userId,jdbcType=VARCHAR}
     </set>
   </update>
-
-
 </mapper>

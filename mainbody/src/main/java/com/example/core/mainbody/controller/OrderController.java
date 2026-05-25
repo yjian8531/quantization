@@ -2,8 +2,10 @@ package com.example.core.mainbody.controller;
 
 import com.example.core.common.controller.BaseController;
 import com.example.core.common.entity.StrategyInfo;
+import com.example.core.common.entity.UserInfo;
 import com.example.core.common.utils.ResultMessage;
 import com.example.core.mainbody.service.OrderService;
+import com.example.core.mainbody.service.ProductService;
 import com.example.core.mainbody.so.product.ConfigRobotSO;
 import com.example.core.mainbody.so.strategy.CreateStrategyOrderSO;
 import com.example.core.mainbody.so.strategy.PositionPushSO;
@@ -26,6 +28,9 @@ public class OrderController extends BaseController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private ProductService productService;
 
     /**
      * 创建策略订单
@@ -98,19 +103,7 @@ public class OrderController extends BaseController {
         return orderService.querySymbolList();
     }
 
-    /**
-     * 配置机器人（创建策略订单）
-     * 对应原型图：产品详情页 -> 点击"创建"按钮
-     * 功能：
-     * 1. 校验产品和余额
-     * 2. 冻结余额 -> 创建订单 -> 实际扣款
-     * 3. 生成策略订单记录
-     */
-    @PostMapping(value = "/configure", produces = {"application/json"})
-    public ResultMessage configRobot(@RequestBody ConfigRobotSO so) {
-        String userId = getUserId();
-        return orderService.configRobot(userId, so);
-    }
+
 
     /**
      * 查询用户机器人列表
@@ -216,5 +209,6 @@ public class OrderController extends BaseController {
         log.info("查询策略模板列表");
         return orderService.queryStrategyInfoList();
     }
+
 
 }

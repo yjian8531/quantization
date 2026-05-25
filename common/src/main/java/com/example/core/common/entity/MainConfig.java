@@ -50,7 +50,7 @@ public class MainConfig {
     private String snapshot;
 
     /**
-     * 状态(0:正常,1:禁用)
+     * 状态 (0:正常,1:禁用)
      */
     private Integer status;
 

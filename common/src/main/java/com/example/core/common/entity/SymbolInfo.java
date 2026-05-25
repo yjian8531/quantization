@@ -26,7 +26,7 @@ public class SymbolInfo {
     private BigDecimal realVal;
 
     /**
-     * 状态(0:正常,1:禁用)
+     * 状态 (0:正常,1:禁用)
      */
     private Integer status;
 

@@ -12,7 +12,7 @@ public class UpdateFinanceStatisticsSO {
 
     private Integer id;
 
-    /** 总收入 **/
+     /** 总收入 **/
     private BigDecimal incomeTotal;
 
     /** 总毛利 **/

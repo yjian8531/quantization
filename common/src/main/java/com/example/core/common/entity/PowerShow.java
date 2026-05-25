@@ -1,7 +1,9 @@
 package com.example.core.common.entity;
 
 import java.util.Date;
-
+/**
+ * 权限绑定表
+ */
 public class PowerShow {
     private Integer id;
 

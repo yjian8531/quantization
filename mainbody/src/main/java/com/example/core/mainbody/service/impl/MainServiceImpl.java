@@ -29,7 +29,7 @@ public class MainServiceImpl implements MainService {
     private MainConfigMapper mainConfigMapper;
 
     /**
-     * 创建机器人服务器
+     *  创建机器人服务器
      * @param mainConfig
      * @return
      */

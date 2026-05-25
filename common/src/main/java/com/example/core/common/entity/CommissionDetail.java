@@ -4,6 +4,9 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.Date;
+/**
+ * 佣金明细表
+ */
 @Data
 public class CommissionDetail {
     private Integer id;

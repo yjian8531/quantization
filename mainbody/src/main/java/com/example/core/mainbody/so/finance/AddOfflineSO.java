@@ -5,7 +5,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 /**
- * 添加线下财务账单SO
+ *  添加线下财务账单SO
  */
 @Data
 public class AddOfflineSO {

@@ -124,5 +124,6 @@ public class ProfitController extends BaseController {
         UserInfo userInfo = this.getLoginUser();
         return profitService.queryUserProducts(userInfo.getUserId());
     }
+
 }
 

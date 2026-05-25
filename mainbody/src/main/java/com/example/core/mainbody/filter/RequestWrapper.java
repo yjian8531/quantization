@@ -17,7 +17,7 @@ public class RequestWrapper extends HttpServletRequestWrapper {
 
     public RequestWrapper(HttpServletRequest request) throws IOException {
         super(request);
-        //保存一份InputStream，将其转换为字节数组
+        // 保存一份InputStream，将其转换为字节数组
         body = StreamUtils.copyToByteArray(request.getInputStream());
     }
 
