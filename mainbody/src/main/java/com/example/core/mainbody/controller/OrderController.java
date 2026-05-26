@@ -2,11 +2,9 @@ package com.example.core.mainbody.controller;
 
 import com.example.core.common.controller.BaseController;
 import com.example.core.common.entity.StrategyInfo;
-import com.example.core.common.entity.UserInfo;
 import com.example.core.common.utils.ResultMessage;
 import com.example.core.mainbody.service.OrderService;
 import com.example.core.mainbody.service.ProductService;
-import com.example.core.mainbody.so.product.ConfigRobotSO;
 import com.example.core.mainbody.so.strategy.CreateStrategyOrderSO;
 import com.example.core.mainbody.so.strategy.PositionPushSO;
 import com.example.core.mainbody.so.strategy.TradeLogPushSO;
@@ -37,7 +35,8 @@ public class OrderController extends BaseController {
      * 请求示例：POST /message/create {"productId": 1, "apikeyId": 1, "symbol": "BTC/USDT", "nodeTime": "15", "paramStr": "{}"}
      */
     @PostMapping(value = "/create", produces = {"application/json"})
-    public ResultMessage createStrategyOrder(@RequestBody CreateStrategyOrderSO so, @RequestParam String userId) {
+    public ResultMessage createStrategyOrder(@RequestBody CreateStrategyOrderSO so) {
+        String userId = getUserId();
         log.info("创建策略订单请求参数: so={}, userId={}", so, userId);
         return orderService.createStrategyOrder(so, userId);
     }
@@ -156,11 +155,22 @@ public class OrderController extends BaseController {
 
     /**
      * 接收策略状态心跳上报
+     * Python策略定期上报运行状态，Java端同步更新订单状态
+     *
+     * 请求示例：POST /order/status
+     * {
+     *   "strategyId": "STRAT-SINGLE",
+     *   "orderNo": "xxx",
+     *   "status": "running",
+     *   "profit": 12.5,
+     *   "position": 0.01,
+     *   "updateTime": "2026-05-26 10:00:00"
+     * }
      */
     @PostMapping(value = "/status", produces = {"application/json"})
     public ResultMessage receiveStrategyStatus(@RequestBody String statusJson) {
         log.info("接收策略状态上报: {}", statusJson);
-        return new ResultMessage(ResultMessage.SUCCEED_CODE, "已接收");
+        return orderService.receiveStrategyStatus(statusJson);
     }
 
     // ==================== 策略模板 CRUD ====================
@@ -208,6 +218,19 @@ public class OrderController extends BaseController {
     public ResultMessage queryStrategyInfoList() {
         log.info("查询策略模板列表");
         return orderService.queryStrategyInfoList();
+    }
+
+    /**
+     * 查询收益曲线数据
+     * 对应原型图：机器人详情页 - 收益曲线
+     * 请求示例：POST /order/profit/curve {"orderId": 3241}
+     * 返回：逐笔累计收益时间序列 [{time: 1716364800, profit: 12.5, income: 3.2, incomeRate: 0.5}]
+     */
+    @PostMapping(value = "/profit/curve", produces = {"application/json"})
+    public ResultMessage queryProfitCurve(@RequestParam Integer orderId) {
+        String userId = getUserId();
+        log.info("查询收益曲线: orderId={}, userId={}", orderId, userId);
+        return orderService.queryProfitCurve(userId, orderId);
     }
 
 

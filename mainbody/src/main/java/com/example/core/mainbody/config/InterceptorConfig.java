@@ -42,6 +42,14 @@ public class InterceptorConfig extends WebMvcConfigurerAdapter {
         registry.addInterceptor(userInterceptor)
                 .addPathPatterns("/finance/**");
 
+        //  订单模块
+        registry.addInterceptor(userInterceptor)
+                .addPathPatterns("/order/**")
+                .excludePathPatterns(
+                        "/order/trade",                   // 接收交易日志
+                        "/order/position",                // 接收仓位日志
+                        "/order/symbol/list"
+                );
         // 3. 收益模块（全部需要 token）
         registry.addInterceptor(userInterceptor)
                 .addPathPatterns("/profit/**");

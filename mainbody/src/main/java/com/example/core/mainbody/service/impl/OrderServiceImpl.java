@@ -112,9 +112,18 @@ public class OrderServiceImpl implements OrderService {
                 return new ResultMessage(ResultMessage.FAILED_CODE, "暂无可用的主机配置");
             }
 
+            //冻结金额
+            UserFinance finance = userFinanceMapper.selectByUserId(userId);
+            if(finance.getValidNum().compareTo(product.getMonthlyFee()) < 0){
+                return new ResultMessage(ResultMessage.FAILED_CODE, "余额不足，请先充值。");
+            }
+            userFinanceMapper.updateBalanceByUserId(userId,"seal",product.getMonthlyFee());
+
             // 5. 创建云服务器
             String instanceId = mainService.create(mainConfig);
             if (StringUtils.isEmpty(instanceId)) {
+                //解冻金额
+                userFinanceMapper.updateBalanceByUserId(userId,"seal",product.getMonthlyFee());
                 return new ResultMessage(ResultMessage.FAILED_CODE, "创建机器人服务器失败");
             }
             String mainNo = CommonUtil.getRandomStr(12);
@@ -147,6 +156,23 @@ public class OrderServiceImpl implements OrderService {
             orderInfo.setCreateTime(new Date());
             int i = orderInfoMapper.insertSelective(orderInfo);
             if(i > 0){
+
+                FinanceDetail financeDetail = new FinanceDetail();
+                financeDetail.setUserId(userId);
+                financeDetail.setFinanceNo(CommonUtil.getRandomStr(8));
+                financeDetail.setOrderNo(orderNo);
+                financeDetail.setType(1);//消费类型
+                financeDetail.setCoinType("USDT");
+                financeDetail.setMoneyNum(product.getMonthlyFee());
+                financeDetail.setPeriod(1);//周期(月)
+                financeDetail.setTag("buy");
+                financeDetail.setDirection(1);//支出
+                financeDetail.setWay(0);
+                financeDetail.setStatus(0);//进行中
+                financeDetail.setCreateTime(new Date());
+                financeDetail.setUpdateTime(new Date());
+                financeDetailMapper.insertSelective(financeDetail);
+
 
                 /** 添加创建策略机器人任务 **/
                 OrderTask orderTask = new OrderTask();
@@ -295,6 +321,11 @@ public class OrderServiceImpl implements OrderService {
         String str = strategyUtil.stopStrategy(orderNo);
         JSONObject result = JSONObject.fromObject(str);
         if("0000".equals(result.getString("code"))) {
+            // 更新订单状态为已结束
+            orderInfo.setStatus(StrategyConstant.OrderStatus.ENDED);
+            orderInfo.setEntTime(new Date());
+            orderInfo.setUpdateTime(new Date());
+            orderInfoMapper.updateByPrimaryKeySelective(orderInfo);
             return new ResultMessage(ResultMessage.SUCCEED_CODE, "停止成功");
         }else{
             return new ResultMessage(ResultMessage.FAILED_CODE, "停止策略失败", result.getString("msg"));
@@ -314,10 +345,6 @@ public class OrderServiceImpl implements OrderService {
                 return new ResultMessage(ResultMessage.FAILED_CODE, "订单不存在");
             }
 
-            // 设置创建时间
-            if (tradeLog.getCreateTime() == null) {
-                tradeLog.setCreateTime(new Date());
-            }
 
             // 保存交易日志
             OrderTrade orderTrade = new OrderTrade();
@@ -328,7 +355,7 @@ public class OrderServiceImpl implements OrderService {
             orderTrade.setTradeNum(tradeLog.getTradeNum());
             orderTrade.setIncome(tradeLog.getIncome());
             orderTrade.setPrice(tradeLog.getPrice());
-            orderTrade.setCreateTime(tradeLog.getCreateTime());
+            orderTrade.setCreateTime(DateUtil.fomatDate(tradeLog.getCreateTime()));
             orderTrade.setUpdateTime(new Date());
             orderTradeMapper.insertSelective(orderTrade);
             if(tradeLog.getTradeNum() != null){
@@ -567,6 +594,116 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    /**
+     * 接收策略状态心跳上报
+     * Python策略定期上报运行状态，Java端同步更新订单信息
+     */
+    @Override
+    public ResultMessage receiveStrategyStatus(String statusJson) {
+        try {
+            if (StringUtils.isEmpty(statusJson)) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "上报数据为空");
+            }
+
+            JSONObject statusData = JSONObject.fromObject(statusJson);
+            String strategyId = statusData.optString("strategyId");
+            String orderNo = statusData.optString("orderNo");
+            String status = statusData.optString("status");
+            Double profit = statusData.optDouble("profit", 0);
+            Integer position = statusData.optInt("position", 0);
+
+            if (StringUtils.isEmpty(strategyId) && StringUtils.isEmpty(orderNo)) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "策略ID或订单号不能为空");
+            }
+
+            // 查询订单
+            OrderInfo orderInfo = null;
+            if (StringUtils.isNotEmpty(orderNo)) {
+                orderInfo = orderInfoMapper.selectByOrderNo(orderNo);
+            }
+            if (orderInfo == null && StringUtils.isNotEmpty(strategyId)) {
+                orderInfo = orderInfoMapper.selectByStrategyId(strategyId);
+            }
+            if (orderInfo == null) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "订单不存在");
+            }
+
+            // 同步状态
+            if ("running".equals(status)) {
+                if (orderInfo.getStatus() != StrategyConstant.OrderStatus.RUNNING) {
+                    orderInfo.setStatus(StrategyConstant.OrderStatus.RUNNING);
+                }
+            } else if ("paused".equals(status)) {
+                orderInfo.setStatus(StrategyConstant.OrderStatus.PAUSED);
+            } else if ("stopped".equals(status) || "ended".equals(status)) {
+                orderInfo.setStatus(StrategyConstant.OrderStatus.ENDED);
+                if (orderInfo.getEntTime() == null) {
+                    orderInfo.setEntTime(new Date());
+                }
+            }
+
+            orderInfo.setUpdateTime(new Date());
+            orderInfoMapper.updateByPrimaryKeySelective(orderInfo);
+
+            log.info("策略状态同步完成: orderNo={}, status={}, profit={}", orderNo, status, profit);
+            return new ResultMessage(ResultMessage.SUCCEED_CODE, "状态已同步");
+
+        } catch (Exception e) {
+            log.error("接收策略状态上报异常", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "状态同步失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 查询收益曲线数据
+     * 从 w_order_position 历史仓位中按时间顺序计算累计收益
+     */
+    @Override
+    public ResultMessage queryProfitCurve(String userId, Integer orderId) {
+        try {
+            OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(orderId);
+            if (orderInfo == null || !orderInfo.getUserId().equals(userId)) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "订单不存在或无权限查看");
+            }
+
+            // 查询所有已平仓的历史仓位，按结束时间升序
+            List<OrderPosition> positions = orderPositionMapper.selectProfitCurveByOrderNo(orderInfo.getOrderNo());
+            if (positions == null || positions.isEmpty()) {
+                return new ResultMessage(ResultMessage.SUCCEED_CODE, "暂无收益数据", new ArrayList<>());
+            }
+
+            // 计算逐笔累计收益
+            BigDecimal cumulativeProfit = BigDecimal.ZERO;
+            List<Map<String, Object>> curve = new ArrayList<>();
+
+            for (OrderPosition pos : positions) {
+                if (pos.getIncome() != null) {
+                    cumulativeProfit = cumulativeProfit.add(pos.getIncome());
+                }
+                if (pos.getEndTime() == null) {
+                    continue;
+                }
+                Map<String, Object> point = new HashMap<>();
+                point.put("time", pos.getEndTime().getTime() / 1000);
+                point.put("profit", cumulativeProfit);
+                point.put("income", pos.getIncome());
+                point.put("incomeRate", pos.getIncomeRate());
+                curve.add(point);
+            }
+
+            // 添加汇总信息
+            Map<String, Object> summary = new HashMap<>();
+            summary.put("totalProfit", cumulativeProfit);
+            summary.put("totalPositions", curve.size());
+            summary.put("curve", curve);
+
+            return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, summary);
+
+        } catch (Exception e) {
+            log.error("查询收益曲线失败", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "查询失败: " + e.getMessage());
+        }
+    }
 
 
 }

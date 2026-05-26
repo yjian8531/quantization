@@ -5,10 +5,7 @@ import com.example.core.common.utils.ResultMessage;
 import com.example.core.mainbody.so.strategy.CreateStrategyOrderSO;
 import com.example.core.mainbody.so.strategy.PositionPushSO;
 import com.example.core.mainbody.so.strategy.TradeLogPushSO;
-import com.example.core.mainbody.so.product.ConfigRobotSO;
-import com.example.core.mainbody.so.robot.QueryHistoryPositionSO;
 import com.example.core.mainbody.so.robot.QueryRobotSO;
-import com.example.core.mainbody.so.robot.QueryTradeRecordSO;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface OrderService {
@@ -32,6 +29,16 @@ public interface OrderService {
      */
     ResultMessage stopStrategyOrder(String orderNo);
 
+
+    /**
+     * 接收策略状态心跳
+     */
+    ResultMessage receiveStrategyStatus(String statusJson);
+
+    /**
+     * 查询收益曲线数据
+     */
+    ResultMessage queryProfitCurve(String userId, Integer orderId);
 
     /**
      * 接收交易日志推送
