@@ -193,4 +193,13 @@
     order by end_time desc
   </select>
 
+  <select id="selectProfitCurveByOrderNo" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from w_order_position
+    where order_no = #{orderNo}
+      and end_time is not null
+    order by end_time asc
+  </select>
+
 </mapper>

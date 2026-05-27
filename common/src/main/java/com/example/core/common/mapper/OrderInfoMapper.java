@@ -65,7 +65,7 @@ public interface OrderInfoMapper {
     /** 根据订单号查询 */
     OrderInfo selectByOrderNo(@Param("orderNo") String orderNo);
 
-    /** 根据策略ID查询 */
-    OrderInfo selectByStrategyId(@Param("strategyId") String strategyId);
+    /** 查询公开机器人列表 */
+    List<RobotListVO> selectPublicRobotList(@Param("exchange") Integer exchange);
 
 }

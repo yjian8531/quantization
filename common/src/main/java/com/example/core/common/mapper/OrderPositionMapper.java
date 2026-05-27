@@ -60,4 +60,7 @@ public interface OrderPositionMapper {
     /** 根据订单号查询仓位列表 */
     List<OrderPosition> selectByOrderNo(@Param("orderNo") String orderNo);
 
+    /** 查询已平仓仓位用于绘制收益曲线（按结束时间升序） */
+    List<OrderPosition> selectProfitCurveByOrderNo(@Param("orderNo") String orderNo);
+
 }

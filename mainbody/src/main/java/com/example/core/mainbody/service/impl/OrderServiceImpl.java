@@ -8,6 +8,7 @@ import com.example.core.mainbody.service.OrderService;
 import com.example.core.mainbody.so.strategy.CreateStrategyOrderSO;
 import com.example.core.mainbody.so.strategy.PositionPushSO;
 import com.example.core.mainbody.so.strategy.TradeLogPushSO;
+import com.example.core.mainbody.utils.PythonExecutor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
 import com.example.core.common.vo.product.ExchangeListVO;
@@ -153,6 +154,7 @@ public class OrderServiceImpl implements OrderService {
             orderInfo.setStrategyId(strategyInfo.getStrategyId());
             orderInfo.setStatus(StrategyConstant.OrderStatus.STARTING);
             orderInfo.setAnnualizedRate(product.getEstimateRate());
+            orderInfo.setPub(0);
             orderInfo.setCreateTime(new Date());
             int i = orderInfoMapper.insertSelective(orderInfo);
             if(i > 0){
@@ -193,6 +195,54 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
+    /**
+     * 查询公开机器人列表
+     */
+    @Override
+    public ResultMessage queryPublicRobotList(Integer exchange) {
+        List<RobotListVO> list = orderInfoMapper.selectPublicRobotList(exchange);
+        if (list == null) {
+            list = new ArrayList<>();
+        }
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("total", list.size());
+        resultMap.put("list", list);
+        return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, resultMap);
+    }
+
+    /**
+     * 用户设置机器人公开或不公开
+     */
+    @Override
+    public ResultMessage setRobotPublic(Integer orderId, Integer pub, String userId) {
+        try {
+            if (orderId == null) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "订单ID不能为空");
+            }
+            if (pub == null || (pub != 0 && pub != 1)) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "公开状态无效(0:不公开,1:公开)");
+            }
+            OrderInfo orderInfo = orderInfoMapper.selectByPrimaryKey(orderId);
+            if (orderInfo == null) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "订单不存在");
+            }
+            if (!orderInfo.getUserId().equals(userId)) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "无权操作此订单");
+            }
+            OrderInfo updateInfo = new OrderInfo();
+            updateInfo.setId(orderId);
+            updateInfo.setPub(pub);
+            updateInfo.setUpdateTime(new Date());
+            int i = orderInfoMapper.updateByPrimaryKeySelective(updateInfo);
+            if (i > 0) {
+                return new ResultMessage(ResultMessage.SUCCEED_CODE, "设置成功");
+            }
+            return new ResultMessage(ResultMessage.FAILED_CODE, "设置失败");
+        } catch (Exception e) {
+            log.error("设置机器人公开状态失败", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "设置失败: " + e.getMessage());
+        }
+    }
 
 
     /**
@@ -278,6 +328,14 @@ public class OrderServiceImpl implements OrderService {
         ApikeyInfo apikeyInfo = apikeyInfoMapper.selectByPrimaryKey(orderInfo.getApikeyId());
 
         try{
+
+            /** 上传策略文件 **/
+            StrategyInfo strategyInfo = strategyInfoMapper.selectByStrategyId(orderInfo.getStrategyId());
+            Boolean bl = PythonExecutor.exec(mainInfo.getConnectIp(),22,"root",mainInfo.getConnectPwd(),strategyInfo.getContent());
+            if(!bl){
+                return new ResultMessage(ResultMessage.FAILED_CODE, "启动策略失败", "策略文件上传不成功！");
+            }
+
             String exchange = apikeyInfo.getFootplate() == 0 ? "binance" : "gateio";
             String apiKey = apikeyInfo.getApikey();
             String secret = apikeyInfo.getSecret();
@@ -340,7 +398,7 @@ public class OrderServiceImpl implements OrderService {
     public ResultMessage receiveTradeLog(TradeLogPushSO tradeLog) {
         try {
             // 校验订单是否存在
-            OrderInfo orderInfo = orderInfoMapper.selectByStrategyId(tradeLog.getStrategyId());
+            OrderInfo orderInfo = orderInfoMapper.selectByOrderNo(tradeLog.getOrderNo());
             if (orderInfo == null) {
                 return new ResultMessage(ResultMessage.FAILED_CODE, "订单不存在");
             }
@@ -379,15 +437,11 @@ public class OrderServiceImpl implements OrderService {
     public ResultMessage receivePositionInfo(PositionPushSO position) {
         try {
             // 校验订单是否存在
-            OrderInfo orderInfo = orderInfoMapper.selectByStrategyId(position.getStrategyId());
+            OrderInfo orderInfo = orderInfoMapper.selectByOrderNo(position.getOrderNo());
             if (orderInfo == null) {
                 return new ResultMessage(ResultMessage.FAILED_CODE, "订单不存在");
             }
 
-            // 设置开始时间
-            if (position.getStartTime() == null) {
-                position.setStartTime(new Date());
-            }
 
             // 保存仓位信息
             OrderPosition orderPosition = new OrderPosition();
@@ -399,8 +453,8 @@ public class OrderServiceImpl implements OrderService {
             orderPosition.setIncome(position.getIncome());
             orderPosition.setIncomeRate(position.getIncomeRate());
             orderPosition.setRemark(position.getRemark());
-            orderPosition.setStartTime(position.getStartTime());
-            orderPosition.setEndTime(position.getEndTime());
+            orderPosition.setStartTime(DateUtil.fomatDate(position.getStartTime()));
+            orderPosition.setEndTime(DateUtil.fomatDate(position.getEndTime()));
             orderPositionMapper.insertSelective(orderPosition);
 
             // 如果有平仓价格，更新订单收益
@@ -455,7 +509,89 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
-     * 查询用户交易所列表
+     * 添加用户交易所API
+     */
+    @Override
+    public ResultMessage addApikeyInfo(ApikeyInfo apikeyInfo, String userId) {
+        try {
+            if (StringUtils.isEmpty(apikeyInfo.getApikey())) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "API Key不能为空");
+            }
+            if (StringUtils.isEmpty(apikeyInfo.getSecret())) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "Secret不能为空");
+            }
+            if (StringUtils.isEmpty(apikeyInfo.getName())) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "名称不能为空");
+            }
+            apikeyInfo.setUserId(userId);
+            apikeyInfo.setStatus(StrategyConstant.ConfigStatus.NORMAL);
+            apikeyInfo.setCreateTime(new Date());
+            apikeyInfo.setUpdateTime(new Date());
+            int i = apikeyInfoMapper.insertSelective(apikeyInfo);
+            if (i > 0) {
+                return new ResultMessage(ResultMessage.SUCCEED_CODE, "添加成功");
+            }
+            return new ResultMessage(ResultMessage.FAILED_CODE, "添加失败");
+        } catch (Exception e) {
+            log.error("添加用户交易所API失败", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "添加失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 更新用户交易所API
+     */
+    @Override
+    public ResultMessage updateApikeyInfo(ApikeyInfo apikeyInfo, String userId) {
+        try {
+            if (apikeyInfo.getId() == null) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "API ID不能为空");
+            }
+            ApikeyInfo exist = apikeyInfoMapper.selectByIdAndUserId(apikeyInfo.getId(), userId);
+            if (exist == null) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "API Key不存在或不属于当前用户");
+            }
+            apikeyInfo.setUpdateTime(new Date());
+            int i = apikeyInfoMapper.updateByPrimaryKeySelective(apikeyInfo);
+            if (i > 0) {
+                return new ResultMessage(ResultMessage.SUCCEED_CODE, "更新成功");
+            }
+            return new ResultMessage(ResultMessage.FAILED_CODE, "更新失败");
+        } catch (Exception e) {
+            log.error("更新用户交易所API失败", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "更新失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 删除用户交易所API
+     */
+    @Override
+    public ResultMessage deleteApikeyInfo(Integer id, String userId) {
+        try {
+            if (id == null) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "API ID不能为空");
+            }
+            ApikeyInfo exist = apikeyInfoMapper.selectByIdAndUserId(id, userId);
+            if (exist == null) {
+                return new ResultMessage(ResultMessage.FAILED_CODE, "API Key不存在或不属于当前用户");
+            }
+            exist.setStatus(1);//无效状态
+            exist.setUpdateTime(new Date());
+            int i = apikeyInfoMapper.updateByPrimaryKeySelective(exist);
+            if (i > 0) {
+                return new ResultMessage(ResultMessage.SUCCEED_CODE, "删除成功");
+            }
+            return new ResultMessage(ResultMessage.FAILED_CODE, "删除失败");
+        } catch (Exception e) {
+            log.error("删除用户交易所API失败", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, "删除失败: " + e.getMessage());
+        }
+    }
+
+
+    /**
+     * 查询用户交易所API列表
      */
     @Override
     public ResultMessage queryExchangeList(String userId) {
@@ -606,23 +742,16 @@ public class OrderServiceImpl implements OrderService {
             }
 
             JSONObject statusData = JSONObject.fromObject(statusJson);
-            String strategyId = statusData.optString("strategyId");
             String orderNo = statusData.optString("orderNo");
             String status = statusData.optString("status");
             Double profit = statusData.optDouble("profit", 0);
             Integer position = statusData.optInt("position", 0);
 
-            if (StringUtils.isEmpty(strategyId) && StringUtils.isEmpty(orderNo)) {
-                return new ResultMessage(ResultMessage.FAILED_CODE, "策略ID或订单号不能为空");
-            }
 
             // 查询订单
             OrderInfo orderInfo = null;
             if (StringUtils.isNotEmpty(orderNo)) {
                 orderInfo = orderInfoMapper.selectByOrderNo(orderNo);
-            }
-            if (orderInfo == null && StringUtils.isNotEmpty(strategyId)) {
-                orderInfo = orderInfoMapper.selectByStrategyId(strategyId);
             }
             if (orderInfo == null) {
                 return new ResultMessage(ResultMessage.FAILED_CODE, "订单不存在");

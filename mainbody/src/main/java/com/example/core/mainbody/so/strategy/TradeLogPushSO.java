@@ -15,7 +15,7 @@ public class TradeLogPushSO {
     /**
      * 策略ID
      */
-    private String strategyId;
+    private String orderNo;
 
     /**
      * 交易单号

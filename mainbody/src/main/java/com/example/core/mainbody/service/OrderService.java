@@ -1,5 +1,6 @@
 package com.example.core.mainbody.service;
 
+import com.example.core.common.entity.ApikeyInfo;
 import com.example.core.common.entity.StrategyInfo;
 import com.example.core.common.utils.ResultMessage;
 import com.example.core.mainbody.so.strategy.CreateStrategyOrderSO;
@@ -116,5 +117,20 @@ public interface OrderService {
 
     /**  查询策略模板列表 */
     ResultMessage queryStrategyInfoList();
+
+    /** 添加用户交易所API */
+    ResultMessage addApikeyInfo(ApikeyInfo apikeyInfo, String userId);
+
+    /** 更新用户交易所API */
+    ResultMessage updateApikeyInfo(ApikeyInfo apikeyInfo, String userId);
+
+    /** 删除用户交易所API */
+    ResultMessage deleteApikeyInfo(Integer id, String userId);
+
+    /** 查询公开机器人列表 */
+    ResultMessage queryPublicRobotList(Integer exchange);
+
+    /** 用户设置机器人公开或不公开 */
+    ResultMessage setRobotPublic(Integer orderId, Integer pub, String userId);
 
 }

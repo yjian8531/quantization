@@ -1,7 +1,9 @@
 package com.example.core.mainbody.controller;
 
 import com.example.core.common.controller.BaseController;
+import com.example.core.common.entity.ApikeyInfo;
 import com.example.core.common.entity.StrategyInfo;
+import com.example.core.common.entity.UserInfo;
 import com.example.core.common.utils.ResultMessage;
 import com.example.core.mainbody.service.OrderService;
 import com.example.core.mainbody.service.ProductService;
@@ -12,6 +14,7 @@ import com.example.core.mainbody.so.robot.QueryHistoryPositionSO;
 import com.example.core.mainbody.so.robot.QueryRobotSO;
 import com.example.core.mainbody.so.robot.QueryTradeRecordSO;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,9 +39,9 @@ public class OrderController extends BaseController {
      */
     @PostMapping(value = "/create", produces = {"application/json"})
     public ResultMessage createStrategyOrder(@RequestBody CreateStrategyOrderSO so) {
-        String userId = getUserId();
-        log.info("创建策略订单请求参数: so={}, userId={}", so, userId);
-        return orderService.createStrategyOrder(so, userId);
+        UserInfo userInfo = this.getLoginUser();
+        log.info("创建策略订单请求参数: so={}, userId={}", so, userInfo.getUserId());
+        return orderService.createStrategyOrder(so, userInfo.getUserId());
     }
 
     /**
@@ -67,7 +70,7 @@ public class OrderController extends BaseController {
      */
     @PostMapping(value = "/trade", produces = {"application/json"})
     public ResultMessage receiveTradeLog(@RequestBody TradeLogPushSO tradeLog) {
-        log.info("接收交易日志推送: tradeLog={}", tradeLog);
+        log.info("接收交易日志推送: {}", JSONObject.fromObject(tradeLog).toString());
         return orderService.receiveTradeLog(tradeLog);
     }
 
@@ -77,7 +80,7 @@ public class OrderController extends BaseController {
      */
     @PostMapping(value = "/position", produces = {"application/json"})
     public ResultMessage receivePositionInfo(@RequestBody PositionPushSO position) {
-        log.info("接收仓位信息推送: position={}", position);
+        log.info("接收仓位信息推送:{}", JSONObject.fromObject(position).toString());
         return orderService.receivePositionInfo(position);
     }
 
@@ -88,8 +91,8 @@ public class OrderController extends BaseController {
      */
     @PostMapping(value = "/exchange/list", produces = {"application/json"})
     public ResultMessage queryExchangeList() {
-        String userId = getUserId();
-        return orderService.queryExchangeList(userId);
+        UserInfo userInfo = this.getLoginUser();
+        return orderService.queryExchangeList(userInfo.getUserId());
     }
 
     /**
@@ -102,6 +105,64 @@ public class OrderController extends BaseController {
         return orderService.querySymbolList();
     }
 
+    // ==================== 交易所API CRUD ====================
+
+    /**
+     * 添加用户交易所API
+     * 请求示例：POST /order/exchange/add {"footplate": 0, "type": 0, "name": "币安现货", "apikey": "xxx", "secret": "xxx", "remark": "备注"}
+     */
+    @PostMapping(value = "/exchange/add", produces = {"application/json"})
+    public ResultMessage addApikeyInfo(@RequestBody ApikeyInfo apikeyInfo) {
+        UserInfo userInfo = this.getLoginUser();
+        log.info("添加交易所API: name={}, userId={}", apikeyInfo.getName(), userInfo.getUserId());
+        return orderService.addApikeyInfo(apikeyInfo, userInfo.getUserId());
+    }
+
+    /**
+     * 更新用户交易所API
+     * 请求示例：POST /order/exchange/update {"id": 1, "name": "新名称", "apikey": "xxx", "secret": "xxx"}
+     */
+    @PostMapping(value = "/exchange/update", produces = {"application/json"})
+    public ResultMessage updateApikeyInfo(@RequestBody ApikeyInfo apikeyInfo) {
+        UserInfo userInfo = this.getLoginUser();
+        log.info("更新交易所API: id={}, userId={}", apikeyInfo.getId(), userInfo.getUserId());
+        return orderService.updateApikeyInfo(apikeyInfo, userInfo.getUserId());
+    }
+
+    /**
+     * 删除用户交易所API
+     * 请求示例：POST /order/exchange/delete?id=1
+     */
+    @PostMapping(value = "/exchange/delete", produces = {"application/json"})
+    public ResultMessage deleteApikeyInfo(@RequestParam Integer id) {
+        UserInfo userInfo = this.getLoginUser();
+        log.info("删除交易所API: id={}, userId={}", id, userInfo.getUserId());
+        return orderService.deleteApikeyInfo(id, userInfo.getUserId());
+    }
+
+    // ==================== 公开机器人 ====================
+
+    /**
+     * 查询公开机器人列表
+     * 请求示例：POST /order/robot/public/list {"exchange": 0}
+     */
+    @PostMapping(value = "/robot/public/list", produces = {"application/json"})
+    public ResultMessage queryPublicRobotList(@RequestBody QueryRobotSO so) {
+        log.info("查询公开机器人列表: exchange={}", so.getExchange());
+        return orderService.queryPublicRobotList(so.getExchange());
+    }
+
+    /**
+     * 设置机器人公开状态
+     * 请求示例：POST /order/robot/setPublic?orderId=1&pub=1
+     */
+    @PostMapping(value = "/robot/setPublic", produces = {"application/json"})
+    public ResultMessage setRobotPublic(@RequestParam Integer orderId, @RequestParam Integer pub) {
+        UserInfo userInfo = this.getLoginUser();
+        log.info("设置机器人公开状态: orderId={}, pub={}, userId={}", orderId, pub, userInfo.getUserId());
+        return orderService.setRobotPublic(orderId, pub, userInfo.getUserId());
+    }
+
 
 
     /**
@@ -112,8 +173,8 @@ public class OrderController extends BaseController {
      */
     @PostMapping(value = "/robot/list", produces = {"application/json"})
     public ResultMessage queryRobotList(@RequestBody QueryRobotSO so) {
-        String userId = getUserId();
-        return orderService.queryRobotList(userId, so);
+        UserInfo userInfo = this.getLoginUser();
+        return orderService.queryRobotList(userInfo.getUserId(), so);
     }
 
     /**
@@ -124,8 +185,8 @@ public class OrderController extends BaseController {
      */
     @PostMapping(value = "/robot/detail", produces = {"application/json"})
     public ResultMessage queryRobotDetail(@RequestParam Integer id) {
-        String userId = getUserId();
-        return orderService.queryRobotDetail(userId, id);
+        UserInfo userInfo = this.getLoginUser();
+        return orderService.queryRobotDetail(userInfo.getUserId(), id);
     }
 
     /**
@@ -136,8 +197,8 @@ public class OrderController extends BaseController {
      */
     @PostMapping(value = "/position/history", produces = {"application/json"})
     public ResultMessage queryHistoryPositionList(@RequestBody QueryHistoryPositionSO so) {
-        String userId = getUserId();
-        return orderService.queryHistoryPositionList(userId, so);
+        UserInfo userInfo = this.getLoginUser();
+        return orderService.queryHistoryPositionList(userInfo.getUserId(), so);
     }
 
 
@@ -149,8 +210,8 @@ public class OrderController extends BaseController {
      */
     @PostMapping(value = "/trade/record", produces = {"application/json"})
     public ResultMessage queryTradeRecordList(@RequestBody QueryTradeRecordSO so) {
-        String userId = getUserId();
-        return orderService.queryTradeRecordList(userId, so);
+        UserInfo userInfo = this.getLoginUser();
+        return orderService.queryTradeRecordList(userInfo.getUserId(), so);
     }
 
     /**
@@ -228,9 +289,9 @@ public class OrderController extends BaseController {
      */
     @PostMapping(value = "/profit/curve", produces = {"application/json"})
     public ResultMessage queryProfitCurve(@RequestParam Integer orderId) {
-        String userId = getUserId();
-        log.info("查询收益曲线: orderId={}, userId={}", orderId, userId);
-        return orderService.queryProfitCurve(userId, orderId);
+        UserInfo userInfo = this.getLoginUser();
+        log.info("查询收益曲线: orderId={}, userId={}", orderId, userInfo.getUserId());
+        return orderService.queryProfitCurve(userInfo.getUserId(), orderId);
     }
 
 

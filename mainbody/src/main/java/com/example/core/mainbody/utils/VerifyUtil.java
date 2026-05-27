@@ -58,7 +58,7 @@ public class VerifyUtil {
             graphic.setColor(getRandomColor());
             // 设置字体大小
             graphic.setFont(new Font(
-                    null, Font.BOLD + Font.ITALIC, FONT_SIZE));
+                    "Serif", Font.BOLD + Font.ITALIC, FONT_SIZE));
             // 画字符
             graphic.drawString(
                     chars[n] + "", i * WIDTH / SIZE, HEIGHT * 2 / 3);
@@ -73,6 +73,8 @@ public class VerifyUtil {
             graphic.drawLine(ran.nextInt(WIDTH), ran.nextInt(HEIGHT),
                     ran.nextInt(WIDTH), ran.nextInt(HEIGHT));
         }
+        // 释放图形资源
+        graphic.dispose();
         // 7.返回验证码和图片
 //        return new Object[]{sb.toString(), image};
 

@@ -22,11 +22,12 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="strategy_id" property="strategyId" jdbcType="VARCHAR" />
     <result column="pid" property="pid" jdbcType="VARCHAR" />
+    <result column="pub" property="pub" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, order_no, order_name, main_no, product_id, user_id, apikey_id, symbol, node_time, 
     param_str, income, income_rate, annualized_rate, status, remark, create_time, ent_time, 
-    update_time, strategy_id, pid
+    update_time, strategy_id, pid, pub
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -48,14 +49,14 @@
       income, income_rate, annualized_rate, 
       status, remark, create_time, 
       ent_time, update_time, strategy_id, 
-      pid)
+      pid, pub)
     values (#{orderNo,jdbcType=VARCHAR}, #{orderName,jdbcType=VARCHAR}, #{mainNo,jdbcType=VARCHAR}, 
       #{productId,jdbcType=INTEGER}, #{userId,jdbcType=VARCHAR}, #{apikeyId,jdbcType=INTEGER}, 
       #{symbol,jdbcType=VARCHAR}, #{nodeTime,jdbcType=VARCHAR}, #{paramStr,jdbcType=LONGVARCHAR},
       #{income,jdbcType=DECIMAL}, #{incomeRate,jdbcType=DECIMAL}, #{annualizedRate,jdbcType=DECIMAL}, 
       #{status,jdbcType=INTEGER}, #{remark,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
       #{entTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{strategyId,jdbcType=VARCHAR}, 
-      #{pid,jdbcType=VARCHAR})
+      #{pid,jdbcType=VARCHAR}, #{pub,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.example.core.common.entity.OrderInfo" >
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
@@ -120,6 +121,9 @@
       <if test="pid != null" >
         pid,
       </if>
+      <if test="pub != null" >
+        pub,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="orderNo != null" >
@@ -178,6 +182,9 @@
       </if>
       <if test="pid != null" >
         #{pid,jdbcType=VARCHAR},
+      </if>
+      <if test="pub != null" >
+        #{pub,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -241,6 +248,9 @@
       <if test="pid != null" >
         pid = #{pid,jdbcType=VARCHAR},
       </if>
+      <if test="pub != null" >
+        pub = #{pub,jdbcType=INTEGER},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -264,7 +274,8 @@
       ent_time = #{entTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       strategy_id = #{strategyId,jdbcType=VARCHAR},
-      pid = #{pid,jdbcType=VARCHAR}
+      pid = #{pid,jdbcType=VARCHAR},
+      pub = #{pub,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
   <select id="selectUserRobotList" resultType="com.example.core.common.vo.robot.RobotListVO">
@@ -275,7 +286,7 @@
     u.nick_name as investorName,
     CASE a.footplate
     WHEN 0 THEN '币安'
-    WHEN 1 THEN '波场'
+    WHEN 1 THEN 'Gate'
     ELSE '未知'
     END as exchangeName,
     o.symbol,
@@ -320,19 +331,26 @@
       o.income_rate as incomeRate,
       o.annualized_rate as annualizedRate,
       DATE_FORMAT(o.update_time, '%Y-%m-%d %H:%i:%s') as updateTime,
+      CONCAT(
+        TIMESTAMPDIFF(DAY, o.create_time, IFNULL(o.ent_time, NOW())), '天',
+        MOD(TIMESTAMPDIFF(HOUR, o.create_time, IFNULL(o.ent_time, NOW())), 24), '时',
+        MOD(TIMESTAMPDIFF(MINUTE, o.create_time, IFNULL(o.ent_time, NOW())), 60), '分'
+      ) as runTime,
+      IFNULL(JSON_EXTRACT(o.param_str, '$.amountObj.FirstOrderAmount'), 0) as investAmount,
+      (SELECT COUNT(1) FROM w_order_position WHERE order_no = o.order_no AND end_time IS NOT NULL) as tradeCount,
       op.trade_num as positionNum,
       op.open_price as positionAvgPrice,
       op.income as unrealizedPnl,
-      0.00 as liquidationPrice,
+      IFNULL(op.liquidation_price, 0.00) as liquidationPrice,
       op.leverage as leverage,
-      op.take_profit_price as takeProfitPrice,
+      IFNULL(op.take_profit_price, 0.00) as takeProfitPrice,
       DATE_FORMAT(op.start_time, '%Y-%m-%d %H:%i:%s') as positionStartTime,
       DATE_FORMAT(op.update_time, '%Y-%m-%d %H:%i:%s') as positionUpdateTime
     from w_order_info o
            left join w_user_info u on u.user_id = o.user_id
            left join w_apikey_info a on a.id = o.apikey_id
            left join (
-      select order_no, trade_num, open_price, income, leverage, take_profit_price, start_time, update_time
+      select order_no, trade_num, open_price, income, leverage, liquidation_price, take_profit_price, start_time, update_time
       from w_order_position
       where end_time is null
       order by start_time desc
@@ -349,11 +367,31 @@
     where order_no = #{orderNo}
   </select>
 
-  <select id="selectByStrategyId" resultMap="BaseResultMap">
+  <select id="selectPublicRobotList" resultType="com.example.core.common.vo.robot.RobotListVO">
     select
-    <include refid="Base_Column_List" />
-    from w_order_info
-    where strategy_id = #{strategyId}
+    o.id,
+    o.order_no as orderNo,
+    o.order_name as orderName,
+    u.nick_name as investorName,
+    CASE a.footplate
+    WHEN 0 THEN '币安'
+    WHEN 1 THEN 'Gate'
+    ELSE '未知'
+    END as exchangeName,
+    o.symbol,
+    o.annualized_rate as annualizedRate,
+    o.income,
+    o.status,
+    o.create_time as createTime,
+    DATEDIFF(NOW(), o.create_time) as runDays
+    from w_order_info o
+    left join w_user_info u on u.user_id = o.user_id
+    left join w_apikey_info a on a.id = o.apikey_id
+    where o.pub = 1
+    <if test="exchange != null">
+      and a.footplate = #{exchange}
+    </if>
+    order by o.create_time desc
   </select>
 
 </mapper>

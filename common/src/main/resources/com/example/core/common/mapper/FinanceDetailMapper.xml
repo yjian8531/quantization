@@ -34,6 +34,13 @@
     where id = #{id,jdbcType=INTEGER}
   </select>
 
+  <select id="selectBuyByOrderNo" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from w_finance_detail
+    where tag = 'buy' and order_no = #{orderNo,jdbcType=VARCHAR}
+  </select>
+
   <select id="selectByUserId" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
     <include refid="Base_Column_List" />

@@ -6,6 +6,7 @@ import com.example.core.common.entity.UserInfo;
 import com.example.core.common.utils.*;
 import com.example.core.mainbody.service.UserService;
 import com.example.core.mainbody.so.user.*;
+import com.example.core.mainbody.utils.VerifyImgUtil;
 import com.example.core.mainbody.utils.VerifyUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.json.JSONObject;
@@ -38,9 +39,9 @@ public class UserController extends BaseController {
         //使用VerifyUtil.createImage()生成验证码图片和随机字符串
         //将验证码字符串存入Redis，key格式为USER:IMG:sessionId，有效期10分钟
         //返回Base64编码的图片数据
-        Object[] objs = VerifyUtil.createImage();
+        VerifyImgUtil.Result result = VerifyImgUtil.quickGenerate();
         // objs[0]是验证码字符串
-        String randomStr = (String) objs[0];
+        String randomStr = result.getCode();
         // 获取当前HTTP会话
         HttpSession session = getRequest().getSession();
         //记录日志
@@ -48,7 +49,7 @@ public class UserController extends BaseController {
         log.info("Verify img code  result: " + randomStr.toUpperCase());
         RedisUtil.setEx("USER:IMG:" + session.getId(), randomStr.toUpperCase(), 600);// 存储到redis中，后续用于作验证
         // objs[1]是验证码图片字节数组，转为Base64返回
-        return Base64.encodeBase64String((byte[]) objs[1]);
+        return result.getBase64Image();
     }
 
 

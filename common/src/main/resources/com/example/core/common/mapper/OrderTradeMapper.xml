@@ -193,7 +193,7 @@
         END as tradeBlName,
       CASE a.footplate
         WHEN 0 THEN '币安'
-        WHEN 1 THEN '波场'
+        WHEN 1 THEN 'Gate'
         ELSE '未知'
         END as exchangeName,
       o.symbol,

@@ -13,9 +13,9 @@ import java.util.Date;
 public class PositionPushSO {
 
     /**
-     * 策略ID
+     * 订单编号
      */
-    private String strategyId;
+    private String orderNo;
 
     /**
      * 交易方向(buy:多单/sell:空单)
@@ -55,11 +55,11 @@ public class PositionPushSO {
     /**
      * 开始时间
      */
-    private Date startTime;
+    private String startTime;
 
     /**
      * 关闭时间
      */
-    private Date endTime;
+    private String endTime;
 
 }

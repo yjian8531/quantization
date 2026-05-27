@@ -29,6 +29,7 @@ public class StrategyInfo {
      * 交易所平台(0:币安,1:gate)
      */
     private Integer footplate;
+
     /**
      * 状态(0:正常,1:禁用)
      */

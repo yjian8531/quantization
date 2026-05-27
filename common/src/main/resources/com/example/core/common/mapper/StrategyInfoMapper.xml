@@ -8,27 +8,20 @@
     <result column="version_no" property="versionNo" jdbcType="VARCHAR" />
     <result column="sort" property="sort" jdbcType="INTEGER" />
     <result column="footplate" property="footplate" jdbcType="INTEGER" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="INTEGER" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="ent_time" property="entTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
-  <resultMap id="ResultMapWithBLOBs" type="com.example.core.common.entity.StrategyInfo" extends="BaseResultMap" >
-    <result column="content" property="content" jdbcType="LONGVARCHAR" />
-  </resultMap>
   <sql id="Base_Column_List" >
-    id, strategy_id, strategy_name, version_no, sort, footplate, status, remark, create_time, 
+    id, strategy_id, strategy_name, version_no, sort, footplate,content, status, remark, create_time,
     ent_time, update_time
   </sql>
-  <sql id="Blob_Column_List" >
-    content
-  </sql>
-  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
     <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
     from w_strategy_info
     where id = #{id,jdbcType=INTEGER}
   </select>
@@ -41,11 +34,11 @@
       SELECT LAST_INSERT_ID()
     </selectKey>
     insert into w_strategy_info (strategy_id, strategy_name, version_no, 
-      sort, footplate, status, 
+      sort, footplate,content, status,
       remark, create_time, ent_time, 
       update_time, content)
     values (#{strategyId,jdbcType=VARCHAR}, #{strategyName,jdbcType=VARCHAR}, #{versionNo,jdbcType=VARCHAR}, 
-      #{sort,jdbcType=INTEGER}, #{footplate,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
+      #{sort,jdbcType=INTEGER}, #{footplate,jdbcType=INTEGER},#{content,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER},
       #{remark,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{entTime,jdbcType=TIMESTAMP}, 
       #{updateTime,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR})
   </insert>
@@ -69,6 +62,9 @@
       </if>
       <if test="footplate != null" >
         footplate,
+      </if>
+      <if test="content != null" >
+        content,
       </if>
       <if test="status != null" >
         status,
@@ -104,6 +100,9 @@
       </if>
       <if test="footplate != null" >
         #{footplate,jdbcType=INTEGER},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=VARCHAR},
       </if>
       <if test="status != null" >
         #{status,jdbcType=INTEGER},
@@ -143,6 +142,9 @@
       <if test="footplate != null" >
         footplate = #{footplate,jdbcType=INTEGER},
       </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=VARCHAR},
+      </if>
       <if test="status != null" >
         status = #{status,jdbcType=INTEGER},
       </if>
@@ -164,21 +166,7 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.example.core.common.entity.StrategyInfo" >
-    update w_strategy_info
-    set strategy_id = #{strategyId,jdbcType=VARCHAR},
-      strategy_name = #{strategyName,jdbcType=VARCHAR},
-      version_no = #{versionNo,jdbcType=VARCHAR},
-      sort = #{sort,jdbcType=INTEGER},
-      footplate = #{footplate,jdbcType=INTEGER},
-      status = #{status,jdbcType=INTEGER},
-      remark = #{remark,jdbcType=VARCHAR},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      ent_time = #{entTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      content = #{content,jdbcType=LONGVARCHAR}
-    where id = #{id,jdbcType=INTEGER}
-  </update>
+
   <update id="updateByPrimaryKey" parameterType="com.example.core.common.entity.StrategyInfo" >
     update w_strategy_info
     set strategy_id = #{strategyId,jdbcType=VARCHAR},
@@ -186,6 +174,7 @@
       version_no = #{versionNo,jdbcType=VARCHAR},
       sort = #{sort,jdbcType=INTEGER},
       footplate = #{footplate,jdbcType=INTEGER},
+      content = #{content,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},
       remark = #{remark,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -194,23 +183,16 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
   
-  <select id="selectByStrategyId" resultMap="ResultMapWithBLOBs" parameterType="java.lang.String" >
+  <select id="selectByStrategyId" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
     from w_strategy_info
     where strategy_id = #{strategyId,jdbcType=VARCHAR}
-    and status = 0
-    order by sort desc, version_no desc
-    limit 1
   </select>
   
-  <select id="selectAll" resultMap="ResultMapWithBLOBs">
+  <select id="selectAll" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
     from w_strategy_info
     order by sort desc, create_time desc
   </select>

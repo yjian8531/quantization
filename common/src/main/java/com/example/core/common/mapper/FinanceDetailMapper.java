@@ -103,4 +103,11 @@ public interface FinanceDetailMapper {
     // 后台查询账单列表
     List<FinanceDetail> selectAdminBillList(QueryBillListAdminSO so);
 
+    /**
+     * 获取订单的购买账单
+     * @param orderNo
+     * @return
+     */
+    FinanceDetail selectBuyByOrderNo(@Param("orderNo")String orderNo);
+
 }
