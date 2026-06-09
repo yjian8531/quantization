@@ -53,6 +53,7 @@ public class AdminInterceptor implements HandlerInterceptor {
         if(StringUtils.isNotEmpty(adminToken)){
             String src = InterceptorUtil.analysisToken(adminToken);
             if(src == null){
+                response.setContentType("application/json;charset=UTF-8");
                 ServletOutputStream out = response.getOutputStream();
                 ResultMessage result = new ResultMessage("3333","invalid_hash_value");
                 out.print(JSONObject.fromObject(result).toString());
@@ -95,7 +96,8 @@ public class AdminInterceptor implements HandlerInterceptor {
 
                             String key = json.getJSONObject("admin").getString("adminId")+":"+url+":"+paramStr;
                             if("Y".equals(RedisUtil.get(Base64.getEncoder().encodeToString(key.getBytes())))  && url.indexOf("get") == -1 && url.indexOf("query") == -1){
-                                response.setContentType("text/html;charset=GBK");
+//                                response.setContentType("text/html;charset=GBK");
+                                response.setContentType("application/json;charset=UTF-8");
                                 ServletOutputStream out = response.getOutputStream();
                                 ResultMessage result = new ResultMessage("3333","Do not repeat the operation");
                                 out.print(JSONObject.fromObject(result).toString());
@@ -119,12 +121,14 @@ public class AdminInterceptor implements HandlerInterceptor {
                         return true;
 
                     }else{
+                        response.setContentType("application/json;charset=UTF-8");
                         ServletOutputStream out = response.getOutputStream();
                         ResultMessage result = new ResultMessage("3333","invalid_hash_value");
                         out.print(JSONObject.fromObject(result).toString());
                         return false;
                     }
                 }else{
+                    response.setContentType("application/json;charset=UTF-8");
                     ServletOutputStream out = response.getOutputStream();
                     ResultMessage result = new ResultMessage("3333","invalid_hash_value");
                     out.print(JSONObject.fromObject(result).toString());
@@ -133,6 +137,7 @@ public class AdminInterceptor implements HandlerInterceptor {
             }
 
         }
+        response.setContentType("application/json;charset=UTF-8");
         ServletOutputStream out = response.getOutputStream();
         ResultMessage result = new ResultMessage("3333","invalid_hash_value");
         out.print(JSONObject.fromObject(result).toString());

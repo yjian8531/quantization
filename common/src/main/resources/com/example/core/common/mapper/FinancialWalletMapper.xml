@@ -125,7 +125,7 @@
     FROM w_financial_wallet
     WHERE address = #{address} AND status = 0
   </select>
-  <!-- 根据用户 ID 和网络类型查询钱包（核心查询方法） -->
+  <!-- 根据用户 ID 和网络类型查询钱包 -->
   <select id="selectByUserIdAndType" resultMap="BaseResultMap">
     SELECT <include refid="Base_Column_List"/>
     FROM w_financial_wallet
@@ -139,9 +139,9 @@
     SELECT <include refid="Base_Column_List"/>
     FROM w_financial_wallet
     WHERE type = #{type}
-    AND user_id IS NULL
+    AND (user_id IS NULL OR user_id = '' OR TRIM(user_id) = '')
     AND status = 0
-    LIMIT 1
+    LIMIT 1;
   </select>
 
   <!-- 绑定地址到用户 -->
@@ -150,7 +150,7 @@
     SET user_id = #{userId},
         update_time = NOW()
     WHERE address = #{address}
-      AND user_id IS NULL
+      AND (user_id IS NULL OR user_id = '' OR TRIM(user_id) = '')
   </update>
 
   <!-- 分页查询财务钱包列表 -->

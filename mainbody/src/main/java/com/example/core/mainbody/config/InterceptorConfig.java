@@ -24,8 +24,7 @@ public class InterceptorConfig extends WebMvcConfigurerAdapter {
     public void addInterceptors(InterceptorRegistry registry) {
         
         // ==================== 用户端拦截器（h-user-token） ====================
-        
-        // 1. 用户模块（登录、注册、验证码等接口不需要 token）
+        // 用户模块
         registry.addInterceptor(userInterceptor)
                 .addPathPatterns("/user/**")
                 .excludePathPatterns(
@@ -38,11 +37,11 @@ public class InterceptorConfig extends WebMvcConfigurerAdapter {
                         "/user/login"                    // 用户登录
                 );
 
-        // 2. 财务模块（全部需要 token）
+        //财务模块
         registry.addInterceptor(userInterceptor)
                 .addPathPatterns("/finance/**");
 
-        //  订单模块
+        //订单模块
         registry.addInterceptor(userInterceptor)
                 .addPathPatterns("/order/**")
                 .excludePathPatterns(
@@ -50,15 +49,15 @@ public class InterceptorConfig extends WebMvcConfigurerAdapter {
                         "/order/position",                // 接收仓位日志
                         "/order/symbol/list"
                 );
-        // 3. 收益模块（全部需要 token）
+        //收益模块
         registry.addInterceptor(userInterceptor)
                 .addPathPatterns("/profit/**");
 
-        // 4. 充值模块（全部需要 token）
+        //充值模块
         registry.addInterceptor(userInterceptor)
                 .addPathPatterns("/deposit/**");
 
-        // 5. 产品模块（全部需要 token）
+        // 产品模块
         registry.addInterceptor(userInterceptor)
                 .addPathPatterns("/product/**")
                 .excludePathPatterns(
@@ -68,14 +67,15 @@ public class InterceptorConfig extends WebMvcConfigurerAdapter {
                 );
 
 
-        // 6. 消息模块（全部需要 token）
+        //消息模块
         registry.addInterceptor(userInterceptor)
                 .addPathPatterns("/message/**");
 
 
+        // 钱包模块
+        registry.addInterceptor(userInterceptor)
+                .addPathPatterns("/wallet/**");
         // ==================== 管理端拦截器（h-admin-token） ====================
-        
-        // 管理端模块（仅登录接口不需要 token）
         registry.addInterceptor(adminInterceptor)
                 .addPathPatterns("/admin/**")
                 .excludePathPatterns(

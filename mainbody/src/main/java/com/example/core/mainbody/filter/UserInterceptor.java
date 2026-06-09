@@ -46,6 +46,7 @@ public class UserInterceptor implements HandlerInterceptor {
         if(StringUtils.isNotEmpty(roleToken)){
             String src = InterceptorUtil.analysisToken(roleToken);
             if(src == null){
+                response.setContentType("application/json;charset=UTF-8");
                 ServletOutputStream out = response.getOutputStream();
                 ResultMessage result = new ResultMessage("3333","invalid_hash_value");
                 out.print(JSONObject.fromObject(result).toString());
@@ -90,6 +91,7 @@ public class UserInterceptor implements HandlerInterceptor {
                         return true;
                     }else{
                         //response.setStatus(3333);
+                        response.setContentType("application/json;charset=UTF-8");
                         ServletOutputStream out = response.getOutputStream();
                         ResultMessage result = new ResultMessage("3333","invalid_hash_value");
                         out.print(JSONObject.fromObject(result).toString());
@@ -97,6 +99,7 @@ public class UserInterceptor implements HandlerInterceptor {
                     }
                 }else{
                     //response.setStatus(3333);
+                    response.setContentType("application/json;charset=UTF-8");
                     ServletOutputStream out = response.getOutputStream();
                     ResultMessage result = new ResultMessage("3333","invalid_hash_value");
                     out.print(JSONObject.fromObject(result).toString());
@@ -106,6 +109,7 @@ public class UserInterceptor implements HandlerInterceptor {
 
         }
         //response.setStatus(3333);
+        response.setContentType("application/json;charset=UTF-8");
         ServletOutputStream out = response.getOutputStream();
         ResultMessage result = new ResultMessage("3333","invalid_hash_value");
         out.print(JSONObject.fromObject(result).toString());
