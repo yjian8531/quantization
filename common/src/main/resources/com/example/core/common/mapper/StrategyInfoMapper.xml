@@ -197,4 +197,15 @@
     order by sort desc, create_time desc
   </select>
 
+  <select id="selectByFootplate" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from w_strategy_info
+    where status = 0
+    <if test="footplate != null">
+      and footplate = #{footplate,jdbcType=INTEGER}
+    </if>
+    order by sort
+  </select>
+
 </mapper>

@@ -3,6 +3,8 @@ package com.example.core.mainbody.service.impl;
 import com.example.core.common.entity.FinanceDetail;
 import com.example.core.common.entity.OrderInfo;
 import com.example.core.common.entity.OrderProduct;
+import com.example.core.common.entity.ProductParam;
+import com.example.core.common.entity.StrategyInfo;
 import com.example.core.common.entity.UserFinance;
 import com.example.core.common.mapper.*;
 import com.example.core.common.utils.ResultMessage;
@@ -11,11 +13,11 @@ import com.example.core.common.vo.robot.RobotListVO;
 import com.example.core.mainbody.service.ProductService;
 import com.example.core.mainbody.so.product.ConfigRobotSO;
 import com.example.core.mainbody.so.product.QueryProductSO;
+import com.example.core.mainbody.so.product.QueryStrategyByExchangeSO;
 import com.example.core.mainbody.so.robot.QueryRobotSO;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,10 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.*;
 
+@Slf4j
 @Service
 public class ProductServiceImpl implements ProductService {
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     private OrderProductMapper orderProductMapper;
@@ -46,6 +47,15 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private FinanceDetailMapper financeDetailMapper;
+
+    @Autowired
+    private StrategyInfoMapper strategyInfoMapper;
+
+    @Autowired
+    private OrderTradeMapper orderTradeMapper;
+
+    @Autowired
+    private ProductParamMapper productParamMapper;
 
     /**
      * 查询产品列表
@@ -72,8 +82,7 @@ public class ProductServiceImpl implements ProductService {
      * 查询产品详情
      * 对应原型图：产品详情弹窗页
      * 功能说明：
-     * 1. 查询产品基础信息（名称、等级、预估年化率、月租、说明文案、累计盈利）
-     * 2. 解析 paramConfig（JSON 字符串）为分组表格结构
+     * 1. 查询产品基础信息（名称、等级、预估年化率、月租、说明文案、累计盈利、投入限制）
      */
     @Override
     public ResultMessage queryProductDetail(Integer productId) {
@@ -88,33 +97,55 @@ public class ProductServiceImpl implements ProductService {
         detailVO.setLevel(product.getLevel());
         detailVO.setEstimateRate(product.getEstimateRate());
         detailVO.setMonthlyFee(product.getMonthlyFee());
+        detailVO.setMonthlyRatio(product.getMonthlyRatio());
         detailVO.setDescription(product.getDescription());
         detailVO.setCumulativeProfit(product.getCumulativeProfit());
-
-        // 解析 param_config JSON 字符串为表格结构
-        List<ParamConfigGroupVO> paramConfigList = parseParamConfig(product.getParamConfig());
-        detailVO.setParamConfigList(paramConfigList);
+        detailVO.setTopLimit(product.getTopLimit());
+        detailVO.setBottomLimit(product.getBottomLimit());
 
         return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, detailVO);
     }
 
-    /**
-     * 解析参数配置 JSON 字符串
-     * @param jsonStr 数据库存的 JSON 字符串
-     * @return 分组表格结构
-     */
-    private List<ParamConfigGroupVO> parseParamConfig(String jsonStr) {
-        if (jsonStr == null || jsonStr.isEmpty()) {
-            return new ArrayList<>();
-        }
-        try {
-            return objectMapper.readValue(jsonStr, new TypeReference<List<ParamConfigGroupVO>>() {});
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ArrayList<>();
-        }
-    }
 
+    /**
+     * 查询产品策略参数信息
+     * 按 paramGroup 分组返回：资金配置、仓位配置
+     */
+    @Override
+    public ResultMessage queryProductParam(Integer productId, String strategyId) {
+        List<ProductParam> paramList = productParamMapper.selectByProductIdAndStrategyId(productId, strategyId);
+        if (paramList == null || paramList.isEmpty()) {
+            return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, new ArrayList<>());
+        }
+
+        // 按 paramGroup 分组
+        Map<String, List<ProductParam>> groupMap = new LinkedHashMap<>();
+        for (ProductParam param : paramList) {
+            groupMap.computeIfAbsent(param.getParamGroup(), k -> new ArrayList<>()).add(param);
+        }
+
+        // 构造返回数据
+        List<ParamConfigGroupVO> resultList = new ArrayList<>();
+        for (Map.Entry<String, List<ProductParam>> entry : groupMap.entrySet()) {
+            ParamConfigGroupVO groupVO = new ParamConfigGroupVO();
+            groupVO.setName(entry.getKey());
+
+            List<ParamConfigItemVO> configList = new ArrayList<>();
+            for (ProductParam param : entry.getValue()) {
+                ParamConfigItemVO itemVO = new ParamConfigItemVO();
+                itemVO.setName(param.getParamName());
+                itemVO.setKey(param.getParamKey());
+                itemVO.setValue(param.getParamValue());
+                itemVO.setUnit(param.getUnit());
+                itemVO.setDescribe(param.getDescribe());
+                configList.add(itemVO);
+            }
+            groupVO.setConfig(configList);
+            resultList.add(groupVO);
+        }
+
+        return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, resultList);
+    }
 
 
     /**
@@ -164,18 +195,24 @@ public class ProductServiceImpl implements ProductService {
     }
 
     /**
-     * 查询用户交易所列表
+     * 查询用户交易所API列表
      */
     @Override
     public ResultMessage queryExchangeList(String userId) {
         List<ExchangeListVO> list = apikeyInfoMapper.selectUserExchangeList(userId);
-        if (list == null) {
-            return new ResultMessage(ResultMessage.FAILED_CODE, "用户未绑定交易所");
-        }
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("list", list);
         resultMap.put("total", list.size());
         return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, resultMap);
+    }
+
+    /**
+     * 根据交易所平台获取可用的策略列表
+     */
+    @Override
+    public ResultMessage queryStrategyByExchange(QueryStrategyByExchangeSO so) {
+        List<StrategyInfo> list = strategyInfoMapper.selectByFootplate(so.getFootplate());
+        return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, list);
     }
 
     /**
@@ -188,6 +225,54 @@ public class ProductServiceImpl implements ProductService {
             return new ResultMessage(ResultMessage.FAILED_CODE, "查询失败");
         }
         return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, list);
+    }
+
+
+    /**
+     * 获取平台数据汇总
+     */
+    @Override
+    public ResultMessage getPlatformSummary() {
+        try {
+            // 1. 活跃用户数（拥有运行中或暂停订单的独立用户数）
+            int activeUserCount = orderInfoMapper.selectActiveUserCount();
+
+            // 2. 交易总额
+            BigDecimal tradeTotalAmount = orderTradeMapper.selectTradeTotalAmount();
+            if (tradeTotalAmount == null) {
+                tradeTotalAmount = BigDecimal.ZERO;
+            }
+
+            // 3. 交易次数
+            int tradeTotalCount = orderTradeMapper.selectTradeTotalCount();
+
+            // 4. 年化区间
+            BigDecimal minAnnualizedRate = null;
+            BigDecimal maxAnnualizedRate = null;
+            Map<String, Object> rateRange = orderInfoMapper.selectAnnualizedRateRange();
+            if (rateRange != null && !rateRange.isEmpty()) {
+                Object minObj = rateRange.get("minRate");
+                Object maxObj = rateRange.get("maxRate");
+                if (minObj != null) {
+                    minAnnualizedRate = new BigDecimal(minObj.toString());
+                }
+                if (maxObj != null) {
+                    maxAnnualizedRate = new BigDecimal(maxObj.toString());
+                }
+            }
+
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("activeUserCount", activeUserCount);
+            resultMap.put("tradeTotalAmount", tradeTotalAmount);
+            resultMap.put("tradeTotalCount", tradeTotalCount);
+            resultMap.put("minAnnualizedRate", minAnnualizedRate != null ? minAnnualizedRate : BigDecimal.ZERO);
+            resultMap.put("maxAnnualizedRate", maxAnnualizedRate != null ? maxAnnualizedRate : BigDecimal.ZERO);
+
+            return new ResultMessage(ResultMessage.SUCCEED_CODE, ResultMessage.SUCCEED_MSG, resultMap);
+        } catch (Exception e) {
+            log.error("获取平台数据汇总失败", e);
+            return new ResultMessage(ResultMessage.FAILED_CODE, ResultMessage.FAILED_MSG);
+        }
     }
 
 

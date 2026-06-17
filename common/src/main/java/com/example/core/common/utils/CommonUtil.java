@@ -1,7 +1,9 @@
 package com.example.core.common.utils;
+import com.binance.client.exception.BinanceApiException;
 import net.sf.json.JSONObject;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -500,73 +502,16 @@ public class CommonUtil {
     }
 
     /**
-     * Orcale根据文件名称获取私钥信息
-     * @param fileName
-     * @return
+     * 使用标准URL Encode编码。注意和JDK默认的不同，空格被编码为%20而不是+。
+     *
+     * @param s String字符串
+     * @return URL编码后的字符串
      */
-    public static String getOrcalePrivateKey(String fileName){
-
-        InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName);
-        byte[] bytes = new byte[0];
-        try{
-            bytes = new byte[inputStream.available()];
-            inputStream.read(bytes);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        String content = new String(bytes);
-        return content;
-    }
-
-    public static String extractChinese(String str) {
-        int index = 0;
-        for (int i = str.length() - 1 ; i > -1 ; i--) {
-            char c = str.charAt(i);
-            if (c >= '\u4E00' && c <= '\u9FA5') { // 或更广范围
-                index = i;
-                break;
-            }
-        }
-        return str.substring(0,index+1);
-    }
-
-    public static String getCountryName(String tail){
-        if(tail.indexOf("英国") > -1){
-            return "Britain";
-        }else if(tail.indexOf("美国") > -1){
-            return "US";
-        }else if(tail.indexOf("德国") > -1){
-            return "Germany";
-        }else if(tail.indexOf("法国") > -1){
-            return "France";
-        }else if(tail.indexOf("马来西亚") > -1){
-            return "Malaysia";
-        }else if(tail.indexOf("泰国") > -1){
-            return "Thailand";
-        }else if(tail.indexOf("越南") > -1){
-            return "Vietnam";
-        }else if(tail.indexOf("台湾") > -1){
-            return "TaiwanChina";
-        }else if(tail.indexOf("菲律宾") > -1){
-            return "Philippines";
-        }else if(tail.indexOf("新加坡") > -1){
-            return "Singapore";
-        }else if(tail.indexOf("印尼") > -1 || tail.indexOf("印度尼西亚") > -1){
-            return "Indonesia";
-        }else if(tail.indexOf("阿联酋") > -1){
-            return "AE";
-        }else if(tail.indexOf("沙特") > -1 || tail.indexOf("沙特阿拉伯") > -1){
-            return "SA";
-        }else if(tail.indexOf("巴西") > -1){
-            return "Brazil";
-        }else if(tail.indexOf("智利") > -1){
-            return "Chile";
-        }else if(tail.indexOf("西班牙") > -1){
-            return "Spain";
-        }else if(tail.indexOf("日本") > -1){
-            return "Japan";
-        }else{
-            return "";
+    public static String urlEncode(String s) {
+        try {
+            return URLEncoder.encode(s, "UTF-8").replaceAll("\\+", "%20");
+        } catch (UnsupportedEncodingException e) {
+            throw new BinanceApiException(BinanceApiException.RUNTIME_ERROR, "[URL] UTF-8 encoding not supported!");
         }
     }
 

@@ -202,4 +202,95 @@
     order by end_time asc
   </select>
 
+  <select id="selectAggregatedProfit" resultType="com.example.core.common.vo.robot.ProfitRecordItem">
+    select
+    <if test="dimension == 'month'">
+      DATE_FORMAT(end_time, '%Y-%m') as timeLabel,
+    </if>
+    <if test="dimension == 'day'">
+      DATE_FORMAT(end_time, '%Y-%m-%d') as timeLabel,
+    </if>
+      SUM(income) as income
+    from w_order_position
+    where order_no = #{orderNo}
+      and end_time is not null
+    group by timeLabel
+    order by timeLabel asc
+  </select>
+
+  <!-- 查询用户收益记录列表（从策略历史仓位关联用户订单） -->
+  <select id="selectUserProfitRecordList" resultType="com.example.core.common.vo.profitrecord.ProfitRecordVO">
+    select
+      o.order_name as productName,
+      o.symbol as productType,
+      op.income as profitAmount,
+      op.income_rate as profitRate,
+      CASE WHEN op.income >= 0 THEN 1 ELSE 0 END as status,
+      op.end_time as createTime
+    from w_order_position op
+    inner join w_order_info o on o.order_no = op.order_no
+    where o.user_id = #{userId,jdbcType=VARCHAR}
+      and op.end_time is not null
+    <if test="productName != null and productName != ''">
+      and o.order_name like concat('%', #{productName,jdbcType=VARCHAR}, '%')
+    </if>
+    <if test="productNo != null and productNo != ''">
+      and o.order_no = #{productNo,jdbcType=VARCHAR}
+    </if>
+    <if test="startTime != null and startTime != ''">
+      <![CDATA[ and op.end_time >= #{startTime,jdbcType=VARCHAR} ]]>
+    </if>
+    <if test="endTime != null and endTime != ''">
+      <![CDATA[ and op.end_time <= #{endTime,jdbcType=VARCHAR} ]]>
+    </if>
+    order by op.end_time desc
+  </select>
+
+  <!-- 查询用户收益趋势数据（年/月/天维度聚合，从策略历史仓位） -->
+  <select id="selectUserProfitTrend" resultType="com.example.core.common.vo.profitrecord.ProfitTrendVO">
+    select
+    <choose>
+      <when test="dimension == 'year'">
+        DATE_FORMAT(op.end_time, '%Y') as timeLabel,
+      </when>
+      <when test="dimension == 'month'">
+        DATE_FORMAT(op.end_time, '%Y-%m') as timeLabel,
+      </when>
+      <otherwise>
+        DATE_FORMAT(op.end_time, '%Y-%m-%d') as timeLabel,
+      </otherwise>
+    </choose>
+    IFNULL(SUM(op.income), 0.0000) as totalProfit
+    from w_order_position op
+    inner join w_order_info o on o.order_no = op.order_no
+    where o.user_id = #{userId,jdbcType=VARCHAR}
+      and op.end_time is not null
+    <if test="startTime != null and startTime != ''">
+      <![CDATA[ and op.end_time >= #{startTime,jdbcType=VARCHAR} ]]>
+    </if>
+    <if test="endTime != null and endTime != ''">
+      <![CDATA[ and op.end_time <= #{endTime,jdbcType=VARCHAR} ]]>
+    </if>
+    <choose>
+      <when test="dimension == 'year'">
+        group by YEAR(op.end_time)
+      </when>
+      <when test="dimension == 'month'">
+        group by YEAR(op.end_time), MONTH(op.end_time)
+      </when>
+      <otherwise>
+        group by YEAR(op.end_time), MONTH(op.end_time), DAY(op.end_time)
+      </otherwise>
+    </choose>
+    order by timeLabel asc
+  </select>
+
+  <!-- 查询用户的策略机器人列表（用于下拉框筛选） -->
+  <select id="selectUserOrderProducts" resultType="com.example.core.common.vo.profitrecord.UserProductVO">
+    select distinct order_no as productNo, order_name as productName
+    from w_order_info
+    where user_id = #{userId}
+    order by order_no
+  </select>
+
 </mapper>

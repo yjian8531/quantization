@@ -45,6 +45,13 @@ public interface StrategyInfoMapper {
     /** 查询所有策略模板列表 */
     List<StrategyInfo> selectAll();
 
+    /**
+     * 根据交易所平台查询可用的策略列表
+     * @param footplate 交易所平台 (null=全部, 0=币安, 1=gate)
+     * @return 可用策略列表
+     */
+    List<StrategyInfo> selectByFootplate(@Param("footplate") Integer footplate);
+
 /**
  * 根据主键选择性更新策略信息
  * 该方法会根据传入的StrategyInfo对象中的非空字段来更新数据库中对应的记录

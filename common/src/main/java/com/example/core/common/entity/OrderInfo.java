@@ -76,6 +76,16 @@ public class OrderInfo {
     private BigDecimal annualizedRate;
 
     /**
+     * 投入本金
+     */
+    private BigDecimal totalAmount;
+
+    /**
+     * 循环标记(0=正常循序,1=强制平仓,2=保本平仓,3=止赢平仓)
+     */
+    private Integer tag;
+
+    /**
      * 状态：0=启动中，1=运行中，2=暂停，3=已结束
      */
     private Integer status;

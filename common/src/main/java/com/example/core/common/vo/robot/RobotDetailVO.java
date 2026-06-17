@@ -31,6 +31,15 @@ public class RobotDetailVO {
     /** 服务器IP */
     private String serverIp;
 
+    /** 交易所API ID */
+    private Integer apikeyId;
+
+    /** 交易所API名称 */
+    private String apikeyName;
+
+    /** 币对 */
+    private String symbol;
+
     /** 交易所名称 */
     private String exchangeName;
 
@@ -45,6 +54,9 @@ public class RobotDetailVO {
 
     /** 运行时间（格式化：34天3小时29分） */
     private String runTime;
+
+    /** 运行天数（纯数字） */
+    private Integer runDays;
 
     /** 最后更新时间 */
     private String updateTime;
@@ -63,6 +75,12 @@ public class RobotDetailVO {
 
     /** 收益率 */
     private BigDecimal incomeRate;
+
+    /** 策略ID */
+    private String strategyId;
+
+    /** 策略名称 */
+    private String strategyName;
 
     // ===== 当前仓位 =====
     /** 持仓数量 */

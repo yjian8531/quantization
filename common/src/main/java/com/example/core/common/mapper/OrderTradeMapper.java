@@ -26,10 +26,10 @@ public interface OrderTradeMapper {
     /** 根据订单号查询交易列表 */
     List<OrderTrade> selectByOrderNo(@Param("orderNo") String orderNo);
 
+    /** 平台汇总 - 交易总额 */
+    java.math.BigDecimal selectTradeTotalAmount();
 
-
-
-
-
+    /** 平台汇总 - 交易次数 */
+    int selectTradeTotalCount();
 
 }

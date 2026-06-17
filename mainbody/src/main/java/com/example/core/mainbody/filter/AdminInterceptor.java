@@ -87,6 +87,7 @@ public class AdminInterceptor implements HandlerInterceptor {
                             }
                             Map<String,Object> execMap= list.stream().collect(Collectors.toMap(SysOperation::getTail, SysOperation::getAlias));
                             if(execMap.get(url) == null){
+                                response.setContentType("application/json;charset=UTF-8");
                                 ServletOutputStream out = response.getOutputStream();
                                 ResultMessage result = new ResultMessage(ResultMessage.FAILED_CODE,"no permission");
                                 out.print(JSONObject.fromObject(result).toString());
@@ -96,7 +97,7 @@ public class AdminInterceptor implements HandlerInterceptor {
 
                             String key = json.getJSONObject("admin").getString("adminId")+":"+url+":"+paramStr;
                             if("Y".equals(RedisUtil.get(Base64.getEncoder().encodeToString(key.getBytes())))  && url.indexOf("get") == -1 && url.indexOf("query") == -1){
-//                                response.setContentType("text/html;charset=GBK");
+                                //response.setContentType("text/html;charset=GBK");
                                 response.setContentType("application/json;charset=UTF-8");
                                 ServletOutputStream out = response.getOutputStream();
                                 ResultMessage result = new ResultMessage("3333","Do not repeat the operation");

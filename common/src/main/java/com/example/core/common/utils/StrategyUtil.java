@@ -100,6 +100,33 @@ public class StrategyUtil {
         }
     }
 
+
+    /**
+     * 更新策略平仓
+     * @param tag 循环标记(0=正常循序,1=强制平仓,2=保本平仓,3=止赢平仓)
+     * @return
+     */
+    public String updateStrategyTag(Integer tag){
+        HttpClient client = HttpClient.newHttpClient();
+        String jsonBody = "{\"tag\":\"" + tag + "\"}";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(baseUrl + "/api/update/tag"))
+                .header("Content-Type", "application/json; charset=utf-8")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                .build();
+
+        try {
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                return response.body();
+            } else {
+                throw new RuntimeException("Failed to stop strategy: " + response.statusCode());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * 启动Python策略
      * @param orderNo 策略订单号
@@ -107,21 +134,20 @@ public class StrategyUtil {
      * @param symbol 交易币对
      * @param apiKey  APIKey
      * @param secret API私钥
+     * @param tag 循环标记(0=正常循序,1=强制平仓,2=保本平仓,3=止赢平仓)
      * @param paramStr 策略参数(JSON字符串)
      * @return
      * @throws Exception
      */
-    public String startStrategy(String orderNo, String exchange, String symbol, String apiKey, String secret, String paramStr) throws Exception {
-        // 使用对称加密加密 apiKey 和 secret
-        String encryptedApiKey = AESUtil.Encrypt(apiKey, ENCRYPT_KEY);
-        String encryptedSecret = AESUtil.Encrypt(secret, ENCRYPT_KEY);
+    public String startStrategy(String orderNo, String exchange, String symbol, String apiKey, String secret,Integer tag, String paramStr) throws Exception {
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("orderNo", orderNo);
         requestBody.put("exchange", exchange);
         requestBody.put("symbol", symbol);
-        requestBody.put("apiKey", encryptedApiKey);
-        requestBody.put("secret", encryptedSecret);
+        requestBody.put("apiKey", apiKey);
+        requestBody.put("secret", secret);
+        requestBody.put("tag", tag);
         requestBody.put("paramStr", paramStr);
 
         String jsonBody = JSONObject.fromObject(requestBody).toString();

@@ -8,8 +8,10 @@
     <result column="level" property="level" jdbcType="INTEGER" />
     <result column="estimate_rate" property="estimateRate" jdbcType="DECIMAL" />
     <result column="monthly_fee" property="monthlyFee" jdbcType="DECIMAL" />
+    <result column="monthly_ratio" property="monthlyRatio" jdbcType="DECIMAL" />
+    <result column="top_limit" property="topLimit" jdbcType="DECIMAL" />
+    <result column="bottom_limit" property="bottomLimit" jdbcType="DECIMAL" />
     <result column="description" property="description" jdbcType="VARCHAR" />
-    <result column="param_config" property="paramConfig" jdbcType="LONGVARCHAR" />
     <result column="total_amount" property="totalAmount" jdbcType="DECIMAL" />
     <result column="profit_ratio" property="profitRatio" jdbcType="DECIMAL" />
     <result column="cumulative_profit" property="cumulativeProfit" jdbcType="DECIMAL" />
@@ -20,7 +22,7 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, product_no, product_name, level, estimate_rate, monthly_fee, description, param_config, total_amount,
+    id, product_no, product_name, level, estimate_rate, monthly_fee, monthly_ratio, top_limit, bottom_limit, description, total_amount,
     profit_ratio, cumulative_profit, buy_count, status, remark, create_time, update_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
@@ -38,11 +40,11 @@
       SELECT LAST_INSERT_ID()
     </selectKey>
     insert into w_order_product (product_no, product_name, level, estimate_rate,
-    monthly_fee, description, param_config,
+    monthly_fee, monthly_ratio, top_limit, bottom_limit, description,
     total_amount, profit_ratio, cumulative_profit,
     buy_count, status, remark, create_time, update_time)
     values (#{productNo,jdbcType=VARCHAR}, #{productName,jdbcType=VARCHAR}, #{level,jdbcType=INTEGER}, #{estimateRate,jdbcType=DECIMAL},
-    #{monthlyFee,jdbcType=DECIMAL}, #{description,jdbcType=VARCHAR}, #{paramConfig,jdbcType=LONGVARCHAR},
+    #{monthlyFee,jdbcType=DECIMAL}, #{monthlyRatio,jdbcType=DECIMAL}, #{topLimit,jdbcType=DECIMAL}, #{bottomLimit,jdbcType=DECIMAL}, #{description,jdbcType=VARCHAR},
     #{totalAmount,jdbcType=DECIMAL}, #{profitRatio,jdbcType=DECIMAL}, #{cumulativeProfit,jdbcType=DECIMAL},
     #{buyCount,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{remark,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
     #{updateTime,jdbcType=TIMESTAMP})
@@ -68,11 +70,17 @@
       <if test="monthlyFee != null" >
         monthly_fee,
       </if>
+      <if test="monthlyRatio != null" >
+        monthly_ratio,
+      </if>
+      <if test="topLimit != null" >
+        top_limit,
+      </if>
+      <if test="bottomLimit != null" >
+        bottom_limit,
+      </if>
       <if test="description != null" >
         description,
-      </if>
-      <if test="paramConfig != null" >
-        param_config,
       </if>
       <if test="totalAmount != null" >
         total_amount,
@@ -115,11 +123,17 @@
       <if test="monthlyFee != null" >
         #{monthlyFee,jdbcType=DECIMAL},
       </if>
+      <if test="monthlyRatio != null" >
+        #{monthlyRatio,jdbcType=DECIMAL},
+      </if>
+      <if test="topLimit != null" >
+        #{topLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="bottomLimit != null" >
+        #{bottomLimit,jdbcType=DECIMAL},
+      </if>
       <if test="description != null" >
         #{description,jdbcType=VARCHAR},
-      </if>
-      <if test="paramConfig != null" >
-        #{paramConfig,jdbcType=LONGVARCHAR},
       </if>
       <if test="totalAmount != null" >
         #{totalAmount,jdbcType=DECIMAL},
@@ -165,11 +179,17 @@
       <if test="monthlyFee != null" >
         monthly_fee = #{monthlyFee,jdbcType=DECIMAL},
       </if>
+      <if test="monthlyRatio != null" >
+        monthly_ratio = #{monthlyRatio,jdbcType=DECIMAL},
+      </if>
+      <if test="topLimit != null" >
+        top_limit = #{topLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="bottomLimit != null" >
+        bottom_limit = #{bottomLimit,jdbcType=DECIMAL},
+      </if>
       <if test="description != null" >
         description = #{description,jdbcType=VARCHAR},
-      </if>
-      <if test="paramConfig != null" >
-        param_config = #{paramConfig,jdbcType=LONGVARCHAR},
       </if>
       <if test="totalAmount != null" >
         total_amount = #{totalAmount,jdbcType=DECIMAL},
@@ -205,8 +225,10 @@
         level = #{level,jdbcType=INTEGER},
         estimate_rate = #{estimateRate,jdbcType=DECIMAL},
         monthly_fee = #{monthlyFee,jdbcType=DECIMAL},
+        monthly_ratio = #{monthlyRatio,jdbcType=DECIMAL},
+        top_limit = #{topLimit,jdbcType=DECIMAL},
+        bottom_limit = #{bottomLimit,jdbcType=DECIMAL},
         description = #{description,jdbcType=VARCHAR},
-        param_config = #{paramConfig,jdbcType=LONGVARCHAR},
         total_amount = #{totalAmount,jdbcType=DECIMAL},
         profit_ratio = #{profitRatio,jdbcType=DECIMAL},
         cumulative_profit = #{cumulativeProfit,jdbcType=DECIMAL},
@@ -218,6 +240,59 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
 
+
+  <update id="updateBuyCount" parameterType="java.lang.Integer" >
+    update
+        w_order_product
+    set
+        buy_count = (
+            select
+                count(1)as num
+            from
+                w_order_info
+            where
+                product_id = #{id,jdbcType=INTEGER}
+        )
+    where
+        id = #{id,jdbcType=INTEGER}
+  </update>
+
+
+  <update id="updateTotalAmount" parameterType="java.lang.Integer" >
+    update
+        w_order_product
+    set
+        total_amount = (
+            select
+                IFNULL(sum(ot.amount),0.0)as num
+            from
+                w_order_info as o
+            left join
+                w_order_trade as ot on ot.order_no = o.order_no
+            where
+                o.product_id = #{id,jdbcType=INTEGER}
+        )
+    where
+        id = #{id,jdbcType=INTEGER}
+  </update>
+
+
+  <update id="updateEstimateRate" parameterType="java.lang.Integer" >
+    update
+        w_order_product
+    set
+        estimate_rate = (
+            select
+                IFNULL(sum(annualized_rate),0.0) / count(1)
+            from
+                w_order_info
+            where
+                product_id = #{id,jdbcType=INTEGER}
+        )
+    where
+        id = #{id,jdbcType=INTEGER}
+  </update>
+
   <select id="selectProductList" resultType="com.example.core.common.vo.product.ProductListVO">
     select
     id,
@@ -226,6 +301,7 @@
     level,
     estimate_rate as annualRate,
     monthly_fee as monthlyFee,
+    monthly_ratio as monthlyRatio,
     buy_count as buyCount,
     total_amount as totalAmount,
     profit_ratio as profitRatio
@@ -246,9 +322,11 @@
       level,
       estimate_rate as annualRate,
       monthly_fee as monthlyFee,
+      monthly_ratio as monthlyRatio,
       description,
-      param_config as paramConfig,
-      cumulative_profit as cumulativeProfit,
+      top_limit as topLimit,
+      bottom_limit as bottomLimit,
+      cumulative_profit as cumulativeProfit
     from w_order_product
     where id = #{id} and status = 0
   </select>

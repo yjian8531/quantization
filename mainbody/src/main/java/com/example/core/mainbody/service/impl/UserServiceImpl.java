@@ -65,6 +65,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private FinanceDetailMapper userFinanceDetailMapper;
 
+    @Autowired
+    private OrderInfoMapper orderInfoMapper;
+
 
 //    @Autowired
 //    private AdminPromotionAccountMapper adminPromotionAccountMapper;
@@ -427,7 +430,7 @@ public class UserServiceImpl implements UserService {
         Map<String, Object> redisMap = new HashMap<>();
         redisMap.put("userInfo", userInfo);
         redisMap.put("str", randomStr);
-        RedisUtil.setEx(userInfo.getUserId(), JSONObject.fromObject(redisMap).toString(), 10800);
+        RedisUtil.setEx(userInfo.getUserId(), JSONObject.fromObject(redisMap).toString(), 604800);//登录缓存7天
 
         // 生成 Token
         String token = InterceptorUtil.getToken(userInfo.getUserId(), randomStr);
@@ -628,8 +631,8 @@ public class UserServiceImpl implements UserService {
             userFinanceMapper.insertSelective(userFinance);
         }
 
-        // 【新增】从财务明细表查询累计收益（佣金+续费）
-        BigDecimal totalProfit = userFinanceDetailMapper.selectTotalProfit(userId);
+        // 从策略机器人订单表查询用户所有机器人的累计交易收益
+        BigDecimal totalProfit = orderInfoMapper.selectTotalIncomeByUserId(userId);
         if (totalProfit == null) {
             totalProfit = BigDecimal.ZERO;
         }

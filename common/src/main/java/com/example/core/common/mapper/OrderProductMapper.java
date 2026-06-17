@@ -66,4 +66,25 @@ public interface OrderProductMapper {
     /** 查询产品列表（管理端，所有状态） */
     List<OrderProduct> selectAdminProductList(@Param("level") Integer level, @Param("status") Integer status);
 
+    /**
+     *  更新产品的购买数量
+     * @param id
+     * @return
+     */
+    int updateBuyCount(@Param("id") Integer id);
+
+    /**
+     *  更新产品的累计交易额
+     * @param id
+     * @return
+     */
+    int updateTotalAmount(@Param("id") Integer id);
+
+    /**
+     *  更新产品的预估年化率
+     * @param id
+     * @return
+     */
+    int updateEstimateRate(@Param("id") Integer id);
+
 }

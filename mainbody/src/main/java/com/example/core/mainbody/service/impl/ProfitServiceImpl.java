@@ -1,7 +1,7 @@
 package com.example.core.mainbody.service.impl;
 
-import com.example.core.common.entity.ProfitRecord;
-import com.example.core.common.mapper.ProfitRecordMapper;
+import com.example.core.common.entity.OrderPosition;
+import com.example.core.common.mapper.OrderPositionMapper;
 import com.example.core.common.utils.DateUtil;
 import com.example.core.common.utils.ResultMessage;
 import com.example.core.common.vo.profitrecord.ProfitRecordVO;
@@ -28,28 +28,24 @@ import java.util.*;
 public class ProfitServiceImpl implements ProfitService {
 
     @Autowired
-    private ProfitRecordMapper profitRecordMapper;
+    private OrderPositionMapper orderPositionMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int addProfitRecord(ProfitRecord record) {
+    public int addProfitRecord(OrderPosition record) {
         if (record == null) {
             throw new RuntimeException("记录不能为空");
         }
-        record.setCreateTime(new Date());
-        if (record.getProfitAmount() != null) {
-            record.setStatus(record.getProfitAmount().compareTo(BigDecimal.ZERO) >= 0);
-        }
-        return profitRecordMapper.insertSelective(record);
+        return orderPositionMapper.insertSelective(record);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int updateProfitRecord(ProfitRecord record) {
+    public int updateProfitRecord(OrderPosition record) {
         if (record == null || record.getId() == null) {
             throw new RuntimeException("ID 不能为空");
         }
-        return profitRecordMapper.updateByPrimaryKeySelective(record);
+        return orderPositionMapper.updateByPrimaryKeySelective(record);
     }
 
     @Override
@@ -58,27 +54,27 @@ public class ProfitServiceImpl implements ProfitService {
         if (id == null) {
             throw new RuntimeException("ID 不能为空");
         }
-        return profitRecordMapper.deleteByPrimaryKey(id);
+        return orderPositionMapper.deleteByPrimaryKey(id);
     }
 
     @Override
-    public ProfitRecord getProfitRecordDetail(Integer id) {
+    public OrderPosition getProfitRecordDetail(Integer id) {
         if (id == null) {
             throw new RuntimeException("ID 不能为空");
         }
-        return profitRecordMapper.selectByPrimaryKey(id);
+        return orderPositionMapper.selectByPrimaryKey(id);
     }
 
 
 
     /**
      * 查询用户收益记录列表
-     * 对应原型图下方的策略收益明细列表
+     * 数据来源：策略历史仓位表(w_order_position) + 策略订单表(w_order_info)
      */
     @Override
     public ResultMessage queryProfitRecordList(String userId, QueryProfitRecordSO queryProfitRecordSO) {
         PageHelper.startPage(queryProfitRecordSO.getPageNum(), queryProfitRecordSO.getPageSize());
-        Page<ProfitRecordVO> page = (Page<ProfitRecordVO>) profitRecordMapper.selectProfitRecordList(
+        Page<ProfitRecordVO> page = (Page<ProfitRecordVO>) orderPositionMapper.selectUserProfitRecordList(
                 userId,
                 queryProfitRecordSO.getProductName(),
                 queryProfitRecordSO.getProductNo(),
@@ -93,7 +89,7 @@ public class ProfitServiceImpl implements ProfitService {
 
     /**
      * 查询收益趋势数据（折线图）
-     * 对应原型图顶部的收益趋势图表（年/月/天维度）
+     * 数据来源：策略历史仓位表(w_order_position) + 策略订单表(w_order_info)
      */
     @Override
     public ResultMessage queryProfitTrend(String userId, QueryProfitTrendSO queryProfitTrendSO) {
@@ -130,8 +126,8 @@ public class ProfitServiceImpl implements ProfitService {
             startTime = DateUtil.DateToString(calendar.getTime(), "yyyy-MM-dd HH:mm:ss");
         }
 
-        // 3. 执行查询：按指定维度聚合收益数据
-        List<ProfitTrendVO> trendList = profitRecordMapper.selectProfitTrend(
+        // 3. 执行查询：按指定维度聚合收益数据（从策略历史仓位）
+        List<ProfitTrendVO> trendList = orderPositionMapper.selectUserProfitTrend(
                 userId,
                 dimension,
                 startTime,
@@ -143,12 +139,12 @@ public class ProfitServiceImpl implements ProfitService {
 
     /**
      * 导出收益记录列表（Excel）
-     * 对应原型图右上角的蓝色下载按钮
+     * 数据来源：策略历史仓位表(w_order_position)
      */
     @Override
     public void exportProfitRecordList(String userId, QueryProfitRecordSO queryProfitRecordSO, HttpServletResponse response) throws Exception {
         // 1. 查询全量数据（导出功能通常不分页，导出所有符合筛选条件的数据）
-        List<ProfitRecordVO> list = profitRecordMapper.selectProfitRecordList(
+        List<ProfitRecordVO> list = orderPositionMapper.selectUserProfitRecordList(
                 userId,
                 queryProfitRecordSO.getProductName(),
                 queryProfitRecordSO.getProductNo(),
@@ -190,11 +186,12 @@ public class ProfitServiceImpl implements ProfitService {
     }
 
     /**
-     * 查询用户产品列表
+     * 查询用户策略机器人列表（用于下拉筛选）
+     * 数据来源：策略订单表(w_order_info)
      */
     @Override
     public ResultMessage queryUserProducts(String userId) {
-        List<UserProductVO> products = profitRecordMapper.selectUserProducts(userId);
+        List<UserProductVO> products = orderPositionMapper.selectUserOrderProducts(userId);
         if (products == null){
             return new ResultMessage(ResultMessage.FAILED_CODE, ResultMessage.FAILED_MSG, null);
         }

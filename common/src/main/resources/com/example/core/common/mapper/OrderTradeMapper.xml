@@ -209,4 +209,14 @@
     order by ot.create_time desc
   </select>
 
+  <select id="selectTradeTotalAmount" resultType="java.math.BigDecimal">
+    select COALESCE(SUM(amount), 0)
+    from w_order_trade
+  </select>
+
+  <select id="selectTradeTotalCount" resultType="java.lang.Integer">
+    select count(1)
+    from w_order_trade
+  </select>
+
 </mapper>

@@ -4,14 +4,18 @@
   <resultMap id="BaseResultMap" type="com.example.core.common.entity.ProductParam" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="product_id" property="productId" jdbcType="INTEGER" />
+    <result column="strategy_id" property="strategyId" jdbcType="VARCHAR" />
     <result column="param_group" property="paramGroup" jdbcType="VARCHAR" />
     <result column="param_name" property="paramName" jdbcType="VARCHAR" />
+    <result column="param_key" property="paramKey" jdbcType="VARCHAR" />
     <result column="param_value" property="paramValue" jdbcType="VARCHAR" />
+    <result column="describe" property="describe" jdbcType="VARCHAR" />
+    <result column="unit" property="unit" jdbcType="VARCHAR" />
     <result column="sort_order" property="sortOrder" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, product_id, param_group, param_name, param_value, sort_order, create_time
+    id, product_id, strategy_id, param_group, param_name, param_key, param_value, `describe`, unit, sort_order, create_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -27,11 +31,11 @@
     <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER" >
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into w_product_param (product_id, param_group, param_name, 
-      param_value, sort_order, create_time
+    insert into w_product_param (product_id, strategy_id, param_group, param_name, 
+      param_key, param_value, describe, unit, sort_order, create_time
       )
-    values (#{productId,jdbcType=INTEGER}, #{paramGroup,jdbcType=VARCHAR}, #{paramName,jdbcType=VARCHAR}, 
-      #{paramValue,jdbcType=VARCHAR}, #{sortOrder,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}
+    values (#{productId,jdbcType=INTEGER}, #{strategyId,jdbcType=VARCHAR}, #{paramGroup,jdbcType=VARCHAR}, #{paramName,jdbcType=VARCHAR}, 
+      #{paramKey,jdbcType=VARCHAR}, #{paramValue,jdbcType=VARCHAR}, #{describe,jdbcType=VARCHAR}, #{unit,jdbcType=VARCHAR}, #{sortOrder,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.example.core.common.entity.ProductParam" >
@@ -43,14 +47,26 @@
       <if test="productId != null" >
         product_id,
       </if>
+      <if test="strategyId != null" >
+        strategy_id,
+      </if>
       <if test="paramGroup != null" >
         param_group,
       </if>
       <if test="paramName != null" >
         param_name,
       </if>
+      <if test="paramKey != null" >
+        param_key,
+      </if>
       <if test="paramValue != null" >
         param_value,
+      </if>
+      <if test="describe != null" >
+        describe,
+      </if>
+      <if test="unit != null" >
+        unit,
       </if>
       <if test="sortOrder != null" >
         sort_order,
@@ -63,14 +79,26 @@
       <if test="productId != null" >
         #{productId,jdbcType=INTEGER},
       </if>
+      <if test="strategyId != null" >
+        #{strategyId,jdbcType=VARCHAR},
+      </if>
       <if test="paramGroup != null" >
         #{paramGroup,jdbcType=VARCHAR},
       </if>
       <if test="paramName != null" >
         #{paramName,jdbcType=VARCHAR},
       </if>
+      <if test="paramKey != null" >
+        #{paramKey,jdbcType=VARCHAR},
+      </if>
       <if test="paramValue != null" >
         #{paramValue,jdbcType=VARCHAR},
+      </if>
+      <if test="describe != null" >
+        #{describe,jdbcType=VARCHAR},
+      </if>
+      <if test="unit != null" >
+        #{unit,jdbcType=VARCHAR},
       </if>
       <if test="sortOrder != null" >
         #{sortOrder,jdbcType=INTEGER},
@@ -86,14 +114,26 @@
       <if test="productId != null" >
         product_id = #{productId,jdbcType=INTEGER},
       </if>
+      <if test="strategyId != null" >
+        strategy_id = #{strategyId,jdbcType=VARCHAR},
+      </if>
       <if test="paramGroup != null" >
         param_group = #{paramGroup,jdbcType=VARCHAR},
       </if>
       <if test="paramName != null" >
         param_name = #{paramName,jdbcType=VARCHAR},
       </if>
+      <if test="paramKey != null" >
+        param_key = #{paramKey,jdbcType=VARCHAR},
+      </if>
       <if test="paramValue != null" >
         param_value = #{paramValue,jdbcType=VARCHAR},
+      </if>
+      <if test="describe != null" >
+        describe = #{describe,jdbcType=VARCHAR},
+      </if>
+      <if test="unit != null" >
+        unit = #{unit,jdbcType=VARCHAR},
       </if>
       <if test="sortOrder != null" >
         sort_order = #{sortOrder,jdbcType=INTEGER},
@@ -107,9 +147,13 @@
   <update id="updateByPrimaryKey" parameterType="com.example.core.common.entity.ProductParam" >
     update w_product_param
     set product_id = #{productId,jdbcType=INTEGER},
+      strategy_id = #{strategyId,jdbcType=VARCHAR},
       param_group = #{paramGroup,jdbcType=VARCHAR},
       param_name = #{paramName,jdbcType=VARCHAR},
+      param_key = #{paramKey,jdbcType=VARCHAR},
       param_value = #{paramValue,jdbcType=VARCHAR},
+      describe = #{describe,jdbcType=VARCHAR},
+      unit = #{unit,jdbcType=VARCHAR},
       sort_order = #{sortOrder,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
@@ -123,10 +167,18 @@
     order by sort_order asc
   </select>
 
-  <select id="selectByProductId" resultType="com.example.core.common.entity.ProductParam">
-    select id, product_id, param_group, param_name, param_value, sort_order, create_time
+  <select id="selectByProductId" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" />
     from w_product_param
     where product_id = #{productId}
     order by sort_order asc
+  </select>
+
+  <!-- 根据产品ID和策略ID查询参数列表 -->
+  <select id="selectByProductIdAndStrategyId" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" />
+    from w_product_param
+    where product_id = #{productId} and strategy_id = #{strategyId}
+    order by param_group, sort_order asc
   </select>
 </mapper>

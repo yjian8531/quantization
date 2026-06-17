@@ -1,0 +1,71 @@
+#端口配置
+server:
+  port: 8188
+
+#mybatis
+mybatis:
+  mapper-locations: classpath:mapper/*Mapper.xml
+
+spring:
+
+
+
+  #服务名称
+  application:
+    name: mainbody
+
+  #redis
+  redis:
+    host: 127.0.0.1
+    port: 6369
+    password: bly2020!@#
+
+  task:
+    execution:
+      pool:
+        core-size: 10
+        max-size: 20
+        keep-alive: 120s
+        queue-capacity: 1000
+        allow-core-thread-timeout: true
+
+  #mysql
+  datasource:
+    url: jdbc:mysql://bly.rwlb.rds.aliyuncs.com:3578/blyamzdb?useUnicode=true&characterEncoding=utf8&useSSL=false
+    username: baoliannetcloud
+    password: y38B70HDKD06Z3Oi1H7A
+    driver-class-name: com.mysql.jdbc.Driver
+    max-idle: 10
+    max-wait: 86400
+    min-idle: 5
+    initial-size: 5
+
+      # 文件上传配置 (关键：必须挂在 spring 下，且与 datasource 并列)
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+#配置分页插件pagehelper
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+
+
+aes:
+  encryptkey: EF01781D65D45A76
+
+web:
+  upload-path: /app/upload/img/
+  access-path: https://www.pioneerqt.com/show/
+
+
+
+#日志配置
+logging:
+  config: classpath:logging-config.xml
+
+init:
+  request: /platform/user/logon/device

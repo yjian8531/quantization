@@ -59,4 +59,7 @@ public interface ApikeyInfoMapper {
     /** 根据ID和用户ID查询APIKey */
     ApikeyInfo selectByIdAndUserId(@Param("id") Integer id, @Param("userId") String userId);
 
+    /** 根据apikey字段查询（用于判断唯一性） */
+    ApikeyInfo selectByApikey(@Param("apikey") String apikey);
+
 }

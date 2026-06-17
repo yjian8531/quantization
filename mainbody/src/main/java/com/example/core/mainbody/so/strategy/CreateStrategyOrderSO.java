@@ -21,7 +21,7 @@ public class CreateStrategyOrderSO {
     private String symbol;
 
     /**
-     * K线时间节点(分钟)
+     * K线时间节点（5m,15m,30m,1h,4h,1d）
      */
     private String nodeTime;
 

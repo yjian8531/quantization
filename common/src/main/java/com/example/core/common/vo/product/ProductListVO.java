@@ -25,6 +25,9 @@ public class ProductListVO {
     /** 月租金额（USDT） */
     private BigDecimal monthlyFee;
 
+    /** 月租比率（%） */
+    private BigDecimal monthlyRatio;
+
     /** 已购买人数 */
     private Integer buyCount;
 

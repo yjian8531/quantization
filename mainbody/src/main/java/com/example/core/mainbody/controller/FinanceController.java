@@ -52,7 +52,7 @@ public class FinanceController extends BaseController {
     /**
      * 获取充值总量概览
      */
-    @PostMapping(value = "/recharge/overview", produces = {"application/json"})
+    @GetMapping(value = "/recharge/overview", produces = {"application/json"})
     public ResultMessage getRechargeOverview() {
         UserInfo userInfo = this.getLoginUser();
         return financeService.getRechargeOverview(userInfo.getUserId());
@@ -74,7 +74,7 @@ public class FinanceController extends BaseController {
      * 查询推广信息统计
      *
      */
-    @PostMapping(value = "/stats", produces = {"application/json"})
+    @GetMapping(value = "/stats", produces = {"application/json"})
     public ResultMessage queryPromotionStats() {
         UserInfo userInfo = this.getLoginUser();
         return financeService.queryPromotionStats(userInfo.getUserId());

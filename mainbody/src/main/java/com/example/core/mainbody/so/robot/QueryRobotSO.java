@@ -11,4 +11,7 @@ public class QueryRobotSO {
 
     /** 交易所筛选：null=全部，0=币安，1=波场 */
     private Integer exchange;
+
+    /** 排序方式：createTime=创建时间倒序(默认)，income=总收益倒序，runDays=运行时长倒序 */
+    private String sortType = "createTime";
 }

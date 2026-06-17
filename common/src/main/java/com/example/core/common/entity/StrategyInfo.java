@@ -22,7 +22,7 @@ public class StrategyInfo {
      */
     private String versionNo;
     /**
-     * 排序
+     * 排序(越小优先级越高)
      */
     private Integer sort;
     /**

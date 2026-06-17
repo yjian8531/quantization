@@ -12,6 +12,6 @@ public class QueryHistoryPositionSO {
 
     private Integer pageSize = 10;
 
-    /** 订单ID */
-    private Integer orderId;
+    /** 订单编号 */
+    private String orderNo;
 }

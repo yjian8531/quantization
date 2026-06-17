@@ -13,5 +13,5 @@ public class QueryTradeRecordSO {
     private Integer pageSize = 10;
 
     /** 订单ID */
-    private Integer orderId;
+    private String orderNo;
 }

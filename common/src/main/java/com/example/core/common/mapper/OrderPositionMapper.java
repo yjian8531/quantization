@@ -1,7 +1,11 @@
 package com.example.core.common.mapper;
 
 import com.example.core.common.entity.OrderPosition;
+import com.example.core.common.vo.profitrecord.ProfitRecordVO;
+import com.example.core.common.vo.profitrecord.ProfitTrendVO;
+import com.example.core.common.vo.profitrecord.UserProductVO;
 import com.example.core.common.vo.robot.HistoryPositionVO;
+import com.example.core.common.vo.robot.ProfitRecordItem;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -62,5 +66,24 @@ public interface OrderPositionMapper {
 
     /** 查询已平仓仓位用于绘制收益曲线（按结束时间升序） */
     List<OrderPosition> selectProfitCurveByOrderNo(@Param("orderNo") String orderNo);
+
+    /** 按时间维度聚合收益（月/天） */
+    List<ProfitRecordItem> selectAggregatedProfit(@Param("orderNo") String orderNo, @Param("dimension") String dimension);
+
+    /** 查询用户收益记录列表（从策略历史仓位关联用户订单） */
+    List<ProfitRecordVO> selectUserProfitRecordList(@Param("userId") String userId,
+                                                     @Param("productName") String productName,
+                                                     @Param("productNo") String productNo,
+                                                     @Param("startTime") String startTime,
+                                                     @Param("endTime") String endTime);
+
+    /** 查询用户收益趋势数据（年/月/天维度聚合，从策略历史仓位） */
+    List<ProfitTrendVO> selectUserProfitTrend(@Param("userId") String userId,
+                                               @Param("dimension") String dimension,
+                                               @Param("startTime") String startTime,
+                                               @Param("endTime") String endTime);
+
+    /** 查询用户的策略机器人列表（用于下拉框筛选） */
+    List<UserProductVO> selectUserOrderProducts(@Param("userId") String userId);
 
 }

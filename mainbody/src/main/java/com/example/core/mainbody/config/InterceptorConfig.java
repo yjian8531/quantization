@@ -47,7 +47,15 @@ public class InterceptorConfig extends WebMvcConfigurerAdapter {
                 .excludePathPatterns(
                         "/order/trade",                   // 接收交易日志
                         "/order/position",                // 接收仓位日志
-                        "/order/symbol/list"
+                        "/order/symbol/list",             // 获取币对列表
+                        "/order/robot/public/list",        // 查询公开机器人列表
+                        "/order/profit/curve",             // 查询机器人收益曲线
+                        "/order/position/history",        // 查询机器人历史仓位
+                        "/order/trade/record",            // 查询机器人交易记录
+                        "/order/robot/public/detail",      // 查询公开机器人详细
+                        "/order/check/param",                // 策略参数风控评估
+                        "/order/update/income",                // 更新订单收益、收益率及年化率
+                        "/order/status"                     //接收策略心跳机制推送
                 );
         //收益模块
         registry.addInterceptor(userInterceptor)
@@ -63,13 +71,20 @@ public class InterceptorConfig extends WebMvcConfigurerAdapter {
                 .excludePathPatterns(
                         "/product/list",                 // 产品列表
                         "/product/detail",               // 产品详情
-                        "/product/level/list"            // 产品等级列表
+                        "/product/admin/list",           // 产品列表-管理后台
+                        "/product/symbol/list",          // 获取币对列表
+                        "/product/summary",               // 平台首页汇总数据
+                        "/product/param/config"          // 查询产品配置参数信息
                 );
 
 
         //消息模块
         registry.addInterceptor(userInterceptor)
                 .addPathPatterns("/message/**");
+
+        // 6. 钱包模块（全部需要 token）
+        registry.addInterceptor(userInterceptor)
+                .addPathPatterns("/wallet/**");
 
 
         // 钱包模块

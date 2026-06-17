@@ -8,15 +8,18 @@ import lombok.Data;
 @Data
 public class ParamConfigItemVO {
 
-    /** 显示名称（如：本金、杠杆倍数） */
-    private String nike;
+    /** 显示名称（如：本金、初始开仓金额） */
+    private String name;
 
-    /** 字段标识（如：AccountAmount、Lever） */
-    private String field;
+    /** 字段标识Key（如：AccountAmount、FirstOrderAmount） */
+    private String key;
+
+    /** 参数值 */
+    private String value;
 
     /** 单位（如：USDT、倍、%） */
     private String unit;
 
-    /** 实际值（从产品表的 param_config 里取，或前端提交时传入） */
-    private Object value;
+    /** 参数描述 */
+    private String describe;
 }

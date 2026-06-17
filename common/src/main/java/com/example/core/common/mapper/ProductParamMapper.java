@@ -28,4 +28,10 @@ public interface ProductParamMapper {
 
     /** 根据产品 ID 查询所有参数 */
     List<ProductParam> selectByProductId(@Param("productId") Integer productId);
+
+    /** 根据产品ID和策略ID查询参数列表 */
+    List<ProductParam> selectByProductIdAndStrategyId(
+            @Param("productId") Integer productId,
+            @Param("strategyId") String strategyId
+    );
 }

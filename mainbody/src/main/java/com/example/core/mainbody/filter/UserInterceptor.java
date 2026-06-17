@@ -67,6 +67,7 @@ public class UserInterceptor implements HandlerInterceptor {
                         if(sysOperation != null && sysOperation.getType() == 1){//判断是否需要进行重复操作限制
                             String key = json.getJSONObject("userInfo").getString("account")+":"+url+":"+paramStr;
                             if("Y".equals(RedisUtil.get(Base64.getEncoder().encodeToString(key.getBytes())))){
+                                response.setContentType("application/json;charset=UTF-8");
                                 ServletOutputStream out = response.getOutputStream();
                                 ResultMessage result = new ResultMessage(ResultMessage.FAILED_CODE,"Do not repeat the operation");
                                 out.print(JSONObject.fromObject(result).toString());
@@ -90,7 +91,6 @@ public class UserInterceptor implements HandlerInterceptor {
 
                         return true;
                     }else{
-                        //response.setStatus(3333);
                         response.setContentType("application/json;charset=UTF-8");
                         ServletOutputStream out = response.getOutputStream();
                         ResultMessage result = new ResultMessage("3333","invalid_hash_value");
@@ -98,7 +98,10 @@ public class UserInterceptor implements HandlerInterceptor {
                         return false;
                     }
                 }else{
+<<<<<<< HEAD
                     //response.setStatus(3333);
+=======
+>>>>>>> 1901239 (修复第一版本)
                     response.setContentType("application/json;charset=UTF-8");
                     ServletOutputStream out = response.getOutputStream();
                     ResultMessage result = new ResultMessage("3333","invalid_hash_value");
@@ -108,7 +111,10 @@ public class UserInterceptor implements HandlerInterceptor {
             }
 
         }
+<<<<<<< HEAD
         //response.setStatus(3333);
+=======
+>>>>>>> 1901239 (修复第一版本)
         response.setContentType("application/json;charset=UTF-8");
         ServletOutputStream out = response.getOutputStream();
         ResultMessage result = new ResultMessage("3333","invalid_hash_value");

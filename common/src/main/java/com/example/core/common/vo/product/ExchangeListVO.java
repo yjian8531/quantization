@@ -20,8 +20,8 @@ public class ExchangeListVO {
     /** 类型(0:现货,1:期货) */
     private Integer type;
 
-    /** 类型名称 */
-    private String typeName;
+    /** API Key名称 */
+    private String name;
 
     /** 状态(0:正常,1:禁用) */
     private Integer status;

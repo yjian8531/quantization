@@ -20,7 +20,7 @@ public class TradeRecordVO {
     /** 交易单号 */
     private String tradeNo;
 
-    /** 交易方向（buy=买/sell=卖） */
+    /** 交易方向（交易方向(openBuy:买入开多/openSell:卖出开空/closeBuy:卖出平多/closeSell:买入平空) */
     private String tradeBl;
 
     /** 交易方向名称 */

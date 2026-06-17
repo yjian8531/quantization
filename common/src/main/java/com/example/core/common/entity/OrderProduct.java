@@ -39,14 +39,24 @@ public class OrderProduct {
     private BigDecimal monthlyFee;
 
     /**
+     * 月租比率（%）
+     */
+    private BigDecimal monthlyRatio;
+
+    /**
+     * 最高投入限制（USDT）
+     */
+    private BigDecimal topLimit;
+
+    /**
+     * 最低投入限制（USDT）
+     */
+    private BigDecimal bottomLimit;
+
+    /**
      * 产品说明
      */
     private String description;
-
-    /**
-     * 参数配置(JSON)
-     */
-    private String paramConfig;
 
     /**
      * 累计交易额（USDT）
